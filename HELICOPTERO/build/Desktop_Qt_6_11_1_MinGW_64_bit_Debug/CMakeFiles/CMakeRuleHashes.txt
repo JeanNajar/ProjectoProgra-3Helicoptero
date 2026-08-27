@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+2f4dd560a977c23cca4f62aa3b39e088 CMakeFiles/HELICOPTERO_autogen
+cac43e7a00c77f2772abe4737c536b12 HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp
+a960573eeefaecd3eaede386db730fcf HELICOPTERO_autogen/timestamp

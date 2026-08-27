@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/Sounds">
+        <file>recursosh/HelicopteroSound.mp3</file>
+        <file>recursosh/CrashSound.mp3</file>
+    </qresource>
+</RCC>
