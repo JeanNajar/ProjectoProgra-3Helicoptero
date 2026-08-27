@@ -8,6 +8,9 @@ HELICOPTERO_autogen/timestamp: \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.h \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.cpp \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.h \
+	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleManager.cpp \
+	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleManager.h \
+	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleType.h \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ResourcesForProject.qrc \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Score.cpp \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Score.h \

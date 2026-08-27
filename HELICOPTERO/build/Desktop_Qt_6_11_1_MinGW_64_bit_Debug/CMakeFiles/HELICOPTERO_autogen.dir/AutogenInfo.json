@@ -436,6 +436,18 @@
 			null
 		],
 		[
+			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/ObstacleManager.h",
+			"MU",
+			"EWIEGA46WW/moc_ObstacleManager.cpp",
+			null
+		],
+		[
+			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/ObstacleType.h",
+			"MU",
+			"EWIEGA46WW/moc_ObstacleType.cpp",
+			null
+		],
+		[
 			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/Score.h",
 			"MU",
 			"EWIEGA46WW/moc_Score.cpp",
@@ -535,6 +547,11 @@
 		],
 		[
 			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/ObstacleH.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/ObstacleManager.cpp",
 			"MU",
 			null
 		],

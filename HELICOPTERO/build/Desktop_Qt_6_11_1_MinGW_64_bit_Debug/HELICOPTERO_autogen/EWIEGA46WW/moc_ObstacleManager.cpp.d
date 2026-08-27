@@ -1,5 +1,6 @@
-C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/EWIEGA46WW/moc_ObstacleH.cpp: C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.h \
+C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/EWIEGA46WW/moc_ObstacleManager.cpp: C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleManager.h \
   C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/moc_predefs.h \
+  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.h \
   C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleType.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
   C:/Qt/6.11.1/mingw_64/include/QtCore/q17memory.h \
@@ -41,6 +42,7 @@ C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_M
   C:/Qt/6.11.1/mingw_64/include/QtCore/qdarwinhelpers.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qdatastream.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qdebug.h \
+  C:/Qt/6.11.1/mingw_64/include/QtCore/qendian.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qexceptionhandling.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qflags.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qfloat16.h \
@@ -130,10 +132,13 @@ C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_M
   C:/Qt/6.11.1/mingw_64/include/QtCore/qversiontagging.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qxptype_traits.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qyieldcpu.h \
+  C:/Qt/6.11.1/mingw_64/include/QtGui/qbrush.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qcolor.h \
+  C:/Qt/6.11.1/mingw_64/include/QtGui/qfont.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qimage.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qpaintdevice.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qpainterpath.h \
+  C:/Qt/6.11.1/mingw_64/include/QtGui/qpen.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qpixelformat.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qpixmap.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qpolygon.h \
@@ -154,7 +159,9 @@ C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_M
   C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
   C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaglobal.h \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
+  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsScene \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsitem.h \
+  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsscene.h \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgets-config.h \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgetsexports.h \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgetsglobal.h \

@@ -410,24 +410,26 @@ CMakeFiles/HELICOPTERO.dir/ObstacleH.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qtimer.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QList \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QDebug \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QAudioOutput \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudiooutput.h \
+ C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QMediaPlayer \
+ C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qmediaplayer.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qurl.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaglobal.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimedia-config.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtaudio.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudio.h \
+ C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QAudioOutput \
+ C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudiooutput.h \
  C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleH.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsitem.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qpainterpath.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QMediaPlayer \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qmediaplayer.h \
- C:/Qt/6.11.1/mingw_64/include/QtCore/qurl.h \
+ C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleType.h \
  C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\MyHeli.h \
  C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\GAME.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QWidget \
  C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Score.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Health.h
+ C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Health.h \
+ C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleManager.h

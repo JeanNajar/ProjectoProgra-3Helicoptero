@@ -343,6 +343,30 @@ ObstacleH.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/ObstacleH.cpp.s
 .PHONY : ObstacleH.cpp.s
 
+ObstacleManager.obj: ObstacleManager.cpp.obj
+.PHONY : ObstacleManager.obj
+
+# target to build an object file
+ObstacleManager.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.obj
+.PHONY : ObstacleManager.cpp.obj
+
+ObstacleManager.i: ObstacleManager.cpp.i
+.PHONY : ObstacleManager.i
+
+# target to preprocess a source file
+ObstacleManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.i
+.PHONY : ObstacleManager.cpp.i
+
+ObstacleManager.s: ObstacleManager.cpp.s
+.PHONY : ObstacleManager.s
+
+# target to generate assembly for a file
+ObstacleManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.s
+.PHONY : ObstacleManager.cpp.s
+
 Score.obj: Score.cpp.obj
 .PHONY : Score.obj
 
@@ -424,6 +448,9 @@ help:
 	@echo ... ObstacleH.obj
 	@echo ... ObstacleH.i
 	@echo ... ObstacleH.s
+	@echo ... ObstacleManager.obj
+	@echo ... ObstacleManager.i
+	@echo ... ObstacleManager.s
 	@echo ... Score.obj
 	@echo ... Score.i
 	@echo ... Score.s

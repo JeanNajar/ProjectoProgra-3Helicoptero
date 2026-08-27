@@ -14,6 +14,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/HELICOPTERO.dir/MyHeli.cpp.obj.d"
   "CMakeFiles/HELICOPTERO.dir/ObstacleH.cpp.obj"
   "CMakeFiles/HELICOPTERO.dir/ObstacleH.cpp.obj.d"
+  "CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.obj"
+  "CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.obj.d"
   "CMakeFiles/HELICOPTERO.dir/Score.cpp.obj"
   "CMakeFiles/HELICOPTERO.dir/Score.cpp.obj.d"
   "CMakeFiles/HELICOPTERO.dir/main.cpp.obj"

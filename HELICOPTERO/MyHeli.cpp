@@ -2,7 +2,6 @@
 #include <QKeyEvent>
 #include <QGraphicsScene>
 #include <QAudioOutput>
-#include "ObstacleH.h"
 #include <QGraphicsItem>
 
 
@@ -29,13 +28,3 @@ void MyHeli::keyPressEvent(QKeyEvent *event)
     }
 
 }
-
-void MyHeli::spawn(){
-  //crear obstaculo
-  ObstacleH * obstaculo = new ObstacleH();
-
-  obstaculo->setPos(scene()->width(), 300);
-  scene()->addItem(obstaculo);
-
-}
-

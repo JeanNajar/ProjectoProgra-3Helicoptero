@@ -2,3 +2,4 @@
 #include "EWIEGA46WW/moc_GAME.cpp"
 #include "EWIEGA46WW/moc_MyHeli.cpp"
 #include "EWIEGA46WW/moc_ObstacleH.cpp"
+#include "EWIEGA46WW/moc_ObstacleManager.cpp"

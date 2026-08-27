@@ -418,5 +418,4 @@ CMakeFiles/HELICOPTERO.dir/MyHeli.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qpen.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QAudioOutput \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudiooutput.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleH.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsItem

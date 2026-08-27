@@ -34,6 +34,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Health.h
         Health.cpp
         ResourcesForProject.qrc
+        ObstacleType.h
+        ObstacleManager.h
+        ObstacleManager.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET HELICOPTERO APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

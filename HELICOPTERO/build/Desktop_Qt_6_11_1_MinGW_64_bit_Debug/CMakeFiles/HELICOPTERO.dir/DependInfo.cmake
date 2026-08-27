@@ -15,6 +15,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/Health.cpp" "CMakeFiles/HELICOPTERO.dir/Health.cpp.obj" "gcc" "CMakeFiles/HELICOPTERO.dir/Health.cpp.obj.d"
   "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/MyHeli.cpp" "CMakeFiles/HELICOPTERO.dir/MyHeli.cpp.obj" "gcc" "CMakeFiles/HELICOPTERO.dir/MyHeli.cpp.obj.d"
   "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/ObstacleH.cpp" "CMakeFiles/HELICOPTERO.dir/ObstacleH.cpp.obj" "gcc" "CMakeFiles/HELICOPTERO.dir/ObstacleH.cpp.obj.d"
+  "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/ObstacleManager.cpp" "CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.obj" "gcc" "CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.obj.d"
   "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/Score.cpp" "CMakeFiles/HELICOPTERO.dir/Score.cpp.obj" "gcc" "CMakeFiles/HELICOPTERO.dir/Score.cpp.obj.d"
   "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/main.cpp" "CMakeFiles/HELICOPTERO.dir/main.cpp.obj" "gcc" "CMakeFiles/HELICOPTERO.dir/main.cpp.obj.d"
   )
