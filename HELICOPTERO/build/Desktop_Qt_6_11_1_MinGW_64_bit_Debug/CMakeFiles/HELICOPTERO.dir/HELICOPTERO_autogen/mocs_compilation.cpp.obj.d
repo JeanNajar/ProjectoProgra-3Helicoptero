@@ -408,6 +408,7 @@ CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtaudio.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudio.h \
+ C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Physics.h \
  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Score.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Health.h \

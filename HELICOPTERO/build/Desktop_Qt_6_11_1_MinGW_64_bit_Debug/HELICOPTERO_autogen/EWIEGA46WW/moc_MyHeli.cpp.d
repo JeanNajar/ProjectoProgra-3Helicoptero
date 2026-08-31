@@ -1,5 +1,6 @@
 C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/EWIEGA46WW/moc_MyHeli.cpp: C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.h \
   C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/moc_predefs.h \
+  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Physics.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
   C:/Qt/6.11.1/mingw_64/include/QtCore/q17memory.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/q20bit.h \

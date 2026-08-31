@@ -427,6 +427,7 @@ CMakeFiles/HELICOPTERO.dir/ObstacleH.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
  C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleType.h \
  C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\MyHeli.h \
+ C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Physics.h \
  C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\GAME.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QWidget \
  C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Score.h \

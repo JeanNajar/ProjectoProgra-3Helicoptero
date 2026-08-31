@@ -367,6 +367,30 @@ ObstacleManager.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.s
 .PHONY : ObstacleManager.cpp.s
 
+Physics.obj: Physics.cpp.obj
+.PHONY : Physics.obj
+
+# target to build an object file
+Physics.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Physics.cpp.obj
+.PHONY : Physics.cpp.obj
+
+Physics.i: Physics.cpp.i
+.PHONY : Physics.i
+
+# target to preprocess a source file
+Physics.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Physics.cpp.i
+.PHONY : Physics.cpp.i
+
+Physics.s: Physics.cpp.s
+.PHONY : Physics.s
+
+# target to generate assembly for a file
+Physics.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Physics.cpp.s
+.PHONY : Physics.cpp.s
+
 Score.obj: Score.cpp.obj
 .PHONY : Score.obj
 
@@ -451,6 +475,9 @@ help:
 	@echo ... ObstacleManager.obj
 	@echo ... ObstacleManager.i
 	@echo ... ObstacleManager.s
+	@echo ... Physics.obj
+	@echo ... Physics.i
+	@echo ... Physics.s
 	@echo ... Score.obj
 	@echo ... Score.i
 	@echo ... Score.s

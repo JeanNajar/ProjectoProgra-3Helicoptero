@@ -204,11 +204,26 @@ CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.s"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\ObstacleManager.cpp" -o CMakeFiles\HELICOPTERO.dir\ObstacleManager.cpp.s
 
+CMakeFiles/HELICOPTERO.dir/Physics.cpp.obj: CMakeFiles/HELICOPTERO.dir/flags.make
+CMakeFiles/HELICOPTERO.dir/Physics.cpp.obj: CMakeFiles/HELICOPTERO.dir/includes_CXX.rsp
+CMakeFiles/HELICOPTERO.dir/Physics.cpp.obj: C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Physics.cpp
+CMakeFiles/HELICOPTERO.dir/Physics.cpp.obj: CMakeFiles/HELICOPTERO.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/HELICOPTERO.dir/Physics.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/HELICOPTERO.dir/Physics.cpp.obj -MF CMakeFiles\HELICOPTERO.dir\Physics.cpp.obj.d -o CMakeFiles\HELICOPTERO.dir\Physics.cpp.obj -c "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\Physics.cpp"
+
+CMakeFiles/HELICOPTERO.dir/Physics.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/HELICOPTERO.dir/Physics.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\Physics.cpp" > CMakeFiles\HELICOPTERO.dir\Physics.cpp.i
+
+CMakeFiles/HELICOPTERO.dir/Physics.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/HELICOPTERO.dir/Physics.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\Physics.cpp" -o CMakeFiles\HELICOPTERO.dir\Physics.cpp.s
+
 CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp.obj: CMakeFiles/HELICOPTERO.dir/flags.make
 CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp.obj: CMakeFiles/HELICOPTERO.dir/includes_CXX.rsp
 CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp.obj: HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp
 CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp.obj: CMakeFiles/HELICOPTERO.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp.obj -MF CMakeFiles\HELICOPTERO.dir\HELICOPTERO_autogen\EWIEGA46WW\qrc_ResourcesForProject.cpp.obj.d -o CMakeFiles\HELICOPTERO.dir\HELICOPTERO_autogen\EWIEGA46WW\qrc_ResourcesForProject.cpp.obj -c "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW\qrc_ResourcesForProject.cpp"
 
 CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp.i: cmake_force
@@ -229,6 +244,7 @@ HELICOPTERO_OBJECTS = \
 "CMakeFiles/HELICOPTERO.dir/Score.cpp.obj" \
 "CMakeFiles/HELICOPTERO.dir/Health.cpp.obj" \
 "CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.obj" \
+"CMakeFiles/HELICOPTERO.dir/Physics.cpp.obj" \
 "CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp.obj"
 
 # External object files for target HELICOPTERO
@@ -242,6 +258,7 @@ HELICOPTERO.exe: CMakeFiles/HELICOPTERO.dir/GAME.cpp.obj
 HELICOPTERO.exe: CMakeFiles/HELICOPTERO.dir/Score.cpp.obj
 HELICOPTERO.exe: CMakeFiles/HELICOPTERO.dir/Health.cpp.obj
 HELICOPTERO.exe: CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.obj
+HELICOPTERO.exe: CMakeFiles/HELICOPTERO.dir/Physics.cpp.obj
 HELICOPTERO.exe: CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/EWIEGA46WW/qrc_ResourcesForProject.cpp.obj
 HELICOPTERO.exe: CMakeFiles/HELICOPTERO.dir/build.make
 HELICOPTERO.exe: C:/Qt/6.11.1/mingw_64/lib/libQt6Widgets.a
@@ -254,7 +271,7 @@ HELICOPTERO.exe: HELICOPTERO.exe.manifest
 HELICOPTERO.exe: CMakeFiles/HELICOPTERO.dir/linkLibs.rsp
 HELICOPTERO.exe: CMakeFiles/HELICOPTERO.dir/objects1.rsp
 HELICOPTERO.exe: CMakeFiles/HELICOPTERO.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Linking CXX executable HELICOPTERO.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable HELICOPTERO.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\HELICOPTERO.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

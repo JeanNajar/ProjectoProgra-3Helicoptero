@@ -20,10 +20,9 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     //create an item to add to the scene
 
     heli = new MyHeli();
-    heli->setRect(0,0,100,100);
 
-    // Posicionarlo en el centro inferior
-    heli->setPos(width() / 2, height() - heli->rect().height());
+    // Posicionar el helicoptero
+    heli->setPos(20, height() - heli->rect().height());
 
     //make the heli focusable
     heli->setFlag(QGraphicsItem::ItemIsFocusable);
@@ -48,15 +47,14 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     spawnTimer->start(3000);
 
     //play background music
+   /*
     QMediaPlayer *heliSound = new QMediaPlayer();
     QAudioOutput *audio = new QAudioOutput();
 
     heliSound->setAudioOutput(audio);
     audio->setVolume(0.3);
-
     heliSound->setSource(QUrl("qrc:/Sounds/recursosh/HelicopteroSound.mp3"));
-
-    heliSound->play();
+    heliSound->play();*/
 }
 
 Game::~Game(){

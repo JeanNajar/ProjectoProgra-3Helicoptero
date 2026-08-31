@@ -381,6 +381,7 @@ CMakeFiles/HELICOPTERO.dir/MyHeli.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtaudio.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudio.h \
+ C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Physics.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/QKeyEvent \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qevent.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qcoreevent.h \
@@ -418,4 +419,8 @@ CMakeFiles/HELICOPTERO.dir/MyHeli.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qpen.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QAudioOutput \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudiooutput.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsItem
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsItem \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QTimer \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qtimer.h \
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QFont
