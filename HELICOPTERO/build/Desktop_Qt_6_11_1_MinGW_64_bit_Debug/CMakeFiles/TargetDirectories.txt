@@ -1,9 +1,0 @@
-C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/HELICOPTERO.dir
-C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/edit_cache.dir
-C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/rebuild_cache.dir
-C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/list_install_components.dir
-C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/install.dir
-C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/install/local.dir
-C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/install/strip.dir
-C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/HELICOPTERO_autogen_timestamp_deps.dir
-C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/HELICOPTERO_autogen.dir
