@@ -414,11 +414,13 @@ CMakeFiles/HELICOPTERO.dir/GAME.cpp.obj: \
  C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleManager.h \
  C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleH.h \
  C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleType.h \
+ C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\LevelManager.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QTimer \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qtimer.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qbasictimer.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qabstracteventdispatcher.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qeventloop.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qdeadlinetimer.h \
+ C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\FinishLine.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QAudioOutput \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudiooutput.h

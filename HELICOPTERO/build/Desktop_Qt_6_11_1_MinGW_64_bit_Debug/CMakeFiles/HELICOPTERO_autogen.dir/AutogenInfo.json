@@ -412,6 +412,12 @@
 	"HEADERS" : 
 	[
 		[
+			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/FinishLine.h",
+			"MU",
+			"EWIEGA46WW/moc_FinishLine.cpp",
+			null
+		],
+		[
 			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/GAME.h",
 			"MU",
 			"EWIEGA46WW/moc_GAME.cpp",
@@ -421,6 +427,12 @@
 			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/Health.h",
 			"MU",
 			"EWIEGA46WW/moc_Health.cpp",
+			null
+		],
+		[
+			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/LevelManager.h",
+			"MU",
+			"EWIEGA46WW/moc_LevelManager.cpp",
 			null
 		],
 		[
@@ -457,6 +469,18 @@
 			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/Score.h",
 			"MU",
 			"EWIEGA46WW/moc_Score.cpp",
+			null
+		],
+		[
+			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/Survivor.h",
+			"MU",
+			"EWIEGA46WW/moc_Survivor.cpp",
+			null
+		],
+		[
+			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/SurvivorManager.h",
+			"MU",
+			"EWIEGA46WW/moc_SurvivorManager.cpp",
 			null
 		]
 	],
@@ -537,12 +561,22 @@
 	"SOURCES" : 
 	[
 		[
+			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/FinishLine.cpp",
+			"MU",
+			null
+		],
+		[
 			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/GAME.cpp",
 			"MU",
 			null
 		],
 		[
 			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/Health.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/LevelManager.cpp",
 			"MU",
 			null
 		],
@@ -568,6 +602,16 @@
 		],
 		[
 			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/Score.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/Survivor.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/SurvivorManager.cpp",
 			"MU",
 			null
 		],

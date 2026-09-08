@@ -38,6 +38,7 @@ void Physics::applyThrust(double &velY,double dt){
 }
 
 void Physics::applyFriction(double &velX, double dt){
+
     //Inercia, funciona cuando se deja de tocar la tecla de
     //  derecha/izquierda hace que no se frene en seco
     velX *= std::pow(friccion,dt*60.0);

@@ -1,7 +1,6 @@
-CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/mocs_compilation.cpp.obj: \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\mocs_compilation.cpp \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_FinishLine.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/FinishLine.h \
+CMakeFiles/HELICOPTERO.dir/FinishLine.cpp.obj: \
+ C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\FinishLine.cpp \
+ C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\FinishLine.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qobject.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qobjectdefs.h \
@@ -374,65 +373,12 @@ CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qrgba64.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qimage.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qpixelformat.h \
- C:/Qt/6.11.1/mingw_64/include/QtCore/qtmochelpers.h \
- C:/Qt/6.11.1/mingw_64/include/QtCore/qtmocconstants.h \
- C:/Qt/6.11.1/mingw_64/include/QtCore/q20algorithm.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_GAME.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/GAME.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsView \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsview.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qpainter.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qtextoption.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qpen.h \
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsScene \
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsscene.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qbrush.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qfontinfo.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qfont.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qendian.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qfontvariableaxis.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qfontmetrics.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/qscrollarea.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/qabstractscrollarea.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/qframe.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/qwidget.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qaction.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qkeysequence.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qicon.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qpalette.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/qsizepolicy.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qcursor.h \
- C:/Qt/6.11.1/mingw_64/include/QtGui/qbitmap.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsscene.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/QWidget \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsScene \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.h \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QMediaPlayer \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qmediaplayer.h \
- C:/Qt/6.11.1/mingw_64/include/QtCore/qurl.h \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaglobal.h \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimedia-config.h \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtaudio.h \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudio.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Physics.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Score.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Health.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleManager.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleType.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/LevelManager.h \
- C:/Qt/6.11.1/mingw_64/include/QtCore/QTimer \
- C:/Qt/6.11.1/mingw_64/include/QtCore/qtimer.h \
- C:/Qt/6.11.1/mingw_64/include/QtCore/qbasictimer.h \
- C:/Qt/6.11.1/mingw_64/include/QtCore/qabstracteventdispatcher.h \
- C:/Qt/6.11.1/mingw_64/include/QtCore/qeventloop.h \
- C:/Qt/6.11.1/mingw_64/include/QtCore/qdeadlinetimer.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/FinishLine.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_LevelManager.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/LevelManager.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_MyHeli.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_ObstacleH.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_ObstacleManager.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleManager.h
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qpen.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QBrush \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QPen \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QColor

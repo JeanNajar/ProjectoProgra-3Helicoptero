@@ -5,11 +5,15 @@
 #include <QObject>
 #include <QMediaPlayer>
 #include "ObstacleType.h"
+//esto para que la memoria unicamente la controle obstacle manager, evita dependencia circular
+class ObstacleManager;
 
 class ObstacleH: public QObject, public QGraphicsRectItem{
     Q_OBJECT
 public:
-    ObstacleH(ObstacleType type = ObstacleType::VERTICAL);
+
+    ObstacleH(ObstacleType type, ObstacleManager *manager);
+
     ~ObstacleH();
     ObstacleType getType() const;
 public slots:
@@ -19,6 +23,7 @@ private:
     QMediaPlayer *CrashSound;
     QAudioOutput *audioOutput;  // Se guarda para liberarlo en el destructor
     ObstacleType tipo;
+    ObstacleManager *manager;
 };
 
 

@@ -39,6 +39,14 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ObstacleManager.cpp
         Physics.h
         Physics.cpp
+        LevelManager.h
+        LevelManager.cpp
+        FinishLine.h
+        FinishLine.cpp
+        Survivor.h
+        SurvivorManager.h
+        Survivor.cpp
+        SurvivorManager.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET HELICOPTERO APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

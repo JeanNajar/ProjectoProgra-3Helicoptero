@@ -199,6 +199,30 @@ HELICOPTERO_autogen/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO_autogen.dir\build.make CMakeFiles/HELICOPTERO_autogen.dir/build
 .PHONY : HELICOPTERO_autogen/fast
 
+FinishLine.obj: FinishLine.cpp.obj
+.PHONY : FinishLine.obj
+
+# target to build an object file
+FinishLine.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/FinishLine.cpp.obj
+.PHONY : FinishLine.cpp.obj
+
+FinishLine.i: FinishLine.cpp.i
+.PHONY : FinishLine.i
+
+# target to preprocess a source file
+FinishLine.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/FinishLine.cpp.i
+.PHONY : FinishLine.cpp.i
+
+FinishLine.s: FinishLine.cpp.s
+.PHONY : FinishLine.s
+
+# target to generate assembly for a file
+FinishLine.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/FinishLine.cpp.s
+.PHONY : FinishLine.cpp.s
+
 GAME.obj: GAME.cpp.obj
 .PHONY : GAME.obj
 
@@ -294,6 +318,30 @@ Health.s: Health.cpp.s
 Health.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Health.cpp.s
 .PHONY : Health.cpp.s
+
+LevelManager.obj: LevelManager.cpp.obj
+.PHONY : LevelManager.obj
+
+# target to build an object file
+LevelManager.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/LevelManager.cpp.obj
+.PHONY : LevelManager.cpp.obj
+
+LevelManager.i: LevelManager.cpp.i
+.PHONY : LevelManager.i
+
+# target to preprocess a source file
+LevelManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/LevelManager.cpp.i
+.PHONY : LevelManager.cpp.i
+
+LevelManager.s: LevelManager.cpp.s
+.PHONY : LevelManager.s
+
+# target to generate assembly for a file
+LevelManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/LevelManager.cpp.s
+.PHONY : LevelManager.cpp.s
 
 MyHeli.obj: MyHeli.cpp.obj
 .PHONY : MyHeli.obj
@@ -415,6 +463,54 @@ Score.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Score.cpp.s
 .PHONY : Score.cpp.s
 
+Survivor.obj: Survivor.cpp.obj
+.PHONY : Survivor.obj
+
+# target to build an object file
+Survivor.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Survivor.cpp.obj
+.PHONY : Survivor.cpp.obj
+
+Survivor.i: Survivor.cpp.i
+.PHONY : Survivor.i
+
+# target to preprocess a source file
+Survivor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Survivor.cpp.i
+.PHONY : Survivor.cpp.i
+
+Survivor.s: Survivor.cpp.s
+.PHONY : Survivor.s
+
+# target to generate assembly for a file
+Survivor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Survivor.cpp.s
+.PHONY : Survivor.cpp.s
+
+SurvivorManager.obj: SurvivorManager.cpp.obj
+.PHONY : SurvivorManager.obj
+
+# target to build an object file
+SurvivorManager.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/SurvivorManager.cpp.obj
+.PHONY : SurvivorManager.cpp.obj
+
+SurvivorManager.i: SurvivorManager.cpp.i
+.PHONY : SurvivorManager.i
+
+# target to preprocess a source file
+SurvivorManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/SurvivorManager.cpp.i
+.PHONY : SurvivorManager.cpp.i
+
+SurvivorManager.s: SurvivorManager.cpp.s
+.PHONY : SurvivorManager.s
+
+# target to generate assembly for a file
+SurvivorManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/SurvivorManager.cpp.s
+.PHONY : SurvivorManager.cpp.s
+
 main.obj: main.cpp.obj
 .PHONY : main.obj
 
@@ -454,6 +550,9 @@ help:
 	@echo ... HELICOPTERO_autogen
 	@echo ... HELICOPTERO_autogen_timestamp_deps
 	@echo ... HELICOPTERO
+	@echo ... FinishLine.obj
+	@echo ... FinishLine.i
+	@echo ... FinishLine.s
 	@echo ... GAME.obj
 	@echo ... GAME.i
 	@echo ... GAME.s
@@ -466,6 +565,9 @@ help:
 	@echo ... Health.obj
 	@echo ... Health.i
 	@echo ... Health.s
+	@echo ... LevelManager.obj
+	@echo ... LevelManager.i
+	@echo ... LevelManager.s
 	@echo ... MyHeli.obj
 	@echo ... MyHeli.i
 	@echo ... MyHeli.s
@@ -481,6 +583,12 @@ help:
 	@echo ... Score.obj
 	@echo ... Score.i
 	@echo ... Score.s
+	@echo ... Survivor.obj
+	@echo ... Survivor.i
+	@echo ... Survivor.s
+	@echo ... SurvivorManager.obj
+	@echo ... SurvivorManager.i
+	@echo ... SurvivorManager.s
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s

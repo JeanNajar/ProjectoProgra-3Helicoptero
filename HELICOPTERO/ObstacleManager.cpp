@@ -1,5 +1,7 @@
 #include "ObstacleManager.h"
 #include <QDebug>
+#include <QTimer>
+#include <typeinfo>
 
 ObstacleManager::ObstacleManager(QGraphicsScene *scene, QObject *parent):QObject(parent){
 
@@ -33,7 +35,7 @@ cantidad = 0;
 
 void ObstacleManager::spawnObstacle(ObstacleType type,int yPos){
 
-    ObstacleH *nuevo = new ObstacleH(type);
+    ObstacleH *nuevo = new ObstacleH(type, this);
 
     qreal xPos = scene->width();
 
@@ -44,6 +46,7 @@ void ObstacleManager::spawnObstacle(ObstacleType type,int yPos){
         break;
      case ObstacleType::SMALL:
          if (yPos <= 0)
+            // yPos = 50 + (rand() % 400);
              yPos = 200;
          break;
      case ObstacleType::CEILING:
@@ -53,6 +56,7 @@ void ObstacleManager::spawnObstacle(ObstacleType type,int yPos){
     }
     nuevo->setPos(xPos, yPos);
 
+    //redimensionar la matriz
     ObstacleH **nuevaMatriz = new ObstacleH*[cantidad + 1];
     // Copiar los punteros existentes
     for(int i = 0; i < cantidad; i++){
@@ -117,4 +121,41 @@ ObstacleH* ObstacleManager::getObstacle(int index) const{
         return nullptr;
     }
     return obstaculos[index];
+}
+
+int ObstacleManager::countVisible() const{
+
+    int contador = 0;
+    QList<QGraphicsItem*> items = scene->items();
+    for(int i = 0; i < items.size(); i++){
+        if(typeid(*(items[i])) == typeid(ObstacleH)){
+            contador++;
+        }
+    }
+    return contador;
+}
+
+void ObstacleManager::notifyObstacleDied(ObstacleH *obstaculo){
+
+    if(obstaculo == nullptr){
+        return;
+    }
+
+    // Buscar el obstáculo en la matriz y poner su slot en nullptr
+    bool encontrado = false;
+    for(int i = 0; i < cantidad; i++){
+        if(obstaculos[i] == obstaculo){
+            obstaculos[i] = nullptr;  // Sin puntero colgante
+            encontrado = true;
+            break;
+        }
+    }
+
+    if(!encontrado){
+        return;
+    }
+    // PASO 2: Programar el delete con retraso (para que suene el crash)
+    QTimer::singleShot(500, obstaculo, [obstaculo]() {
+        delete obstaculo;
+    });
 }

@@ -1,9 +1,13 @@
 HELICOPTERO_autogen/timestamp: \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/CMakeLists.txt \
+	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/FinishLine.cpp \
+	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/FinishLine.h \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/GAME.cpp \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/GAME.h \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Health.cpp \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Health.h \
+	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/LevelManager.cpp \
+	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/LevelManager.h \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.cpp \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.h \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.cpp \
@@ -25,6 +29,7 @@ HELICOPTERO_autogen/timestamp: \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/moc_predefs.h \
 	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/main.cpp \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
+	C:/Qt/6.11.1/mingw_64/include/QtCore/QTimer \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/q17memory.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/q20bit.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/q20functional.h \
@@ -34,6 +39,7 @@ HELICOPTERO_autogen/timestamp: \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/q20utility.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/q23type_traits.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/q23utility.h \
+	C:/Qt/6.11.1/mingw_64/include/QtCore/qabstracteventdispatcher.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qalgorithms.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qalloc.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qanystringview.h \
@@ -44,6 +50,7 @@ HELICOPTERO_autogen/timestamp: \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qatomic.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qatomic_cxx11.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qbasicatomic.h \
+	C:/Qt/6.11.1/mingw_64/include/QtCore/qbasictimer.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qbindingstorage.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qbytearray.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qbytearrayalgorithms.h \
@@ -63,8 +70,10 @@ HELICOPTERO_autogen/timestamp: \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qcontiguouscache.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qdarwinhelpers.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qdatastream.h \
+	C:/Qt/6.11.1/mingw_64/include/QtCore/qdeadlinetimer.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qdebug.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qendian.h \
+	C:/Qt/6.11.1/mingw_64/include/QtCore/qeventloop.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qexceptionhandling.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qflags.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qfloat16.h \
@@ -137,6 +146,7 @@ HELICOPTERO_autogen/timestamp: \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qtenvironmentvariables.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qtextstream.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qtformat_impl.h \
+	C:/Qt/6.11.1/mingw_64/include/QtCore/qtimer.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qtmetamacros.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qtnoop.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qtpreprocessorsupport.h \

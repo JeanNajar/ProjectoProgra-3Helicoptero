@@ -21,7 +21,7 @@ public:
 public slots:
 
     void updatePhysics();
-
+    void crash();
 private:
 
     //fisicas
@@ -38,7 +38,7 @@ private:
 
     //funciones
     void checkLanding();
-    void crash();
+
 
 };
 

@@ -22,6 +22,10 @@ public:
 
  ObstacleH* getObstacle(int index) const;
 
+ int countVisible() const;
+ // Busca el obstáculo en la matriz y pone su slot en nullptr
+void notifyObstacleDied(ObstacleH *obstaculo);
+
  private:
      ObstacleH **obstaculos;
      int cantidad;

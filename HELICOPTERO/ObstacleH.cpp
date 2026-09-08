@@ -11,13 +11,16 @@
 #include "ObstacleH.h"
 #include "MyHeli.h"
 #include "GAME.h"
+#include "ObstacleManager.h"
 
 extern Game * game;
 
-ObstacleH::ObstacleH(ObstacleType type): QObject(), QGraphicsRectItem(){
+ObstacleH::ObstacleH(ObstacleType type, ObstacleManager *manager): QObject(), QGraphicsRectItem(){
 
     // Guardar el tipo
     tipo = type;
+
+    this->manager = manager;
 
     switch(tipo) {
     case ObstacleType::VERTICAL:
@@ -60,6 +63,10 @@ ObstacleType ObstacleH::getType() const{
 }
 void ObstacleH::move(){
 
+    if(scene() == nullptr){
+        return;
+    }
+
     //colision
     QList<QGraphicsItem* > colliding_items = collidingItems();
 
@@ -69,8 +76,6 @@ void ObstacleH::move(){
             //quita vida
             game->health->decrease();
 
-              //CrashSound->play();
-
             //suena el sonido de crash
             if(CrashSound->playbackState() == QMediaPlayer::PlayingState){
                 CrashSound->setPosition(0);
@@ -79,16 +84,16 @@ void ObstacleH::move(){
             }
             //si llega a 0 se destruye
             if(game->health->getHealth()<=0){
-                scene()->removeItem(colliding_items[i]);
-                delete colliding_items[i];
+
+                MyHeli *heli = dynamic_cast<MyHeli*>(colliding_items[i]);
+                if(heli != nullptr){
+                    heli->crash();
+                }
             }
             //si el heli pega con un objeto lo destruye
             scene()->removeItem(this);
 
-            QTimer::singleShot(1000, this, [this]() {
-                delete this;
-            });
-           //delete this;
+            manager->notifyObstacleDied(this);
 
             return;
 
@@ -99,6 +104,7 @@ void ObstacleH::move(){
     setPos(x()-5,y());
     if(pos().x()+rect().width()< 0){
         scene()->removeItem(this);
-        delete this;
+
+        manager->notifyObstacleDied(this);
     }
 }

@@ -8,7 +8,8 @@
 #include "Score.h"
 #include "Health.h"
 #include "ObstacleManager.h"
-
+#include "LevelManager.h"
+#include "FinishLine.h"
 
 class Game : public QGraphicsView {
     Q_OBJECT //
@@ -26,9 +27,21 @@ public:
     Score * score;
     Health * health;
     ObstacleManager * obstacleManager;
+    LevelManager * levelManager;
+    FinishLine * finishLine;
 
     public slots:
    void spawnObstacles();
+   void checkFinishLine();
+
+   //logica de zona de aterrizaje
+   private:
+
+   bool heliEnZona;
+   int tiempoEnZona;
+   bool nivelGanado;
+
+    void mostrarVictoria();//temporal
 };
 
 #endif // GAME_H

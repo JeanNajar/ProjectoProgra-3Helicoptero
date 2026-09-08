@@ -9,7 +9,7 @@
 
 MyHeli::MyHeli() : QObject(), QGraphicsRectItem(){
     //tam helicoptero
-    setRect(0,0,80,20);
+    setRect(0,0,80,40);
 
     //esto sirve para que el punto de en medio sea el origen del helicoptero
     setTransformOriginPoint(rect().center());
@@ -52,7 +52,7 @@ void MyHeli::keyPressEvent(QKeyEvent *event){
         //subir
         thrusting = true;
     }else if(event->key()==Qt::Key_Left){
-        //moberse a la izquierda
+        //moverse a la izquierda
         movingLeft=true;
     }else if(event->key() == Qt::Key_Right){
         //moverse a la derecha
@@ -100,7 +100,7 @@ void MyHeli::updatePhysics(){
         //acelerar hacia la izquierda
         velX-=600.0 * dt;
         if(velX< -physics->getMaxHorizontalSpeed()){
-            velX = physics->getMaxHorizontalSpeed();
+            velX = -physics->getMaxHorizontalSpeed();
         }
 
     }else if(movingRight){

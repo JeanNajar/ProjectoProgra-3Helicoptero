@@ -1,14 +1,5 @@
-C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/EWIEGA46WW/moc_GAME.cpp: C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/GAME.h \
+C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/EWIEGA46WW/moc_LevelManager.cpp: C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/LevelManager.h \
   C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/moc_predefs.h \
-  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/FinishLine.h \
-  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Health.h \
-  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/LevelManager.h \
-  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.h \
-  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.h \
-  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleManager.h \
-  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleType.h \
-  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Physics.h \
-  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Score.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
   C:/Qt/6.11.1/mingw_64/include/QtCore/QTimer \
   C:/Qt/6.11.1/mingw_64/include/QtCore/q17memory.h \
@@ -53,7 +44,6 @@ C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_M
   C:/Qt/6.11.1/mingw_64/include/QtCore/qdatastream.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qdeadlinetimer.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qdebug.h \
-  C:/Qt/6.11.1/mingw_64/include/QtCore/qendian.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qeventloop.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qexceptionhandling.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qflags.h \
@@ -138,66 +128,33 @@ C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_M
   C:/Qt/6.11.1/mingw_64/include/QtCore/qtversionchecks.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qtypeinfo.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qtypes.h \
-  C:/Qt/6.11.1/mingw_64/include/QtCore/qurl.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qutf8stringview.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qvariant.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qvarlengtharray.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qversiontagging.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qxptype_traits.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qyieldcpu.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qaction.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qbitmap.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qbrush.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qcolor.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qcursor.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qfont.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qfontinfo.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qfontmetrics.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qfontvariableaxis.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qicon.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qimage.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qkeysequence.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qpaintdevice.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qpainter.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qpainterpath.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qpalette.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qpen.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qpixelformat.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qpixmap.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qpolygon.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qregion.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qrgb.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qrgba64.h \
-  C:/Qt/6.11.1/mingw_64/include/QtGui/qtextoption.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qtgui-config.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qtguiexports.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qtguiglobal.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qtransform.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qwindowdefs.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qwindowdefs_win.h \
-  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QMediaPlayer \
-  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudio.h \
-  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qmediaplayer.h \
-  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtaudio.h \
-  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimedia-config.h \
-  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
-  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaglobal.h \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsScene \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsView \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QWidget \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qabstractscrollarea.h \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qframe.h \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsitem.h \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsscene.h \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsview.h \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qscrollarea.h \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qsizepolicy.h \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgets-config.h \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgetsexports.h \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgetsglobal.h \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qwidget.h \
   C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/algorithm \
   C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/array \
   C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/atomic \
