@@ -405,6 +405,7 @@ CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QWidget \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsScene \
  C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/MyHeli.h \
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsPixmapItem \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QMediaPlayer \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qmediaplayer.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qurl.h \
@@ -413,6 +414,7 @@ CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtaudio.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudio.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QPixmap \
  C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Physics.h \
  C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Score.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
@@ -430,6 +432,8 @@ CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/mocs_compilation.cpp.obj: \
  C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/FinishLine.h \
  C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_LevelManager.cpp \
  C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/LevelManager.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_Menu.cpp \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Menu.h \
  C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_MyHeli.cpp \
  C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/MyHeli.h \
  C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_ObstacleH.cpp \

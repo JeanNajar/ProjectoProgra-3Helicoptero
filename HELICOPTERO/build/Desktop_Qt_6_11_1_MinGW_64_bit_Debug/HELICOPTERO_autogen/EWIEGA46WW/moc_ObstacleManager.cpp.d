@@ -156,7 +156,7 @@ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOP
   C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimedia-config.h \
   C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
   C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaglobal.h \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
+  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsPixmapItem \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsScene \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsitem.h \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsscene.h \

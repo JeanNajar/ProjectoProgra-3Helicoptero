@@ -343,6 +343,30 @@ LevelManager.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/LevelManager.cpp.s
 .PHONY : LevelManager.cpp.s
 
+Menu.obj: Menu.cpp.obj
+.PHONY : Menu.obj
+
+# target to build an object file
+Menu.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Menu.cpp.obj
+.PHONY : Menu.cpp.obj
+
+Menu.i: Menu.cpp.i
+.PHONY : Menu.i
+
+# target to preprocess a source file
+Menu.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Menu.cpp.i
+.PHONY : Menu.cpp.i
+
+Menu.s: Menu.cpp.s
+.PHONY : Menu.s
+
+# target to generate assembly for a file
+Menu.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Menu.cpp.s
+.PHONY : Menu.cpp.s
+
 MyHeli.obj: MyHeli.cpp.obj
 .PHONY : MyHeli.obj
 
@@ -568,6 +592,9 @@ help:
 	@echo ... LevelManager.obj
 	@echo ... LevelManager.i
 	@echo ... LevelManager.s
+	@echo ... Menu.obj
+	@echo ... Menu.i
+	@echo ... Menu.s
 	@echo ... MyHeli.obj
 	@echo ... MyHeli.i
 	@echo ... MyHeli.s

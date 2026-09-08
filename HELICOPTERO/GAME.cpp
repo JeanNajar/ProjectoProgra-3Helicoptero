@@ -4,6 +4,10 @@
 #include <QTimer>
 #include <QMediaPlayer>
 #include <QAudioOutput>
+#include <QGraphicsPixmapItem>
+#include <QColor>
+#include <QPixmap>
+#include <QShowEvent>
 
 Game::Game(QWidget *parent) : QGraphicsView(parent) {
 
@@ -17,12 +21,21 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setFixedSize(800, 600);
+    //color de fondo de la vista (igual al cielo del fondo, evita franjas blancas)
+    setBackgroundBrush(QColor(21, 10, 43));
+
+    //fondo de la ciudad cyberpunk (se agrega primero para que quede detras de todo)
+    QGraphicsPixmapItem *fondo = new QGraphicsPixmapItem(
+        QPixmap(":/Sprites/recursosh/fondo_ciudad_cyberpunk_800x600.png"));
+    fondo->setZValue(-100);
+    scene->addItem(fondo);
+
     //create an item to add to the scene
 
     heli = new MyHeli();
 
     // Posicionar el helicoptero
-    heli->setPos(20, height() - heli->rect().height());
+    heli->setPos(20, height() - heli->boundingRect().height());
 
     //make the heli focusable
     heli->setFlag(QGraphicsItem::ItemIsFocusable);
@@ -48,7 +61,7 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     nivelGanado = false;
 
 
-     levelManager = new LevelManager(this);
+    levelManager = new LevelManager(this);
 
     // Timer principal
     QTimer *finishCheckTimer = new QTimer(this);
@@ -58,7 +71,7 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
 
     // Conectar el spawn de obstáculos al timer del nivel
     connect(levelManager->spawnTimer, SIGNAL(timeout()),
-        this, SLOT(spawnObstacles()));
+            this, SLOT(spawnObstacles()));
 
     levelManager->startLevel(30, 3000);
 
@@ -81,7 +94,7 @@ Game::~Game(){
 
 void Game::spawnObstacles(){
 
-     // Cuando el tiempo llega a 0 LevelManager pone active=false,
+    // Cuando el tiempo llega a 0 LevelManager pone active=false,
     if(!levelManager->isActive()){
         return;
     }
@@ -124,7 +137,7 @@ void Game::checkFinishLine(){
                             + "s  |  Score: " + QString::number(score->getScore()));
     }
 
-     //DETECTAR FIN DE NIVEL
+    //DETECTAR FIN DE NIVEL
 
     static bool instruccionMostrada = false;
     if(levelManager->isFinished() && !instruccionMostrada){
@@ -165,7 +178,7 @@ void Game::checkFinishLine(){
         return;
     }
     // Verificar si el helicóptero está ATERRIZADO y sobre la zona
-    bool heliEnSuelo = (heli->y() + heli->rect().height() >= scene->height() - 2);
+    bool heliEnSuelo = (heli->y() + heli->boundingRect().height() >= scene->height() - 2);
 
     // Verificar si el heli colisiona con la zona
     QList<QGraphicsItem*> colliding = heli->collidingItems();
@@ -208,4 +221,11 @@ void Game::mostrarVictoria(){
     sub->setFont(QFont("times", 16));
     sub->setPos(scene->width() / 2 - 100, scene->height() / 2 + 30);
     scene->addItem(sub);
+}
+
+void Game::showEvent(QShowEvent *event){
+    QGraphicsView::showEvent(event);
+    //escala la escena para que quepa completa en la ventana
+    //(evita que el heli y el suelo se corten en el borde inferior)
+    fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }

@@ -34,14 +34,18 @@ public:
    void spawnObstacles();
    void checkFinishLine();
 
-   //logica de zona de aterrizaje
-   private:
+//logica de zona de aterrizaje
+    private:
 
    bool heliEnZona;
    int tiempoEnZona;
    bool nivelGanado;
 
     void mostrarVictoria();//temporal
+
+protected:
+    //ajusta la vista para que toda la escena siempre sea visible
+    void showEvent(QShowEvent *event) override;
 };
 
 #endif // GAME_H

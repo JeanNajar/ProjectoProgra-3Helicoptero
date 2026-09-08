@@ -7,12 +7,18 @@
 #include <QGraphicsTextItem>
 #include <QFont>
 
-MyHeli::MyHeli() : QObject(), QGraphicsRectItem(){
-    //tam helicoptero
-    setRect(0,0,80,40);
+MyHeli::MyHeli() : QObject(), QGraphicsPixmapItem(){
+
+    //cargar los 4 fotogramas del rotor girando
+    rotorFrames[0] = QPixmap(":/Sprites/recursosh/helicoptero_frame1.png");
+    rotorFrames[1] = QPixmap(":/Sprites/recursosh/helicoptero_frame2.png");
+    rotorFrames[2] = QPixmap(":/Sprites/recursosh/helicoptero_frame3.png");
+    rotorFrames[3] = QPixmap(":/Sprites/recursosh/helicoptero_frame4.png");
+    currentFrame = 0;
+    setPixmap(rotorFrames[currentFrame]);
 
     //esto sirve para que el punto de en medio sea el origen del helicoptero
-    setTransformOriginPoint(rect().center());
+    setTransformOriginPoint(boundingRect().center());
 
     //inicializacion de fisicas
     physics = new Physics();
@@ -26,6 +32,11 @@ MyHeli::MyHeli() : QObject(), QGraphicsRectItem(){
     QTimer *physicsTimer = new QTimer(this);
     connect(physicsTimer, SIGNAL(timeout()), this, SLOT(updatePhysics()));
     physicsTimer->start(16);
+
+    //timer aparte para la animacion del rotor
+    rotorTimer = new QTimer(this);
+    connect(rotorTimer, SIGNAL(timeout()), this, SLOT(updateRotorAnimation()));
+    rotorTimer->start(90);
 
     //sonido de choque
 
@@ -126,8 +137,8 @@ void MyHeli::updatePhysics(){
     }
 
     //limite derecho
-    if(newX + rect().width() > scene()->width()){
-        newX = scene()->width() - rect().width();
+    if(newX + boundingRect().width() > scene()->width()){
+        newX = scene()->width() - boundingRect().width();
         velX = 0;
     }
 
@@ -136,8 +147,8 @@ void MyHeli::updatePhysics(){
         velY = 0;
     }
 
-    if(newY + rect().height() >= scene()->height()){
-        newY = scene()->height() - rect().height();
+    if(newY + boundingRect().height() >= scene()->height()){
+        newY = scene()->height() - boundingRect().height();
         checkLanding();
         return;
     }
@@ -153,10 +164,10 @@ void MyHeli::updatePhysics(){
 }
 
 void MyHeli::checkLanding(){
-//tolerancia de aterrizaje
+    //tolerancia de aterrizaje
 
     if(physics->SafeLanding(velY)){
-       //si atterrizamos
+        //si atterrizamos
         velY = 0.0;
         setRotation(0.0);
     }else{
@@ -165,23 +176,19 @@ void MyHeli::checkLanding(){
     }
 }
 
-void MyHeli::crash(){
+//avanza al siguiente fotograma para simular el giro de la helice
+void MyHeli::updateRotorAnimation(){
 
+    currentFrame = (currentFrame + 1) % 4;
+    setPixmap(rotorFrames[currentFrame]);
+}
+
+void MyHeli::crash(){
 
     // Sonido de choque
     if(crashSound->playbackState() == QMediaPlayer::StoppedState){
         crashSound->play();
     }
-
-    /*
-    // Texto de GAME OVER
-    QGraphicsTextItem *gameOver = new QGraphicsTextItem("GAME OVER");
-    gameOver->setDefaultTextColor(Qt::red);
-    gameOver->setFont(QFont("times", 40));
-    gameOver->setPos(scene()->width() / 2 - 100, scene()->height() / 2 - 20);
-    scene()->addItem(gameOver);
-    */
-
 
     // Quitar el heli de la escena
     scene()->removeItem(this);
@@ -191,30 +198,3 @@ void MyHeli::crash(){
         delete this;
     });
 }
-
-
-
-/*
-void MyHeli::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Left){
-        if(pos().x()>0){
-        setPos(x()-10,y());
-        }
-    }else if(event->key() == Qt::Key_Right){
-        if (pos().x() + rect().width() < scene()->width())
-        setPos(x()+10,y());
-
-    }else if(event->key() == Qt::Key_Up){
-        if(pos().y()>0){
-        setPos(x(),y()-10);
-        }
-    }else if(event->key() == Qt::Key_Down){
-        if (pos().y() + rect().height() < scene()->height())
-
-        setPos(x(),y()+10);
-
-    }
-
-}
-*/

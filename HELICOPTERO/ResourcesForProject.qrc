@@ -3,4 +3,14 @@
         <file>recursosh/HelicopteroSound.mp3</file>
         <file>recursosh/CrashSound.mp3</file>
     </qresource>
+    <qresource prefix="/Sprites">
+        <file>recursosh/fondo_ciudad_cyberpunk_800x600.png</file>
+        <file>recursosh/helicoptero_frame1.png</file>
+        <file>recursosh/helicoptero_frame2.png</file>
+        <file>recursosh/helicoptero_frame3.png</file>
+        <file>recursosh/helicoptero_frame4.png</file>
+        <file>recursosh/torre_industrial_obstaculo_40x140.png</file>
+        <file>recursosh/cajon_barrera_obstaculo_32x32.png</file>
+        <file>recursosh/tuberias_techo_obstaculo_160x64.png</file>
+    </qresource>
 </RCC>

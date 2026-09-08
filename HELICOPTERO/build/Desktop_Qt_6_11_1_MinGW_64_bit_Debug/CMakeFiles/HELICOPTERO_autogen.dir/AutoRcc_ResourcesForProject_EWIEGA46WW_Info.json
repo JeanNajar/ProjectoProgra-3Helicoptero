@@ -10,7 +10,15 @@
 	"INPUTS" : 
 	[
 		"C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/recursosh/CrashSound.mp3",
-		"C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/recursosh/HelicopteroSound.mp3"
+		"C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/recursosh/HelicopteroSound.mp3",
+		"C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/recursosh/helicoptero_frame3.png",
+		"C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/recursosh/fondo_ciudad_cyberpunk_800x600.png",
+		"C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/recursosh/helicoptero_frame2.png",
+		"C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/recursosh/tuberias_techo_obstaculo_160x64.png",
+		"C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/recursosh/cajon_barrera_obstaculo_32x32.png",
+		"C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/recursosh/torre_industrial_obstaculo_40x140.png",
+		"C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/recursosh/helicoptero_frame1.png",
+		"C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/recursosh/helicoptero_frame4.png"
 	],
 	"LOCK_FILE" : "C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/HELICOPTERO_autogen.dir/AutoRcc_ResourcesForProject_EWIEGA46WW_Lock.lock",
 	"MULTI_CONFIG" : false,

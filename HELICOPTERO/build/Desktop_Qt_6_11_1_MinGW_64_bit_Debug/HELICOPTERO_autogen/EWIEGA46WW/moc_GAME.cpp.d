@@ -136,6 +136,7 @@ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOP
   C:/Qt/6.11.1/mingw_64/include/QtCore/qversiontagging.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qxptype_traits.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qyieldcpu.h \
+  C:/Qt/6.11.1/mingw_64/include/QtGui/QPixmap \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qaction.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qbitmap.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qbrush.h \
@@ -173,6 +174,7 @@ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOP
   C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimedia-config.h \
   C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
   C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaglobal.h \
+  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsPixmapItem \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsScene \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \

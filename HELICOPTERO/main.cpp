@@ -1,5 +1,6 @@
 #include <QApplication>
 #include "Game.h"
+#include "Menu.h"
 
 Game * game;
 
@@ -7,11 +8,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // Crear la instancia del juego
-    game = new Game();
-
-    // Mostrar la ventana del juego
-    game->show();
+    // Mostrar el menu principal
+    Menu menu;
+    menu.show();
 
     return a.exec();
 }
