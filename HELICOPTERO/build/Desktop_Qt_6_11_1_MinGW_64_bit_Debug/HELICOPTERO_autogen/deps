@@ -1,33 +1,4 @@
 HELICOPTERO_autogen/timestamp: \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/CMakeLists.txt \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/FinishLine.cpp \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/FinishLine.h \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/GAME.cpp \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/GAME.h \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Health.cpp \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Health.h \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/LevelManager.cpp \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/LevelManager.h \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.cpp \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.h \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.cpp \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.h \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleManager.cpp \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleManager.h \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleType.h \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Physics.cpp \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Physics.h \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ResourcesForProject.qrc \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Score.cpp \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Score.h \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qtcreator/cmake-helper/maintenance_tool_provider.cmake \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qtcreator/cmake-helper/package-manager.cmake \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qtcreator/cmake-helper/qtcreator-project.cmake \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/3.30.5/CMakeCXXCompiler.cmake \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/3.30.5/CMakeRCCompiler.cmake \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/3.30.5/CMakeSystem.cmake \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/moc_predefs.h \
-	C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/main.cpp \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/QTimer \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/q17memory.h \
@@ -164,6 +135,7 @@ HELICOPTERO_autogen/timestamp: \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qversiontagging.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qxptype_traits.h \
 	C:/Qt/6.11.1/mingw_64/include/QtCore/qyieldcpu.h \
+	C:/Qt/6.11.1/mingw_64/include/QtGui/QPixmap \
 	C:/Qt/6.11.1/mingw_64/include/QtGui/qaction.h \
 	C:/Qt/6.11.1/mingw_64/include/QtGui/qbitmap.h \
 	C:/Qt/6.11.1/mingw_64/include/QtGui/qbrush.h \
@@ -201,6 +173,7 @@ HELICOPTERO_autogen/timestamp: \
 	C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimedia-config.h \
 	C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
 	C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaglobal.h \
+	C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsPixmapItem \
 	C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
 	C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsScene \
 	C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
@@ -695,4 +668,39 @@ HELICOPTERO_autogen/timestamp: \
 	C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/time.h \
 	C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/vadefs.h \
 	C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/CMakeLists.txt \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/FinishLine.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/FinishLine.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/GAME.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/GAME.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Health.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Health.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/LevelManager.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/LevelManager.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Menu.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Menu.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/MyHeli.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/MyHeli.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ObstacleH.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ObstacleH.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ObstacleManager.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ObstacleManager.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ObstacleType.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Physics.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Physics.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ResourcesForProject.qrc \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Score.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Score.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Survivor.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Survivor.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/SurvivorManager.cpp \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/SurvivorManager.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qtcreator/cmake-helper/maintenance_tool_provider.cmake \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qtcreator/cmake-helper/package-manager.cmake \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qtcreator/cmake-helper/qtcreator-project.cmake \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/3.30.5/CMakeCXXCompiler.cmake \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/3.30.5/CMakeRCCompiler.cmake \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/3.30.5/CMakeSystem.cmake \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/moc_predefs.h \
+	C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/main.cpp \
 	C:/Qt/Tools/CMake_64/bin/cmake.exe

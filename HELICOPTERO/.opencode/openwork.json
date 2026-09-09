@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "workspace": {
+    "name": "HELICOPTERO",
+    "createdAt": 1788892778295,
+    "preset": "starter"
+  },
+  "authorizedRoots": [
+    "C:\\Users\\gpopo\\Desktop\\Proyecto HELICOPTERO\\ProjectoProgra-3Helicoptero\\HELICOPTERO"
+  ],
+  "reload": null
+}

@@ -52,10 +52,10 @@ RM = C:\Qt\Tools\CMake_64\bin\cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO"
+CMAKE_SOURCE_DIR = "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug"
+CMAKE_BINARY_DIR = "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug"
 
 # Utility rule file for HELICOPTERO_autogen_timestamp_deps.
 
@@ -77,6 +77,6 @@ CMakeFiles/HELICOPTERO_autogen_timestamp_deps.dir/clean:
 .PHONY : CMakeFiles/HELICOPTERO_autogen_timestamp_deps.dir/clean
 
 CMakeFiles/HELICOPTERO_autogen_timestamp_deps.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO" "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO" "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug" "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug" "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles\HELICOPTERO_autogen_timestamp_deps.dir\DependInfo.cmake" "--color=$(COLOR)"
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO" "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO" "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug" "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug" "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles\HELICOPTERO_autogen_timestamp_deps.dir\DependInfo.cmake" "--color=$(COLOR)"
 .PHONY : CMakeFiles/HELICOPTERO_autogen_timestamp_deps.dir/depend
 

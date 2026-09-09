@@ -1,6 +1,5 @@
-C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/EWIEGA46WW/moc_MyHeli.cpp: C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.h \
-  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/moc_predefs.h \
-  C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Physics.h \
+C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/EWIEGA46WW/moc_MyHeli.cpp: C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/MyHeli.h \
+  C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/HELICOPTERO_autogen/moc_predefs.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
   C:/Qt/6.11.1/mingw_64/include/QtCore/q17memory.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/q20bit.h \
@@ -130,6 +129,7 @@ C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_M
   C:/Qt/6.11.1/mingw_64/include/QtCore/qversiontagging.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qxptype_traits.h \
   C:/Qt/6.11.1/mingw_64/include/QtCore/qyieldcpu.h \
+  C:/Qt/6.11.1/mingw_64/include/QtGui/QPixmap \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qcolor.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qimage.h \
   C:/Qt/6.11.1/mingw_64/include/QtGui/qpaintdevice.h \
@@ -153,7 +153,7 @@ C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_M
   C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimedia-config.h \
   C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
   C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaglobal.h \
-  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
+  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsPixmapItem \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsitem.h \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgets-config.h \
   C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgetsexports.h \
@@ -370,4 +370,5 @@ C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_M
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/sys/types.h \
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/time.h \
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/vadefs.h \
-  C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h
+  C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h \
+  C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Physics.h

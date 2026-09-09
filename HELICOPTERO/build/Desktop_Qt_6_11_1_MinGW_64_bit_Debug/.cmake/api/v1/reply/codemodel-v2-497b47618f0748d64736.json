@@ -7,7 +7,7 @@
 				{
 					"build" : ".",
 					"hasInstallRule" : true,
-					"jsonFile" : "directory-.-Debug-418132fb5560095270aa.json",
+					"jsonFile" : "directory-.-Debug-3182b038b2974fd4e9ca.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.16"
@@ -44,7 +44,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "HELICOPTERO::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-HELICOPTERO-Debug-f661631fb7f1809c3990.json",
+					"jsonFile" : "target-HELICOPTERO-Debug-6082b0210aeb6603e334.json",
 					"name" : "HELICOPTERO",
 					"projectIndex" : 0
 				},
@@ -68,8 +68,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug",
-		"source" : "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO"
+		"build" : "C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug",
+		"source" : "C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO"
 	},
 	"version" : 
 	{

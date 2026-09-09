@@ -56,10 +56,10 @@ RM = C:\Qt\Tools\CMake_64\bin\cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO"
+CMAKE_SOURCE_DIR = "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug"
+CMAKE_BINARY_DIR = "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -131,9 +131,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\\CMakeFiles\progress.marks"
+	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\\CMakeFiles\progress.marks"
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\C++FolderPP\ProjectoProgra#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
@@ -342,6 +342,30 @@ LevelManager.s: LevelManager.cpp.s
 LevelManager.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/LevelManager.cpp.s
 .PHONY : LevelManager.cpp.s
+
+Menu.obj: Menu.cpp.obj
+.PHONY : Menu.obj
+
+# target to build an object file
+Menu.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Menu.cpp.obj
+.PHONY : Menu.cpp.obj
+
+Menu.i: Menu.cpp.i
+.PHONY : Menu.i
+
+# target to preprocess a source file
+Menu.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Menu.cpp.i
+.PHONY : Menu.cpp.i
+
+Menu.s: Menu.cpp.s
+.PHONY : Menu.s
+
+# target to generate assembly for a file
+Menu.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\HELICOPTERO.dir\build.make CMakeFiles/HELICOPTERO.dir/Menu.cpp.s
+.PHONY : Menu.cpp.s
 
 MyHeli.obj: MyHeli.cpp.obj
 .PHONY : MyHeli.obj
@@ -568,6 +592,9 @@ help:
 	@echo ... LevelManager.obj
 	@echo ... LevelManager.i
 	@echo ... LevelManager.s
+	@echo ... Menu.obj
+	@echo ... Menu.i
+	@echo ... Menu.s
 	@echo ... MyHeli.obj
 	@echo ... MyHeli.i
 	@echo ... MyHeli.s

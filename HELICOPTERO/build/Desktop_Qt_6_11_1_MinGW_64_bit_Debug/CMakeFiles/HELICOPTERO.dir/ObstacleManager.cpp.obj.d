@@ -1,6 +1,6 @@
 CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.obj: \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleManager.cpp \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleManager.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleManager.cpp \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleManager.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qobject.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qobjectdefs.h \
@@ -358,8 +358,8 @@ CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qfont.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qendian.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qpen.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleH.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleH.h \
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsPixmapItem \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsitem.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qvariant.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qdebug.h \
@@ -388,7 +388,7 @@ CMakeFiles/HELICOPTERO.dir/ObstacleManager.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtaudio.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudio.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleType.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleType.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QDebug \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QTimer \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qtimer.h \

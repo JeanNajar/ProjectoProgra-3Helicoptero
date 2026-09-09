@@ -1,6 +1,6 @@
 CMakeFiles/HELICOPTERO.dir/Health.cpp.obj: \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Health.cpp \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Health.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Health.cpp \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Health.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsitem.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgetsglobal.h \

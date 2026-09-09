@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug"
+			"value" : "c:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -467,7 +467,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -551,7 +551,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO"
+			"value" : "C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO"
 		},
 		{
 			"name" : "CMAKE_INSTALL_BINDIR",
@@ -1051,7 +1051,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qtcreator/cmake-helper/qtcreator-project.cmake"
+			"value" : "C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qtcreator/cmake-helper/qtcreator-project.cmake"
 		},
 		{
 			"name" : "CMAKE_PROJECT_NAME",
@@ -1551,7 +1551,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug"
+			"value" : "C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug"
 		},
 		{
 			"name" : "HELICOPTERO_IS_TOP_LEVEL",
@@ -1575,7 +1575,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO"
+			"value" : "C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO"
 		},
 		{
 			"name" : "QTCREATOR_CMAKE_HELPER_DIRECTORY",
@@ -1587,7 +1587,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qtcreator/cmake-helper"
+			"value" : "C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/build/Desktop_Qt_6_11_1_MinGW_64_bit_Debug/.qtcreator/cmake-helper"
 		},
 		{
 			"name" : "QT_ADDITIONAL_HOST_PACKAGES_PREFIX_PATH",

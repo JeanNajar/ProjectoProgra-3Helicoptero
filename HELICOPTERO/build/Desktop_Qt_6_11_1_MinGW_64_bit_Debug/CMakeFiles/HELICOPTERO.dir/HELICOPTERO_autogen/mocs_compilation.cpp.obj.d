@@ -1,7 +1,7 @@
 CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/mocs_compilation.cpp.obj: \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\mocs_compilation.cpp \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_FinishLine.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/FinishLine.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\mocs_compilation.cpp \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_FinishLine.cpp \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/FinishLine.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qobject.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qobjectdefs.h \
@@ -377,8 +377,8 @@ CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qtmochelpers.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qtmocconstants.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/q20algorithm.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_GAME.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/GAME.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_GAME.cpp \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/GAME.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsView \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsview.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qpainter.h \
@@ -404,7 +404,8 @@ CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsscene.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QWidget \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsScene \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.h \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/MyHeli.h \
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsPixmapItem \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QMediaPlayer \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qmediaplayer.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qurl.h \
@@ -413,26 +414,29 @@ CMakeFiles/HELICOPTERO.dir/HELICOPTERO_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtaudio.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudio.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Physics.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Score.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QPixmap \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Physics.h \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Score.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/Health.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleManager.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleType.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/LevelManager.h \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Health.h \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ObstacleManager.h \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ObstacleH.h \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ObstacleType.h \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/LevelManager.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QTimer \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qtimer.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qbasictimer.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qabstracteventdispatcher.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qeventloop.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qdeadlinetimer.h \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/FinishLine.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_LevelManager.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/LevelManager.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_MyHeli.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/MyHeli.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_ObstacleH.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleH.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_ObstacleManager.cpp \
- C:/C++FolderPP/ProjectoProgra\#Helicoptero/HELICOPTERO/ObstacleManager.h
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/FinishLine.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_LevelManager.cpp \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/LevelManager.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_Menu.cpp \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/Menu.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_MyHeli.cpp \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/MyHeli.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_ObstacleH.cpp \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ObstacleH.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\build\Desktop_Qt_6_11_1_MinGW_64_bit_Debug\HELICOPTERO_autogen\EWIEGA46WW/moc_ObstacleManager.cpp \
+ C:/Users/gpopo/Desktop/Proyecto\ HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ObstacleManager.h

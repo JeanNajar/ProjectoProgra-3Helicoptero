@@ -7,14 +7,6 @@ set(CMAKE_DEPENDS_GENERATOR "MinGW Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/CMakeLists.txt"
-  "C:/C++FolderPP/ProjectoProgra#Helicoptero/HELICOPTERO/ResourcesForProject.qrc"
-  ".qtcreator/cmake-helper/maintenance_tool_provider.cmake"
-  ".qtcreator/cmake-helper/package-manager.cmake"
-  ".qtcreator/cmake-helper/qtcreator-project.cmake"
-  "CMakeFiles/3.30.5/CMakeCXXCompiler.cmake"
-  "CMakeFiles/3.30.5/CMakeRCCompiler.cmake"
-  "CMakeFiles/3.30.5/CMakeSystem.cmake"
   "C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6/FindWrapAtomic.cmake"
   "C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6/FindWrapVulkanHeaders.cmake"
   "C:/Qt/6.11.1/mingw_64/lib/cmake/Qt6/Qt6Config.cmake"
@@ -280,6 +272,14 @@ set(CMAKE_MAKEFILE_DEPENDS
   "C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-windres.cmake"
   "C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows.cmake"
   "C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/WindowsPaths.cmake"
+  "C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/CMakeLists.txt"
+  "C:/Users/gpopo/Desktop/Proyecto HELICOPTERO/ProjectoProgra-3Helicoptero/HELICOPTERO/ResourcesForProject.qrc"
+  ".qtcreator/cmake-helper/maintenance_tool_provider.cmake"
+  ".qtcreator/cmake-helper/package-manager.cmake"
+  ".qtcreator/cmake-helper/qtcreator-project.cmake"
+  "CMakeFiles/3.30.5/CMakeCXXCompiler.cmake"
+  "CMakeFiles/3.30.5/CMakeRCCompiler.cmake"
+  "CMakeFiles/3.30.5/CMakeSystem.cmake"
   )
 
 # The corresponding makefile is:

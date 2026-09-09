@@ -1,6 +1,6 @@
 CMakeFiles/HELICOPTERO.dir/Score.cpp.obj: \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Score.cpp \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Score.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Score.cpp \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Score.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsitem.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgetsglobal.h \

@@ -15,26 +15,29 @@
 
 extern Game * game;
 
-ObstacleH::ObstacleH(ObstacleType type, ObstacleManager *manager): QObject(), QGraphicsRectItem(){
+ObstacleH::ObstacleH(ObstacleType type, ObstacleManager *manager): QObject(), QGraphicsPixmapItem(){
 
     // Guardar el tipo
     tipo = type;
-
     this->manager = manager;
 
     switch(tipo) {
     case ObstacleType::VERTICAL:
-      //dibujar el obstaculo
-        setRect(0,0,100,300);
+        //torre industrial (obstaculo alto)
+        //se escala para que sea mas gruesa y alta y quede anclada al suelo
+        //(el manager la coloca en y = altura - 300, asi la base toca el fondo)
+        setPixmap(QPixmap(":/Sprites/recursosh/torre_industrial_obstaculo_40x140.png")
+                      .scaled(80, 300, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
         break;
 
     case ObstacleType::SMALL:
-
-        setRect(0, 0, 60, 80);
+        //cajon / barrera industrial (obstaculo bajo)
+        setPixmap(QPixmap(":/Sprites/recursosh/cajon_barrera_obstaculo_32x32.png"));
         break;
 
     case ObstacleType::CEILING:
-        setRect(0, 0, 200, 150);
+        //tuberias colgando del techo
+        setPixmap(QPixmap(":/Sprites/recursosh/tuberias_techo_obstaculo_160x64.png"));
         break;
     }
 
@@ -51,7 +54,6 @@ ObstacleH::ObstacleH(ObstacleType type, ObstacleManager *manager): QObject(), QG
     CrashSound->setAudioOutput(audioOutput);
     audioOutput->setVolume(0.3);
 }
-
 
 ObstacleH::~ObstacleH(){
     delete CrashSound;
@@ -84,7 +86,6 @@ void ObstacleH::move(){
             }
             //si llega a 0 se destruye
             if(game->health->getHealth()<=0){
-
                 MyHeli *heli = dynamic_cast<MyHeli*>(colliding_items[i]);
                 if(heli != nullptr){
                     heli->crash();
@@ -92,19 +93,15 @@ void ObstacleH::move(){
             }
             //si el heli pega con un objeto lo destruye
             scene()->removeItem(this);
-
             manager->notifyObstacleDied(this);
-
             return;
-
         }
     }
 
     //mover el obstaculo
     setPos(x()-5,y());
-    if(pos().x()+rect().width()< 0){
+    if(pos().x()+boundingRect().width()< 0){
         scene()->removeItem(this);
-
         manager->notifyObstacleDied(this);
     }
 }

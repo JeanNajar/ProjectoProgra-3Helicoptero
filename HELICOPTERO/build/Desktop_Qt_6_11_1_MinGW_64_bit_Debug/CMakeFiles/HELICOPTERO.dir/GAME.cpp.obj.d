@@ -1,6 +1,6 @@
 CMakeFiles/HELICOPTERO.dir/GAME.cpp.obj: \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\GAME.cpp \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Game.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\GAME.cpp \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Game.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsView \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsview.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgetsglobal.h \
@@ -394,8 +394,8 @@ CMakeFiles/HELICOPTERO.dir/GAME.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsscene.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QWidget \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsScene \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\MyHeli.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\MyHeli.h \
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsPixmapItem \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsitem.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qpainterpath.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
@@ -407,20 +407,47 @@ CMakeFiles/HELICOPTERO.dir/GAME.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtaudio.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudio.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Physics.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Score.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QPixmap \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Physics.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Score.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Health.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleManager.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleH.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleType.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\LevelManager.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Health.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleManager.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleH.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleType.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\LevelManager.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QTimer \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qtimer.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qbasictimer.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qabstracteventdispatcher.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qeventloop.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qdeadlinetimer.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\FinishLine.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\FinishLine.h \
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QAudioOutput \
- C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudiooutput.h
+ C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudiooutput.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QColor \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QShowEvent \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qevent.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qcoreevent.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qiodevice.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qeventpoint.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qvector2d.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qvectornd.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qpointingdevice.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qinputdevice.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qscreen.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QList \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QRect \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QSize \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/QSizeF \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QTransform \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qnativeinterface.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qscreen_platform.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qguiapplication.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qcoreapplication.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qcoreapplication_platform.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qinputmethod.h \
+ C:/Qt/6.11.1/mingw_64/include/QtCore/qlocale.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/qguiapplication_platform.h

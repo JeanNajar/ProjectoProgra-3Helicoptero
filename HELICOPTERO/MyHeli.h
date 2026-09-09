@@ -1,14 +1,17 @@
 #ifndef MYHELI_H
 #define MYHELI_H
 
-#include <QGraphicsRectItem>
+#include <QGraphicsPixmapItem>
 #include <QObject>
 #include <QMediaPlayer>
+#include <QPixmap>
 #include "Physics.h"
 
-class MyHeli: public QObject, public QGraphicsRectItem{
+class QTimer;
 
-  Q_OBJECT
+class MyHeli: public QObject, public QGraphicsPixmapItem{
+
+    Q_OBJECT
 
 public:
 
@@ -22,6 +25,8 @@ public slots:
 
     void updatePhysics();
     void crash();
+    void updateRotorAnimation();
+
 private:
 
     //fisicas
@@ -36,12 +41,12 @@ private:
     QMediaPlayer *crashSound;
     QAudioOutput *crashAudio;
 
+    //animacion del rotor (4 fotogramas)
+    QPixmap rotorFrames[4];
+    int currentFrame;
+    QTimer *rotorTimer;
+
     //funciones
     void checkLanding();
-
-
 };
-
-
-
 #endif // MYHELI_H

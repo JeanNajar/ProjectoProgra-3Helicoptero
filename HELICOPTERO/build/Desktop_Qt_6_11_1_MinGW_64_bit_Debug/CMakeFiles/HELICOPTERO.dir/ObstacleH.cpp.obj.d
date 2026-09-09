@@ -1,5 +1,5 @@
 CMakeFiles/HELICOPTERO.dir/ObstacleH.cpp.obj: \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleH.cpp \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleH.cpp \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QApplication \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qapplication.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgetsglobal.h \
@@ -420,19 +420,21 @@ CMakeFiles/HELICOPTERO.dir/ObstacleH.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudio.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/QAudioOutput \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudiooutput.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleH.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleH.h \
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsPixmapItem \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsitem.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qpainterpath.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleType.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\MyHeli.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Physics.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\GAME.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleType.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\MyHeli.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QPixmap \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Physics.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\GAME.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QWidget \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Score.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Score.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsTextItem \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Health.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\ObstacleManager.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\LevelManager.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\FinishLine.h
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Health.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleManager.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\LevelManager.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\FinishLine.h \
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem

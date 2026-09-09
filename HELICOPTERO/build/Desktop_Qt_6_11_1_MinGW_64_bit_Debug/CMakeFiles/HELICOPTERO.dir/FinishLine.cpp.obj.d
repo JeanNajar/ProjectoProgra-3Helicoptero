@@ -1,6 +1,6 @@
 CMakeFiles/HELICOPTERO.dir/FinishLine.cpp.obj: \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\FinishLine.cpp \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\FinishLine.h \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\FinishLine.cpp \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\FinishLine.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qobject.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qobjectdefs.h \

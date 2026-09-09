@@ -1,7 +1,7 @@
 CMakeFiles/HELICOPTERO.dir/MyHeli.cpp.obj: \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\MyHeli.cpp \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\MyHeli.h \
- C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsRectItem \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\MyHeli.cpp \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\MyHeli.h \
+ C:/Qt/6.11.1/mingw_64/include/QtWidgets/QGraphicsPixmapItem \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qgraphicsitem.h \
  C:/Qt/6.11.1/mingw_64/include/QtWidgets/qtwidgetsglobal.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qtguiglobal.h \
@@ -381,7 +381,8 @@ CMakeFiles/HELICOPTERO.dir/MyHeli.cpp.obj: \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtmultimediaexports.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qtaudio.h \
  C:/Qt/6.11.1/mingw_64/include/QtMultimedia/qaudio.h \
- C:\C++FolderPP\ProjectoProgra\#Helicoptero\HELICOPTERO\Physics.h \
+ C:/Qt/6.11.1/mingw_64/include/QtGui/QPixmap \
+ C:\Users\gpopo\Desktop\Proyecto\ HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Physics.h \
  C:/Qt/6.11.1/mingw_64/include/QtGui/QKeyEvent \
  C:/Qt/6.11.1/mingw_64/include/QtGui/qevent.h \
  C:/Qt/6.11.1/mingw_64/include/QtCore/qcoreevent.h \

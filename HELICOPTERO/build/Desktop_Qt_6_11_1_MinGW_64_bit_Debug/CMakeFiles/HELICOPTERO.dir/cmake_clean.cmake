@@ -14,6 +14,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/HELICOPTERO.dir/Health.cpp.obj.d"
   "CMakeFiles/HELICOPTERO.dir/LevelManager.cpp.obj"
   "CMakeFiles/HELICOPTERO.dir/LevelManager.cpp.obj.d"
+  "CMakeFiles/HELICOPTERO.dir/Menu.cpp.obj"
+  "CMakeFiles/HELICOPTERO.dir/Menu.cpp.obj.d"
   "CMakeFiles/HELICOPTERO.dir/MyHeli.cpp.obj"
   "CMakeFiles/HELICOPTERO.dir/MyHeli.cpp.obj.d"
   "CMakeFiles/HELICOPTERO.dir/ObstacleH.cpp.obj"

@@ -23,6 +23,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(HELICOPTERO
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        Menu.h
+        Menu.cpp
         MyHeli.h
         MyHeli.cpp
         ObstacleH.h
