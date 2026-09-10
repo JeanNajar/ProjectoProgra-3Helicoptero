@@ -40,7 +40,7 @@ bool SurvivorManager::posicionLibre(qreal xPos, qreal yPos) const{
         if(obs->scene() == nullptr){
             continue;
         }
-        QRectF zonaObstaculo = obs->rect().translated(obs->pos());
+        QRectF zonaObstaculo = obs->boundingRect().translated(obs->pos());
         if(zonaSuperviviente.intersects(zonaObstaculo)){
             return false;  // Hay un obstáculo ahí
         }

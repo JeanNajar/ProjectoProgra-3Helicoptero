@@ -1,5 +1,6 @@
 #ifndef OBSTACLEH_H
 #define OBSTACLEH_H
+
 #include <QGraphicsPixmapItem>
 #include <QObject>
 #include <QMediaPlayer>
