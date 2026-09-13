@@ -11,32 +11,32 @@ Survivor::Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene)
     rescatado = false;
     heliEncima = false;
 
-    //CUADRADITO VERDE temporal
+    //cuadrito verde (Es temporal)
 
     setRect(0, 0, 40, 40);
     setBrush(QBrush(Qt::green));
     setPen(QPen(Qt::darkGreen));
     setPos(xPos, yPos);
 
-    //  FONDO DE LA BARRA DE PROGRESO
+    //  fondo de la barra de progresion
     fondoBarra = new QGraphicsRectItem(0, 0, 40, 6, this);
     fondoBarra->setBrush(QBrush(QColor(60, 60, 60)));
     fondoBarra->setPen(QPen(Qt::black));
     fondoBarra->setPos(0, -10);  // Encima del superviviente
 
-    //  BARRA DE PROGRESO
+    // barra de progresion
 
     barra = new QGraphicsRectItem(0, 0, 0, 6, this);
     barra->setBrush(QBrush(Qt::yellow));
     barra->setPen(QPen(Qt::NoPen));
-    barra->setPos(0, -10);  // Encima del superviviente, sobre el fondo
+    barra->setPos(0, -10);  // Encima del superviviente, sobre el fondo verdesito
 
-    // TIMER DE PROGRESO
+    // timer de progresion
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateProgress()));
     timer->start(50);
 
-    // TIMER DE MOVIMIENTO (funciona para que se mueva junto con la pantalla)
+    // timer de movimiento(el movimiento con patalla)
     moveTimer = new QTimer(this);
     connect(moveTimer, SIGNAL(timeout()), this, SLOT(move()));
     moveTimer->start(50);
@@ -50,7 +50,7 @@ Survivor::~Survivor(){
     if(moveTimer != nullptr){
         moveTimer->stop();
     }
-    // La barra y el fondo son hijos (this), Qt los borra automáticamente.
+    // La barra y el fondo (para que se dentengan y desaparezcan)
     // No hace falta delete manual aquí
 }
 
@@ -80,25 +80,23 @@ void Survivor::updateProgress(){
         return;
     }
 
-    // El heli está encima → avanzar el progreso.
-    // 2 segundos = 40 ticks de 50ms. Para llegar a 100 en 40 ticks,
-    // avanzamos 2.5 por tick. Como usamos enteros, acumulamos con float.
+    // El heli está encima -> avanzar el progreso.
     progreso += 2.5;
     if(progreso > 100){
         progreso = 100;
     }
 
-    // Actualizar la barra según el progreso (0 a 100 → 0 a 40 px de ancho)
+    // Actualizar la barra según el progreso
     int anchoBarra = static_cast<int>((progreso / 100.0) * 40.0);
     barra->setRect(0, 0, anchoBarra, 6);
 
-    // Si llegó al 100%, rescatar
+    // Si llego a rescatar
     if(progreso >= 100){
         rescatado = true;
         timer->stop();
-        moveTimer->stop();  // Detener también el movimiento (ya no se mueve)
+        moveTimer->stop();  // Detener también el movimiento
         escena->removeItem(this);
-        // No hacemos delete this: SurvivorManager decide cuándo borrar.
+        // No hacemos delete this porque eso se controla en survivor manager
     }
 }
 
@@ -108,15 +106,13 @@ void Survivor::move(){
         return;
     }
 
-    // Mover hacia la izquierda a la MISMA velocidad que los obstáculos (3px/tick)
+    // Mover hacia la izquierda
     setPos(x() - 3, y());
 
-    // Si salió por la izquierda, quitarlo de la escena
+    // Si salio por la izquierda, quitarlo de la escena
     if(pos().x() + rect().width() < 0){
         escena->removeItem(this);
-        // No hacemos delete this: SurvivorManager decide cuándo borrar.
-        // Marcamos rescatado para que el manager lo limpie (aunque no fue
-        // rescatado, simplemente salió del mapa).
+
         rescatado = true;
         timer->stop();
         moveTimer->stop();

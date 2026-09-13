@@ -10,6 +10,7 @@
 #include "ObstacleManager.h"
 #include "LevelManager.h"
 #include "FinishLine.h"
+#include "SurvivorManager.h"
 
 class Game : public QGraphicsView {
     Q_OBJECT //
@@ -29,17 +30,20 @@ public:
     ObstacleManager * obstacleManager;
     LevelManager * levelManager;
     FinishLine * finishLine;
+    SurvivorManager * survivorManager;  // Maneja a los supervivientes
+    bool mundoEnMovimiento;  // true: el mundo avanza (scroll). false: la meta apareció y todo se detiene
 
-    public slots:
-   void spawnObstacles();
-   void checkFinishLine();
+public slots:
+    void spawnObstacles();
+    void checkFinishLine();
+    void updateSurvivors();
 
-//logica de zona de aterrizaje
-    private:
+    //logica de zona de aterrizaje
+private:
 
-   bool heliEnZona;
-   int tiempoEnZona;
-   bool nivelGanado;
+    bool heliEnZona;
+    int tiempoEnZona;
+    bool nivelGanado;
 
     void mostrarVictoria();//temporal
 

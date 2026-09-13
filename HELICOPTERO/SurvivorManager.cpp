@@ -26,7 +26,7 @@ SurvivorManager::~SurvivorManager(){
 
 bool SurvivorManager::posicionLibre(qreal xPos, qreal yPos) const{
 
-  // Verifica que la posición (xPos, yPos) no esté dentro de un obstáculo.
+    // Verifica que la posición no esta chocando con un obstaculo
 
     QRectF zonaSuperviviente(xPos, yPos, 40, 40);
 
@@ -34,39 +34,38 @@ bool SurvivorManager::posicionLibre(qreal xPos, qreal yPos) const{
     for(int i = 0; i < cantidad; i++){
         ObstacleH *obs = obstacleManager->getObstacle(i);
         if(obs == nullptr){
-            continue;  // Slot vacío (obstáculo ya muerto)
+            continue;  // Slot vacio
         }
-        // Solo considerar obstáculos que siguen en la escena
+        //solo se fija en los obstaculos que sigen en la escena
         if(obs->scene() == nullptr){
             continue;
         }
+        // basicamente devuevle el size del pixmap
         QRectF zonaObstaculo = obs->boundingRect().translated(obs->pos());
         if(zonaSuperviviente.intersects(zonaObstaculo)){
-            return false;  // Hay un obstáculo ahí
+            return false;  // Hay un obstaculo ahi
         }
     }
     return true;
 }
 
 bool SurvivorManager::spawnSurvivorBehindObstacle(ObstacleH *obstaculo){
-//genera un superviviente adelante de los obstaculos
+    //genera un superviviente adelante de los obstaculos
     if(totalGenerados >= 2){
-        return false;  // Ya se generaron los 2
+        return false;  // Ya se generaron los 2 deja de generar
     }
 
     if(obstaculo == nullptr || obstaculo->scene() == nullptr){
         return false;
     }
 
-    // El suelo está en la parte inferior de la pantalla
+    // El suelo esta en la parte inferior de la pantalla
     qreal yPos = scene->height() - 40;
 
-    // Posición X: ADELANTE del obstáculo (a la derecha de él), fuera de
-    // pantalla. El obstáculo aparece en x = scene->width(). El superviviente
-    // aparece más a la derecha (por ejemplo 200px más), así entra después.
+    // Posicioan X ADELANTE del obstáculo
     qreal xPos = obstaculo->pos().x() + 200;
 
-    // Crear el superviviente (fuera de pantalla, entrará gradualmente)
+    // Crear el superviviente
     Survivor *nuevo = new Survivor(xPos, yPos, scene);
     scene->addItem(nuevo);
     supervivientes.append(nuevo);
@@ -77,7 +76,7 @@ bool SurvivorManager::spawnSurvivorBehindObstacle(ObstacleH *obstaculo){
 }
 
 void SurvivorManager::updateAll(QRectF heliRect){
-//verificar posicion y estado(si esta aun o no)
+    //verificar posicion y estado(si esta aun o no)
     for(int i = supervivientes.size() - 1; i >= 0; i--){
         Survivor *s = supervivientes[i];
         if(s == nullptr){
@@ -88,9 +87,9 @@ void SurvivorManager::updateAll(QRectF heliRect){
         // Decirle al superviviente si el heli está encima
         s->setHeliEncima(s->isHeliOver(heliRect));
 
-        // Si ya fue rescatado, eliminarlo
+        // Si ya fue rescatado eliminarlo
         if(s->isRescued()){
-            // Ya fue removido de la escena por el propio Survivor
+
             delete s;
             supervivientes.removeAt(i);
         }

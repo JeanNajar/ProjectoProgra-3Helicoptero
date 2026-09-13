@@ -98,8 +98,8 @@ void ObstacleH::move(){
         }
     }
 
-    //mover el obstaculo
-    setPos(x()-5,y());
+    //mover el obstaculo (3px por tick = 60px/s, igual que el scroll del mundo)
+    setPos(x()-3,y());
     if(pos().x()+boundingRect().width()< 0){
         scene()->removeItem(this);
         manager->notifyObstacleDied(this);

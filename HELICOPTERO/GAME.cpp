@@ -54,11 +54,18 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     scene->addItem(health);
 
     obstacleManager = new ObstacleManager(scene, this);
+
+    // ===== MANAGER DE SUPERVIVIENTES =====
+    // Maneja a los supervivientes en el suelo. Recibe el obstacleManager
+    // para no generar supervivientes dentro de un obstáculo.
+    survivorManager = new SurvivorManager(scene, obstacleManager, this);
+
     //manager del nivel
     finishLine = nullptr;
     heliEnZona = false;
     tiempoEnZona = 0;
     nivelGanado = false;
+    mundoEnMovimiento = true;  // El mundo avanza hasta que aparezca la meta
 
 
     levelManager = new LevelManager(this);
@@ -67,6 +74,13 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     QTimer *finishCheckTimer = new QTimer(this);
     connect(finishCheckTimer, SIGNAL(timeout()), this, SLOT(checkFinishLine()));
     finishCheckTimer->start(50);
+
+    // Timer de actualización de supervivientes (cada 50ms).
+    // Le dice a cada superviviente si el heli está encima (para el rescate)
+    // y elimina los que ya fueron rescatados.
+    QTimer *survivorTimer = new QTimer(this);
+    connect(survivorTimer, SIGNAL(timeout()), this, SLOT(updateSurvivors()));
+    survivorTimer->start(50);
 
 
     // Conectar el spawn de obstáculos al timer del nivel
@@ -88,6 +102,7 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
 
 Game::~Game(){
 
+    delete survivorManager;
     delete obstacleManager;
 
 }
@@ -122,6 +137,24 @@ void Game::spawnObstacles(){
     obstacleManager->spawnObstacle(tipo, yPos);
 
     contador++;
+
+    // Generar un superviviente DETRÁS del obstáculo recién creado.
+    // Solo se generan 2 por nivel. Así el superviviente aparece "en el mapa"
+    // detrás de un obstáculo y se mueve junto con él (efecto scroll).
+    if(!survivorManager->allSpawned()){
+        survivorManager->spawnSurvivorBehindObstacle(
+            obstacleManager->getObstacle(obstacleManager->getCantidad() - 1));
+    }
+}
+
+void Game::updateSurvivors(){
+    // Le dice a cada superviviente si el heli está encima (para el rescate)
+    // y elimina los que ya fueron rescatados.
+    if(heli == nullptr || heli->scene() == nullptr){
+        return;
+    }
+    QRectF heliRect(heli->pos(), heli->boundingRect().size());
+    survivorManager->updateAll(heliRect);
 }
 
 
@@ -162,6 +195,9 @@ void Game::checkFinishLine(){
         if(obstacleManager->countVisible() == 0){
             // Crear la zona de aterrizaje
             finishLine = new FinishLine(scene);
+            // El mapa deja de avanzar: el heli aterrizado ya no se desliza,
+            // da la sensación de que el mundo se detuvo y solo falta aterrizar.
+            mundoEnMovimiento = false;
         }else{
             // Todavía hay obstáculos, esperar al siguiente tick
             return;

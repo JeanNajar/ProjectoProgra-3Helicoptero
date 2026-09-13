@@ -1,4 +1,5 @@
 #include "MyHeli.h"
+#include "GAME.h"
 #include <QKeyEvent>
 #include <QGraphicsScene>
 #include <QAudioOutput>
@@ -6,6 +7,8 @@
 #include <QTimer>
 #include <QGraphicsTextItem>
 #include <QFont>
+
+extern Game * game;
 
 MyHeli::MyHeli() : QObject(), QGraphicsPixmapItem(){
 
@@ -149,6 +152,26 @@ void MyHeli::updatePhysics(){
 
     if(newY + boundingRect().height() >= scene()->height()){
         newY = scene()->height() - boundingRect().height();
+
+        // ===== SCROLL DEL MUNDO (heli aterrizado) =====
+        // Cuando el heli está en el suelo, el mundo se mueve hacia la
+        // izquierda (los obstáculos y supervivientes avanzan). Para que el
+        // heli se mueva EXACTAMENTE a la misma velocidad que el mundo,
+        // usamos la posición actual x() (sin la inercia del jugador velX)
+        // y le restamos la velocidad de scroll (60px/s = 3px por tick).
+        double scrollVel = 60.0;
+        if(game->mundoEnMovimiento){
+            newX = x() - scrollVel * dt;
+            if(newX < 0){
+                newX = 0;
+            }
+        }else{
+            // El mundo se detuvo (la meta apareció): el heli aterrizado
+            // queda QUIETO para poder aterrizar en la zona sin deslizarse.
+            newX = x();
+        }
+
+        setPos(newX, newY);
         checkLanding();
         return;
     }
