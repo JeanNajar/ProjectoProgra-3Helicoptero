@@ -10,7 +10,8 @@
 
 extern Game * game;
 
-MyHeli::MyHeli() : QObject(), QGraphicsPixmapItem(){
+MyHeli::MyHeli() : QObject(), QGraphicsPixmapItem()
+{
 
     //cargar los 4 fotogramas del rotor girando
     rotorFrames[0] = QPixmap(":/Sprites/recursosh/helicoptero_frame1.png");
@@ -19,6 +20,14 @@ MyHeli::MyHeli() : QObject(), QGraphicsPixmapItem(){
     rotorFrames[3] = QPixmap(":/Sprites/recursosh/helicoptero_frame4.png");
     currentFrame = 0;
     setPixmap(rotorFrames[currentFrame]);
+
+    //cargas los fotogramas de la explosion
+    explosionFrames[0] = QPixmap(":/Sprites/recursosh/explosion_frame1.png");
+    explosionFrames[1] = QPixmap(":/Sprites/recursosh/explosion_frame2.png");
+    explosionFrames[2] = QPixmap(":/Sprites/recursosh/explosion_frame3.png");
+    explosionFrames[3] = QPixmap(":/Sprites/recursosh/explosion_frame4.png");
+    explosionFrames[4] = QPixmap(":/Sprites/recursosh/explosion_frame5.png");
+    explosionFrame = 0;
 
     //esto sirve para que el punto de en medio sea el origen del helicoptero
     setTransformOriginPoint(boundingRect().center());
@@ -30,6 +39,7 @@ MyHeli::MyHeli() : QObject(), QGraphicsPixmapItem(){
     thrusting = false;
     movingLeft = false;
     movingRight = false;
+    crashed = false;
 
     //timer para las fisicas
     QTimer *physicsTimer = new QTimer(this);
@@ -52,7 +62,8 @@ MyHeli::MyHeli() : QObject(), QGraphicsPixmapItem(){
 }
 
 //destructor aqui liberamos la memoria
-MyHeli::~MyHeli(){
+MyHeli::~MyHeli()
+{
 
     delete physics;
     delete crashSound;
@@ -206,18 +217,49 @@ void MyHeli::updateRotorAnimation(){
     setPixmap(rotorFrames[currentFrame]);
 }
 
-void MyHeli::crash(){
+void MyHeli::crash()
+{
+    if(crashed)
+    {
+        return; // ya esta explotando, no reinicar la animacion
+    }
+    crashed = true;
 
     // Sonido de choque
     if(crashSound->playbackState() == QMediaPlayer::StoppedState){
         crashSound->play();
     }
 
-    // Quitar el heli de la escena
-    scene()->removeItem(this);
+    // Detener animacion del rotor
+    rotorTimer->stop();
 
-    //para que suene el sonido antes de borrarlo
+    // Centrar la explosion donde estaba el helicoptero
+    QPointF centro = pos() + boundingRect().center();
+    setPixmap(explosionFrames[0]);
+    setOffset(0,0);
+    setPos(centro.x() - boundingRect().width() / 2.0, centro.y() - boundingRect().height() / 2.0);
+
+    // Animar la explosion (5 fotogramas cada 100ms = 500ms)
+    explosionTimer = new QTimer(this);
+    connect(explosionTimer, SIGNAL(timeout()), this, SLOT(updateExplosion()));
+    explosionTimer->start(100);
+
+    //para que suene el somnido y se vea la explosion antes de borrarlo
     QTimer::singleShot(1000, this, [this]() {
+        scene()->removeItem(this);
         delete this;
     });
+}
+
+void MyHeli::updateExplosion()
+{
+    explosionFrame++;
+    if(explosionFrame >= 5)
+    {
+        explosionTimer->stop();
+        return;
+    }
+    QPointF centroViejo = pos() + boundingRect().center();
+    setPixmap(explosionFrames[explosionFrame]);
+    setPos(centroViejo.x() - boundingRect().width() / 2.0, centroViejo.y() - boundingRect().height() / 2.0);
 }

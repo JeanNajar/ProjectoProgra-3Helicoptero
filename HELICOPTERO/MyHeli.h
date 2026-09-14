@@ -26,6 +26,7 @@ public slots:
     void updatePhysics();
     void crash();
     void updateRotorAnimation();
+    void updateExplosion();
 
 private:
 
@@ -36,6 +37,7 @@ private:
     bool thrusting; //subiendo
     bool movingLeft;
     bool movingRight;
+    bool crashed; //true apenas explota, corta la fisica y evita crash() repetido
 
     //sonidos
     QMediaPlayer *crashSound;
@@ -45,6 +47,11 @@ private:
     QPixmap rotorFrames[4];
     int currentFrame;
     QTimer *rotorTimer;
+
+    //animacion de la explosion
+    QPixmap explosionFrames[5];
+    int explosionFrame;
+    QTimer *explosionTimer;
 
     //funciones
     void checkLanding();

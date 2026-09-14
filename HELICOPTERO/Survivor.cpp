@@ -4,42 +4,46 @@
 #include <QPen>
 
 Survivor::Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene)
-    : QObject(), QGraphicsRectItem()
+    : QObject(), QGraphicsPixmapItem()
 {
     this->escena = scene;
     progreso = 0;
     rescatado = false;
     heliEncima = false;
 
-    //cuadrito verde (Es temporal)
-
-    setRect(0, 0, 40, 40);
-    setBrush(QBrush(Qt::green));
-    setPen(QPen(Qt::darkGreen));
+    // cargar los 2 fotogramas (brazo derecho / izquierdo levantado)
+    frames[0] = QPixmap(":/Sprites/recursosh/superviviente_frame1.png");
+    frames[1] = QPixmap(":/Sprites/recursosh/superviviente_frame2.png");
+    currentFrame = 0;
+    setPixmap(frames[currentFrame]);
     setPos(xPos, yPos);
 
     //  fondo de la barra de progresion
-    fondoBarra = new QGraphicsRectItem(0, 0, 40, 6, this);
+    fondoBarra = new QGraphicsRectItem(0, 0, boundingRect().width(), 6, this);
     fondoBarra->setBrush(QBrush(QColor(60, 60, 60)));
     fondoBarra->setPen(QPen(Qt::black));
     fondoBarra->setPos(0, -10);  // Encima del superviviente
 
     // barra de progresion
-
     barra = new QGraphicsRectItem(0, 0, 0, 6, this);
     barra->setBrush(QBrush(Qt::yellow));
     barra->setPen(QPen(Qt::NoPen));
-    barra->setPos(0, -10);  // Encima del superviviente, sobre el fondo verdesito
+    barra->setPos(0, -10);  // Encima del superviviente, sobre el fondo
 
     // timer de progresion
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateProgress()));
     timer->start(50);
 
-    // timer de movimiento(el movimiento con patalla)
+    // timer de movimiento (el movimiento con pantalla)
     moveTimer = new QTimer(this);
     connect(moveTimer, SIGNAL(timeout()), this, SLOT(move()));
     moveTimer->start(50);
+
+    // timer de animacion (alterna los brazos, como si pidiera auxilio)
+    animTimer = new QTimer(this);
+    connect(animTimer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
+    animTimer->start(400);
 }
 
 Survivor::~Survivor(){
@@ -49,6 +53,9 @@ Survivor::~Survivor(){
     }
     if(moveTimer != nullptr){
         moveTimer->stop();
+    }
+    if(animTimer != nullptr){
+        animTimer->stop();
     }
     // La barra y el fondo (para que se dentengan y desaparezcan)
     // No hace falta delete manual aquí
@@ -60,7 +67,7 @@ bool Survivor::isRescued() const{
 
 bool Survivor::isHeliOver(QRectF heliRect) const{
     // Verificar si el rectángulo del heli se superpone con el del superviviente
-    return heliRect.intersects(rect().translated(pos()));
+    return heliRect.intersects(boundingRect().translated(pos()));
 }
 
 void Survivor::setHeliEncima(bool encima){
@@ -87,7 +94,7 @@ void Survivor::updateProgress(){
     }
 
     // Actualizar la barra según el progreso
-    int anchoBarra = static_cast<int>((progreso / 100.0) * 40.0);
+    int anchoBarra = static_cast<int>((progreso / 100.0) * boundingRect().width());
     barra->setRect(0, 0, anchoBarra, 6);
 
     // Si llego a rescatar
@@ -95,6 +102,7 @@ void Survivor::updateProgress(){
         rescatado = true;
         timer->stop();
         moveTimer->stop();  // Detener también el movimiento
+        animTimer->stop();
         escena->removeItem(this);
         // No hacemos delete this porque eso se controla en survivor manager
     }
@@ -110,11 +118,20 @@ void Survivor::move(){
     setPos(x() - 3, y());
 
     // Si salio por la izquierda, quitarlo de la escena
-    if(pos().x() + rect().width() < 0){
+    if(pos().x() + boundingRect().width() < 0){
         escena->removeItem(this);
 
         rescatado = true;
         timer->stop();
         moveTimer->stop();
+        animTimer->stop();
     }
+}
+
+void Survivor::updateAnimation(){
+    if(rescatado){
+        return;
+    }
+    currentFrame = (currentFrame + 1) % 2;
+    setPixmap(frames[currentFrame]);
 }
