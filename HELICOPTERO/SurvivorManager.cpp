@@ -8,6 +8,7 @@ SurvivorManager::SurvivorManager(QGraphicsScene *scene, ObstacleManager *obstacl
     this->scene = scene;
     this->obstacleManager = obstacleManager;
     totalGenerados = 0;
+    totalRescatados = 0;
 }
 
 SurvivorManager::~SurvivorManager(){
@@ -90,6 +91,11 @@ void SurvivorManager::updateAll(QRectF heliRect){
         // Si ya fue rescatado eliminarlo
         if(s->isRescued()){
 
+            // Solo cuenta como rescatado si completó la barra de progreso
+            if(s->fueRescatado()){
+                totalRescatados++;
+            }
+
             delete s;
             supervivientes.removeAt(i);
         }
@@ -102,4 +108,18 @@ int SurvivorManager::countActive() const{
 
 bool SurvivorManager::allSpawned() const{
     return totalGenerados >= 2;
+}
+
+int SurvivorManager::getTotalRescatados() const{
+    return totalRescatados;
+}
+
+int SurvivorManager::getProgresoTotal() const{
+    int total = totalRescatados * 100;
+    for(int i = 0; i < supervivientes.size(); i++){
+        if(supervivientes[i] != nullptr){
+            total += static_cast<int>(supervivientes[i]->getProgreso());
+        }
+    }
+    return total;
 }

@@ -3,14 +3,15 @@
 #include "Menu.h"
 
 Game * game;
+Menu * menu;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // Mostrar el menu principal
-    Menu menu;
-    menu.show();
+    menu = new Menu();
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+    menu->show();
 
     return a.exec();
 }

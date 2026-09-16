@@ -69,6 +69,11 @@ void ObstacleH::move(){
         return;
     }
 
+    // Si el juego terminó (ganó o perdió), los obstáculos se congelan
+    if(game->juegoTerminado){
+        return;
+    }
+
     //colision
     QList<QGraphicsItem* > colliding_items = collidingItems();
 

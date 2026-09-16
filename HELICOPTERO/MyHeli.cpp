@@ -111,6 +111,11 @@ void MyHeli::updatePhysics(){
         return;
     }
 
+    // Si el juego terminó (ganó o perdió), el heli se congela
+    if(game->juegoTerminado){
+        return;
+    }
+
     double dt = 0.016;
 
     if(thrusting){
@@ -224,6 +229,12 @@ void MyHeli::crash()
         return; // ya esta explotando, no reinicar la animacion
     }
     crashed = true;
+
+    // Avisar al juego: el heli se destruyó → mostrar pantalla de derrota
+    // (con porcentaje de rescate y barra). Esto también pausa el mundo.
+    if(game != nullptr && !game->juegoTerminado){
+        game->mostrarDerrota();
+    }
 
     // Sonido de choque
     if(crashSound->playbackState() == QMediaPlayer::StoppedState){

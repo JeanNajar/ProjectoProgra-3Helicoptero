@@ -1,7 +1,10 @@
 #include "Survivor.h"
+#include "GAME.h"
 #include <QTimer>
 #include <QBrush>
 #include <QPen>
+
+extern Game * game;
 
 Survivor::Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene)
     : QObject(), QGraphicsPixmapItem()
@@ -9,6 +12,7 @@ Survivor::Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene)
     this->escena = scene;
     progreso = 0;
     rescatado = false;
+    rescatadoPorProgreso = false;
     heliEncima = false;
 
     // cargar los 2 fotogramas (brazo derecho / izquierdo levantado)
@@ -65,9 +69,17 @@ bool Survivor::isRescued() const{
     return rescatado;
 }
 
+bool Survivor::fueRescatado() const{
+    return rescatadoPorProgreso;
+}
+
 bool Survivor::isHeliOver(QRectF heliRect) const{
     // Verificar si el rectángulo del heli se superpone con el del superviviente
     return heliRect.intersects(boundingRect().translated(pos()));
+}
+
+double Survivor::getProgreso() const{
+    return progreso;
 }
 
 void Survivor::setHeliEncima(bool encima){
@@ -75,6 +87,11 @@ void Survivor::setHeliEncima(bool encima){
 }
 
 void Survivor::updateProgress(){
+    // Si el juego terminó (ganó o perdió), el mundo se pausa
+    if(game->juegoTerminado){
+        return;
+    }
+
     // Si ya fue rescatado, no hacer nada
     if(rescatado){
         return;
@@ -100,6 +117,7 @@ void Survivor::updateProgress(){
     // Si llego a rescatar
     if(progreso >= 100){
         rescatado = true;
+        rescatadoPorProgreso = true;  // rescate REAL (completó la barra)
         timer->stop();
         moveTimer->stop();  // Detener también el movimiento
         animTimer->stop();
@@ -111,6 +129,11 @@ void Survivor::updateProgress(){
 void Survivor::move(){
 
     if(scene() == nullptr){
+        return;
+    }
+
+    // Si el juego terminó (ganó o perdió), el mundo se pausa
+    if(game->juegoTerminado){
         return;
     }
 

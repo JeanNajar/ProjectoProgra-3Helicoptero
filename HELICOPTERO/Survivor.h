@@ -19,7 +19,14 @@ public:
 
     bool isRescued() const;
 
+    // true solo si el rescate se completó por la barra de progreso
+    // (no si el superviviente simplemente salió del mapa)
+    bool fueRescatado() const;
+
     bool isHeliOver(QRectF heliRect) const;
+
+    // Progreso actual de rescate (0 a 100). Se usa para la barra de la derrota.
+    double getProgreso() const;
 
     void setHeliEncima(bool encima);
 
@@ -42,6 +49,7 @@ private:
     int currentFrame;
     double progreso;            // Progreso actual (0 a 100)
     bool rescatado;             // si ya a fue rescatado?
+    bool rescatadoPorProgreso;  // true si se rescató completando la barra
     bool heliEncima;            // ¿El heli está encima en el último tick?
 };
 

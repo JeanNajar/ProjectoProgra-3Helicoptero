@@ -14,7 +14,15 @@ extern Game * game;
 Menu::Menu(QWidget *parent) : QWidget(parent) {
 
     setWindowTitle("Helicopter Rescue");
-    setFixedSize(400, 640);
+
+    // Tamaño nativo del fondo (640x880): el menú se ve COMPLETO y sin cortes.
+    // Antes era 400x640: el fondo se deformaba y los botones (380px) no
+    // cabían en el espacio disponible (400 - 80 de márgenes = 320px).
+    // Ahora con 640 de ancho hay 560px disponibles: los botones caben.
+    // Se puede redimensionar (mínimo 480x660) y el fondo se escala sin
+    // deformarse (ver paintEvent).
+    resize(640, 880);
+    setMinimumSize(480, 660);
 
     fondo = QPixmap(":/Sprites/recursosh/menu_fondo_v2_640x880.png");
 
@@ -68,7 +76,19 @@ void Menu::paintEvent(QPaintEvent *event)
     //dibuja el fondo estirado a todo el tamano de la ventan, ANTEs
     // de que Qt pinte los widgets hijos(titulo, botones) encima
     QPainter painter(this);
-    painter.drawPixmap(rect(), fondo);
+
+    // Fondo oscuro base: rellena las franjas si la ventana no tiene la
+    // misma proporción que la imagen (evita que se vea blanco/cortado).
+    painter.fillRect(rect(), QColor(21, 10, 43));
+
+    // Dibujar el fondo escalado CONSERVANDO la proporción y centrado.
+    // Así nunca se deforma ni se corta al redimensionar la ventana.
+    QPixmap escalado = fondo.scaled(size(), Qt::KeepAspectRatio,
+                                    Qt::SmoothTransformation);
+    int x = (width() - escalado.width()) / 2;
+    int y = (height() - escalado.height()) / 2;
+    painter.drawPixmap(x, y, escalado);
+
     QWidget::paintEvent(event);
 }
 
@@ -92,7 +112,9 @@ void Menu::jugar(){
     game = new Game();
     game->setAttribute(Qt::WA_DeleteOnClose);
     game->show();
-    this->close();
+    // Ocultar el menú (no cerrarlo): se vuelve a mostrar al salir del juego
+    // con el botón "Volver al menú" (Game::volverAlMenu).
+    this->hide();
 }
 
 void Menu::seleccionarNivel(){
@@ -105,9 +127,9 @@ void Menu::puntajes(){
 
 void Menu::comoJugar(){
     QMessageBox::information(this, "Como Jugar",
-        "Flecha arriba / Espacio: subir\n"
-        "Flecha izquierda / derecha: moverse\n"
-        "Evita los obstaculos y aterriza en la zona verde.");
+                             "Flecha arriba / Espacio: subir\n"
+                             "Flecha izquierda / derecha: moverse\n"
+                             "Evita los obstaculos y aterriza en la zona verde.");
 }
 
 void Menu::salir(){
