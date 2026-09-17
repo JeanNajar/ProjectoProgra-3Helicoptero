@@ -8,6 +8,7 @@
 #include <QPainter>
 #include <QIcon>
 
+
 //puntero global de la ventana única (definido en main.cpp)
 extern VentanaPrincipal * ventanaPrincipal;
 
@@ -15,6 +16,7 @@ Menu::Menu(QWidget *parent) : QWidget(parent) {
 
     // Es una página de la ventana única: el tamaño lo define la ventana
     // (800x600). El fondo se estira para llenar toda la pantalla.
+
 
     fondo = QPixmap(":/Sprites/recursosh/menu_fondo_v2_640x880.png");
 
