@@ -129,7 +129,7 @@ void ObstacleH::move(){
     }
 
     // Si el juego terminó (ganó o perdió), los obstáculos se congelan
-    if(game->juegoTerminado){
+    if(game == nullptr || game->juegoTerminado){
         return;
     }
 
@@ -188,7 +188,7 @@ void ObstacleH::recibirImpacto(){
     }
 
     // Si el juego terminó, las balas ya no afectan
-    if(game->juegoTerminado){
+    if(game == nullptr || game->juegoTerminado){
         return;
     }
 

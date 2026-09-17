@@ -1,13 +1,12 @@
 #include <QApplication>
 #include <QThread>
 #include "Game.h"
-#include "Menu.h"
+#include "VentanaPrincipal.h"
 #include "ResourceLoader.h"
 #include "UserManager.h"
-#include "LoginScreen.h"
 
 Game * game;
-Menu * menu;
+VentanaPrincipal * ventanaPrincipal;
 UserManager * userManager;
 QString usuarioActual;   // usuario que inició sesión (se llena en LoginScreen)
 
@@ -40,11 +39,13 @@ int main(int argc, char *argv[])
     userManager = new UserManager();
     userManager->cargarUsuarios();
 
-    // La app arranca en la pantalla de LOGIN (antes del menú).
-    // Al iniciar sesión correctamente se crea y muestra el Menu.
-    LoginScreen *login = new LoginScreen();
-    login->setAttribute(Qt::WA_DeleteOnClose);
-    login->show();
+    // ===== VENTANA ÚNICA =====
+    // Todas las pantallas (login, registro, menú, selector y juego) son
+    // páginas de un QStackedWidget dentro de esta ventana. La app arranca
+    // en el login y navega cambiando de página (sin abrir ventanas nuevas).
+    ventanaPrincipal = new VentanaPrincipal();
+    ventanaPrincipal->setAttribute(Qt::WA_DeleteOnClose);
+    ventanaPrincipal->show();
 
     return a.exec();
 }

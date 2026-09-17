@@ -6,10 +6,10 @@
 
 class QLineEdit;
 class QPushButton;
-class RegisterScreen;
 
 // Pantalla de inicio de sesión: aparece ANTES del menú. Pide
 // usuario/contraseña y valida contra UserManager (usuarios.dat).
+// Es una página de la ventana única (VentanaPrincipal).
 class LoginScreen : public QWidget {
     Q_OBJECT
 

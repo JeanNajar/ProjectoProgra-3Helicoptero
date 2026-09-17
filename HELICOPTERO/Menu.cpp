@@ -1,6 +1,5 @@
 #include "Menu.h"
-#include "Game.h"
-#include "LevelSelect.h"
+#include "VentanaPrincipal.h"
 
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -9,21 +8,13 @@
 #include <QPainter>
 #include <QIcon>
 
-//puntero global del juego (definido en main.cpp)
-extern Game * game;
+//puntero global de la ventana única (definido en main.cpp)
+extern VentanaPrincipal * ventanaPrincipal;
 
 Menu::Menu(QWidget *parent) : QWidget(parent) {
 
-    setWindowTitle("Helicopter Rescue");
-
-    // Tamaño nativo del fondo (640x880): el menú se ve COMPLETO y sin cortes.
-    // Antes era 400x640: el fondo se deformaba y los botones (380px) no
-    // cabían en el espacio disponible (400 - 80 de márgenes = 320px).
-    // Ahora con 640 de ancho hay 560px disponibles: los botones caben.
-    // Se puede redimensionar (mínimo 480x660) y el fondo se escala sin
-    // deformarse (ver paintEvent).
-    resize(640, 880);
-    setMinimumSize(480, 660);
+    // Es una página de la ventana única: el tamaño lo define la ventana
+    // (800x600). El fondo se estira para llenar toda la pantalla.
 
     fondo = QPixmap(":/Sprites/recursosh/menu_fondo_v2_640x880.png");
 
@@ -71,21 +62,10 @@ Menu::Menu(QWidget *parent) : QWidget(parent) {
 
 void Menu::paintEvent(QPaintEvent *event)
 {
-    //dibuja el fondo estirado a todo el tamano de la ventan, ANTEs
-    // de que Qt pinte los widgets hijos(titulo, botones) encima
+    // Fondo estirado a TODA la ventana (sin barras laterales ni franjas)
     QPainter painter(this);
-
-    // Fondo oscuro base: rellena las franjas si la ventana no tiene la
-    // misma proporción que la imagen (evita que se vea blanco/cortado).
     painter.fillRect(rect(), QColor(21, 10, 43));
-
-    // Dibujar el fondo escalado CONSERVANDO la proporción y centrado.
-    // Así nunca se deforma ni se corta al redimensionar la ventana.
-    QPixmap escalado = fondo.scaled(size(), Qt::KeepAspectRatio,
-                                    Qt::SmoothTransformation);
-    int x = (width() - escalado.width()) / 2;
-    int y = (height() - escalado.height()) / 2;
-    painter.drawPixmap(x, y, escalado);
+    painter.drawPixmap(rect(), fondo);
 
     QWidget::paintEvent(event);
 }
@@ -109,10 +89,8 @@ QPushButton* Menu::crearBotonImagen(const QString &rutaImagen, int w, int h)
 void Menu::jugar(){
     // Al darle PLAY se abre el selector de niveles: el 1 siempre disponible
     // y el 2 y 3 bloqueados hasta completar el nivel anterior.
-    LevelSelect *selector = new LevelSelect();
-    selector->setAttribute(Qt::WA_DeleteOnClose);
-    selector->show();
-    this->hide();
+    // Cambia de página en la ventana única (no abre una ventana nueva).
+    ventanaPrincipal->mostrarSelector();
 }
 
 void Menu::puntajes(){
@@ -127,5 +105,6 @@ void Menu::comoJugar(){
 }
 
 void Menu::salir(){
-    this->close();
+    // Cerrar la ventana única (cierra toda la aplicación)
+    ventanaPrincipal->close();
 }

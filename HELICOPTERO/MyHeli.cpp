@@ -199,7 +199,7 @@ void MyHeli::updatePhysics(){
     }
 
     // Si el juego terminó (ganó o perdió), el heli se congela
-    if(game->juegoTerminado){
+    if(game == nullptr || game->juegoTerminado){
         return;
     }
 

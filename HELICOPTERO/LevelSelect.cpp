@@ -1,6 +1,5 @@
 #include "LevelSelect.h"
-#include "Game.h"
-#include "Menu.h"
+#include "VentanaPrincipal.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -10,17 +9,13 @@
 #include <QSettings>
 
 //punteros globales (definidos en main.cpp)
-extern Game * game;
-extern Menu * menu;
+extern VentanaPrincipal * ventanaPrincipal;
 extern QString usuarioActual;
 
 LevelSelect::LevelSelect(QWidget *parent) : QWidget(parent) {
 
-    setWindowTitle("Seleccionar Nivel");
-
-    // El fondo del selector es 800x600, mismo tamaño que la ventana
-    resize(800, 600);
-    setMinimumSize(640, 480);
+    // Es una página de la ventana única: el tamaño lo define la ventana
+    // (800x600, mismo tamaño nativo del fondo del selector).
 
     fondo = QPixmap(":/Sprites/recursosh/seleccionar_nivel_fondo_800x600.png");
 
@@ -106,15 +101,11 @@ QPushButton* LevelSelect::crearCardNivel(int nivel, bool desbloqueado)
 }
 
 void LevelSelect::jugarNivel(int nivel){
-    // Crear el juego con el nivel elegido y cerrar este menú
-    game = new Game(nivel);
-    game->setAttribute(Qt::WA_DeleteOnClose);
-    game->show();
-    this->close();
+    // Crear el juego con el nivel elegido (página nueva en la ventana única)
+    ventanaPrincipal->mostrarJuego(nivel);
 }
 
 void LevelSelect::volver(){
-    // Regresar al menú principal
-    menu->show();
-    this->close();
+    // Regresar al menú principal (cambia de página en la ventana única)
+    ventanaPrincipal->mostrarMenu();
 }

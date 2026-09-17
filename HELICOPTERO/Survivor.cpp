@@ -108,7 +108,7 @@ void Survivor::setHeliEncima(bool encima){
 
 void Survivor::updateProgress(){
     // Si el juego terminó (ganó o perdió), el mundo se pausa
-    if(game->juegoTerminado){
+    if(game == nullptr || game->juegoTerminado){
         return;
     }
 
@@ -153,7 +153,7 @@ void Survivor::move(){
     }
 
     // Si el juego terminó (ganó o perdió), el mundo se pausa
-    if(game->juegoTerminado){
+    if(game == nullptr || game->juegoTerminado){
         return;
     }
 

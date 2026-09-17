@@ -1,7 +1,6 @@
 #include "LoginScreen.h"
-#include "RegisterScreen.h"
 #include "UserManager.h"
-#include "Menu.h"
+#include "VentanaPrincipal.h"
 
 #include <QVBoxLayout>
 #include <QLineEdit>
@@ -13,21 +12,18 @@
 
 //punteros globales (definidos en main.cpp)
 extern UserManager * userManager;
-extern Menu * menu;
+extern VentanaPrincipal * ventanaPrincipal;
 extern QString usuarioActual;
 
 LoginScreen::LoginScreen(QWidget *parent) : QWidget(parent) {
 
-    setWindowTitle("Iniciar Sesión");
-
-    // Mismo tamaño y estilo que el menú principal
-    resize(640, 880);
-    setMinimumSize(480, 660);
+    // Es una página de la ventana única: el tamaño lo define la ventana
+    // (800x600). El fondo se estira para llenar toda la pantalla.
 
     fondo = QPixmap(":/Sprites/recursosh/login_fondo_640x880.png");
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(120, 250, 120, 80);
+    layout->setContentsMargins(120, 150, 120, 60);
     layout->setSpacing(16);
 
     QLabel *titulo = new QLabel("INICIAR SESIÓN");
@@ -84,15 +80,11 @@ LoginScreen::LoginScreen(QWidget *parent) : QWidget(parent) {
 
 void LoginScreen::paintEvent(QPaintEvent *event)
 {
-    // Fondo igual que el menú principal: oscuro + imagen escalada centrada
+    // Fondo estirado a TODA la ventana (sin barras laterales ni franjas).
+    // La imagen 640x880 se adapta a cualquier tamaño de la ventana.
     QPainter painter(this);
     painter.fillRect(rect(), QColor(21, 10, 43));
-
-    QPixmap escalado = fondo.scaled(size(), Qt::KeepAspectRatio,
-                                    Qt::SmoothTransformation);
-    int x = (width() - escalado.width()) / 2;
-    int y = (height() - escalado.height()) / 2;
-    painter.drawPixmap(x, y, escalado);
+    painter.drawPixmap(rect(), fondo);
 
     QWidget::paintEvent(event);
 }
@@ -128,19 +120,13 @@ void LoginScreen::iniciarSesion(){
         return;
     }
 
-    // Login correcto: guardar el usuario logueado y abrir el menú
+    // Login correcto: guardar el usuario logueado y pasar al menú
+    // (cambia de página en la ventana única, no abre una ventana nueva)
     usuarioActual = nombre;
-
-    menu = new Menu();
-    menu->setAttribute(Qt::WA_DeleteOnClose);
-    menu->show();
-    this->close();
+    ventanaPrincipal->mostrarMenu();
 }
 
 void LoginScreen::crearCuenta(){
-    // Abrir la pantalla de registro (esta se oculta, no se cierra)
-    RegisterScreen *registro = new RegisterScreen(this);
-    registro->setAttribute(Qt::WA_DeleteOnClose);
-    registro->show();
-    this->hide();
+    // Cambiar a la página de registro (dentro de la misma ventana)
+    ventanaPrincipal->mostrarRegistro();
 }

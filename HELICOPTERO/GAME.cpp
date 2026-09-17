@@ -1,7 +1,6 @@
 #include "Game.h"
 #include "ObstacleType.h"
-#include "Menu.h"
-#include "LevelSelect.h"
+#include "VentanaPrincipal.h"
 #include "ResourceLoader.h"
 
 #include <QTimer>
@@ -18,8 +17,8 @@
 
 //puntero global del juego (definido en main.cpp)
 extern Game * game;
-//puntero global del menú (definido en main.cpp): se usa para volver al menú
-extern Menu * menu;
+//ventana única (definida en main.cpp): se usa para navegar entre páginas
+extern VentanaPrincipal * ventanaPrincipal;
 //usuario que inició sesión (definido en main.cpp): el progreso es por cuenta
 extern QString usuarioActual;
 
@@ -599,29 +598,18 @@ QString Game::calcularNota(int vidas, int rescatados) const{
 }
 
 void Game::reintentarNivel(){
-    // Crear un nivel nuevo (el mismo nivel) y cerrar este. El puntero
-    // global `game` se actualiza al nuevo juego para que el resto del
-    // código (MyHeli, ObstacleH, Survivor) siga funcionando.
-    Game *nuevo = new Game(nivelActual);
-    nuevo->setAttribute(Qt::WA_DeleteOnClose);
-    this->close();   // este juego se borra solo (WA_DeleteOnClose)
-    game = nuevo;
-    nuevo->show();
+    // La ventana única recrea la página del juego con el mismo nivel
+    ventanaPrincipal->reintentarNivel();
 }
 
 void Game::seleccionarNivel(){
-    // Abrir el menú de selección de niveles y cerrar este juego.
-    LevelSelect *selector = new LevelSelect();
-    selector->setAttribute(Qt::WA_DeleteOnClose);
-    this->close();
-    selector->show();
+    // Cambiar a la página del selector de niveles (ventana única)
+    ventanaPrincipal->mostrarSelector();
 }
 
 void Game::volverAlMenu(){
-    // Mostrar el menú ANTES de cerrar el juego: si el menú está oculto y
-    // cerramos el juego, la app se cerraría (última ventana visible).
-    menu->show();
-    this->close();
+    // Cambiar a la página del menú principal (ventana única)
+    ventanaPrincipal->mostrarMenu();
 }
 
 void Game::showEvent(QShowEvent *event){
@@ -629,6 +617,12 @@ void Game::showEvent(QShowEvent *event){
     //escala la escena para que quepa completa en la ventana
     //(evita que el heli y el suelo se corten en el borde inferior)
     fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+
+    // Al mostrarse la página del juego, darle el foco al heli para que
+    // las teclas (subir, moverse, disparar) funcionen de inmediato.
+    if(heli != nullptr && heli->scene() != nullptr){
+        heli->setFocus();
+    }
 }
 
 void Game::resizeEvent(QResizeEvent *event){

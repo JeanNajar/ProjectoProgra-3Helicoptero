@@ -1,6 +1,6 @@
 #include "RegisterScreen.h"
-#include "LoginScreen.h"
 #include "UserManager.h"
+#include "VentanaPrincipal.h"
 
 #include <QVBoxLayout>
 #include <QLineEdit>
@@ -9,26 +9,21 @@
 #include <QIcon>
 #include <QPainter>
 #include <QMessageBox>
-#include <QCloseEvent>
 
 //puntero global (definido en main.cpp)
 extern UserManager * userManager;
+extern VentanaPrincipal * ventanaPrincipal;
 
-RegisterScreen::RegisterScreen(LoginScreen *loginScreen, QWidget *parent)
+RegisterScreen::RegisterScreen(QWidget *parent)
     : QWidget(parent)
 {
-    this->loginScreen = loginScreen;
-
-    setWindowTitle("Crear Cuenta");
-
-    // Mismo tamaño y estilo que el login / menú principal
-    resize(640, 880);
-    setMinimumSize(480, 660);
+    // Es una página de la ventana única: el tamaño lo define la ventana
+    // (800x600). El fondo se estira para llenar toda la pantalla.
 
     fondo = QPixmap(":/Sprites/recursosh/login_fondo_640x880.png");
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(120, 200, 120, 80);
+    layout->setContentsMargins(120, 120, 120, 60);
     layout->setSpacing(16);
 
     QLabel *titulo = new QLabel("CREAR CUENTA");
@@ -91,26 +86,12 @@ RegisterScreen::RegisterScreen(LoginScreen *loginScreen, QWidget *parent)
 
 void RegisterScreen::paintEvent(QPaintEvent *event)
 {
-    // Fondo igual que el login / menú principal: oscuro + imagen escalada
+    // Fondo estirado a TODA la ventana (sin barras laterales ni franjas)
     QPainter painter(this);
     painter.fillRect(rect(), QColor(21, 10, 43));
-
-    QPixmap escalado = fondo.scaled(size(), Qt::KeepAspectRatio,
-                                    Qt::SmoothTransformation);
-    int x = (width() - escalado.width()) / 2;
-    int y = (height() - escalado.height()) / 2;
-    painter.drawPixmap(x, y, escalado);
+    painter.drawPixmap(rect(), fondo);
 
     QWidget::paintEvent(event);
-}
-
-void RegisterScreen::closeEvent(QCloseEvent *event)
-{
-    // Si cierran con la X, volver a mostrar el login
-    if(loginScreen != nullptr){
-        loginScreen->show();
-    }
-    QWidget::closeEvent(event);
 }
 
 QPushButton* RegisterScreen::crearBotonImagen(const QString &rutaImagen, int w, int h)
@@ -156,9 +137,6 @@ void RegisterScreen::registrarse(){
 }
 
 void RegisterScreen::volver(){
-    // Volver al login
-    if(loginScreen != nullptr){
-        loginScreen->show();
-    }
-    this->close();
+    // Volver al login (cambia de página en la ventana única)
+    ventanaPrincipal->mostrarLogin();
 }
