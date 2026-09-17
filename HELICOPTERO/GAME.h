@@ -16,13 +16,14 @@
 #include "LevelManager.h"
 #include "FinishLine.h"
 #include "SurvivorManager.h"
+#include "BidonCombustible.h"
 
 class Game : public QGraphicsView {
     Q_OBJECT //
 
 public:
-    // Constructor
-    Game(QWidget *parent = nullptr);
+    // Constructor: recibe el nivel a jugar (1, 2 o 3)
+    Game(int nivel = 1, QWidget *parent = nullptr);
 
     // Destructor
     ~Game();
@@ -36,8 +37,10 @@ public:
     LevelManager * levelManager;
     FinishLine * finishLine;
     SurvivorManager * survivorManager;  // Maneja a los supervivientes
+    int nivelActual;         // Nivel que se está jugando (1, 2 o 3)
     bool mundoEnMovimiento;  // true: el mundo avanza (scroll). false: la meta apareció y todo se detiene
     bool juegoTerminado;     // true cuando se gana o pierde: pausa todo el mundo
+    QTimer *bidonTimer;     // Timer que genera bidones de combustible
 
     // Pantallas de resultados (estilo Cuphead)
     void mostrarVictoria();  // Nota A/A-/B+... según vidas y rescatados
@@ -48,7 +51,9 @@ public slots:
     void checkFinishLine();
     void updateSurvivors();
     void reintentarNivel();
+    void seleccionarNivel();
     void volverAlMenu();
+    void spawnBidon();  // Genera un bidón de combustible
 
     //logica de zona de aterrizaje
 private:
@@ -70,8 +75,10 @@ private:
     QGraphicsRectItem *barraFondo;
     QGraphicsRectItem *barraRelleno;
     QPushButton *btnReintentar;
+    QPushButton *btnNiveles;
     QPushButton *btnMenu;
     QGraphicsProxyWidget *proxyReintentar;
+    QGraphicsProxyWidget *proxyNiveles;
     QGraphicsProxyWidget *proxyMenu;
 
     void crearPanel();

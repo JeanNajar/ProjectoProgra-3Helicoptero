@@ -13,7 +13,8 @@ class Survivor : public QObject, public QGraphicsPixmapItem {
 
 public:
 
-    Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene);
+    // nivel: 1 = ciudad, 2 = desierto, 3 = nieve (elige los sprites)
+    Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene, int nivel = 1);
 
     ~Survivor();
 

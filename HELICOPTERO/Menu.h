@@ -17,7 +17,6 @@ protected:
 
 private slots:
     void jugar();
-    void seleccionarNivel();
     void puntajes();
     void comoJugar();
     void salir();

@@ -4,7 +4,8 @@
 enum class ObstacleType {
     VERTICAL,
     SMALL,
-    CEILING
+    CEILING,
+    FALLING   // cae de arriba hacia abajo (roca de desierto / carámbano de nieve)
 };
 
 #endif // OBSTACLETYPE_H

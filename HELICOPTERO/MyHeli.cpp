@@ -1,5 +1,6 @@
 #include "MyHeli.h"
 #include "GAME.h"
+#include "Bala.h"
 #include <QKeyEvent>
 #include <QGraphicsScene>
 #include <QAudioOutput>
@@ -7,11 +8,18 @@
 #include <QTimer>
 #include <QGraphicsTextItem>
 #include <QFont>
+#include <QBrush>
+#include <QPen>
+#include <QRandomGenerator>
 
 extern Game * game;
 
-MyHeli::MyHeli() : QObject(), QGraphicsPixmapItem()
+MyHeli::MyHeli(int nivel) : QObject(), QGraphicsPixmapItem()
 {
+    this->nivel = nivel;
+    // Las balas solo están disponibles desde el nivel 2 (desierto)
+    puedeDisparar = (nivel >= 2);
+    ultimoDisparo.start();
 
     //cargar los 4 fotogramas del rotor girando
     rotorFrames[0] = QPixmap(":/Sprites/recursosh/helicoptero_frame1.png");
@@ -40,6 +48,45 @@ MyHeli::MyHeli() : QObject(), QGraphicsPixmapItem()
     movingLeft = false;
     movingRight = false;
     crashed = false;
+
+    // ===== COMBUSTIBLE =====
+    // Arranca lleno (100). Se consume ~2.0/s de base y ~5.0/s extra al empujar.
+    // Si llega a 0, el empuje se ignora (solo gravedad).
+    fuel = 100.0;
+
+    // Barra de combustible (misma mecánica que la barra de Survivor):
+    // fondo oscuro + relleno que cambia de ancho según el porcentaje.
+    // Se posiciona encima del helicóptero (hija de este, como en Survivor).
+    barraCombustibleFondo = new QGraphicsRectItem(0, 0, boundingRect().width(), 6, this);
+    barraCombustibleFondo->setBrush(QBrush(QColor(60, 60, 60)));
+    barraCombustibleFondo->setPen(QPen(Qt::black));
+    barraCombustibleFondo->setPos(0, -12); // encima del helicóptero
+
+    barraCombustible = new QGraphicsRectItem(0, 0, boundingRect().width(), 6, this);
+    barraCombustible->setBrush(QBrush(QColor(0, 180, 255))); // azul
+    barraCombustible->setPen(QPen(Qt::NoPen));
+    barraCombustible->setPos(0, -12);
+
+    // ===== VIENTO =====
+    windX = 0.0;
+    windY = 0.0;
+    windTimer = nullptr;
+
+    if(nivel == 2){
+        // Nivel 2 (desierto): viento constante que empuja hacia los obstáculos
+        // (los obstáculos vienen de la derecha → windX positivo empuja a la derecha)
+        windX = 40.0;
+        windY = 0.0;
+    }else if(nivel == 3){
+        // Nivel 3 (nieve): turbulencia — viento aleatorio que cambia cada ~1.5s
+        windTimer = new QTimer(this);
+        connect(windTimer, &QTimer::timeout, this, [this](){
+            windX = QRandomGenerator::global()->bounded(-60, 61); // -60 a +60
+            windY = QRandomGenerator::global()->bounded(-40, 41); // -40 a +40
+        });
+        windTimer->start(1500);
+    }
+    // Nivel 1: sin viento (windX = windY = 0)
 
     //timer para las fisicas
     QTimer *physicsTimer = new QTimer(this);
@@ -82,10 +129,24 @@ void MyHeli::keyPressEvent(QKeyEvent *event){
     }else if(event->key() == Qt::Key_Right){
         //moverse a la derecha
         movingRight=true;
+    }else if(event->key() == Qt::Key_X){
+        //disparar una bala (solo nivel 2 y 3)
+        disparar();
     }
 
     //esto sirve para no se propague a otros elementos
     event->accept();
+}
+
+void MyHeli::recargarCombustible(double cantidad){
+    fuel += cantidad;
+    if(fuel > 100.0){
+        fuel = 100.0;
+    }
+}
+
+double MyHeli::getFuel() const{
+    return fuel;
 }
 
 void MyHeli::keyReleaseEvent(QKeyEvent *event){
@@ -102,6 +163,32 @@ void MyHeli::keyReleaseEvent(QKeyEvent *event){
     event->accept();
 }
 
+void MyHeli::disparar(){
+
+    // solo desde el nivel 2, y no cuando el juego terminó
+    if(!puedeDisparar){
+        return;
+    }
+    if(game == nullptr || game->juegoTerminado){
+        return;
+    }
+    if(scene() == nullptr){
+        return;
+    }
+
+    // cooldown de 400ms entre disparos
+    if(ultimoDisparo.elapsed() < 400){
+        return;
+    }
+    ultimoDisparo.restart();
+
+    // la bala sale del lado derecho del heli, centrada verticalmente
+    qreal bx = x() + boundingRect().width();
+    qreal by = y() + boundingRect().height() / 2.0 - 4.0; // -4 para centrar la bala (8px de alto)
+
+    Bala *bala = new Bala(bx, by, scene());
+    scene()->addItem(bala);
+}
 
 //actualizar las fisicas con el qtimer
 void MyHeli::updatePhysics(){
@@ -118,7 +205,26 @@ void MyHeli::updatePhysics(){
 
     double dt = 0.016;
 
-    if(thrusting){
+    // ===== COMBUSTIBLE =====
+    // Consumo base constante (~2.0/s) + consumo extra mientras thrusting (~5.0/s).
+    // Si fuel llega a 0, thrusting se ignora (solo gravedad).
+    double consumoBase = 2.0 * dt;
+    double consumoExtra = 0.0;
+    if(thrusting && fuel > 0.0){
+        consumoExtra = 5.0 * dt;
+    }
+    fuel -= (consumoBase + consumoExtra);
+    if(fuel < 0.0){
+        fuel = 0.0;
+    }
+
+    // Actualizar barra de combustible (mismo patrón que Survivor)
+    int anchoBarra = static_cast<int>((fuel / 100.0) * boundingRect().width());
+    barraCombustible->setRect(0, 0, anchoBarra, 6);
+
+    // ===== EMPUJE / GRAVEDAD =====
+    // Si no hay combustible, thrusting se ignora → solo gravedad
+    if(thrusting && fuel > 0.0){
         //aplicamos el empuje
         physics->applyThrust(velY,dt);
     }else{
@@ -143,6 +249,11 @@ void MyHeli::updatePhysics(){
         //inercia si no se toca ninguna tecla
         physics->applyFriction(velX, dt);
     }
+
+    // ===== VIENTO =====
+    // Empuja al helicóptero en la dirección del viento (se suma a la velocidad).
+    velX += windX * dt;
+    velY += windY * dt;
 
     //movimientos (la formula de posicion)
 
@@ -257,6 +368,11 @@ void MyHeli::crash()
 
     //para que suene el somnido y se vea la explosion antes de borrarlo
     QTimer::singleShot(1000, this, [this]() {
+        // Evitar puntero colgante: si el juego sigue abierto, avisarle que
+        // el heli ya no existe (así ~Game no lo borra dos veces).
+        if(game != nullptr && game->heli == this){
+            game->heli = nullptr;
+        }
         scene()->removeItem(this);
         delete this;
     });

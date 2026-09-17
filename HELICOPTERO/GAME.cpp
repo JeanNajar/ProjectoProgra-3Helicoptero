@@ -1,6 +1,8 @@
 #include "Game.h"
 #include "ObstacleType.h"
 #include "Menu.h"
+#include "LevelSelect.h"
+#include "ResourceLoader.h"
 
 #include <QTimer>
 #include <QMediaPlayer>
@@ -11,14 +13,19 @@
 #include <QPainter>
 #include <QShowEvent>
 #include <QResizeEvent>
+#include <QSettings>
+#include <cstdlib>
 
 //puntero global del juego (definido en main.cpp)
 extern Game * game;
 //puntero global del menú (definido en main.cpp): se usa para volver al menú
 extern Menu * menu;
+//usuario que inició sesión (definido en main.cpp): el progreso es por cuenta
+extern QString usuarioActual;
 
-Game::Game(QWidget *parent) : QGraphicsView(parent) {
+Game::Game(int nivel, QWidget *parent) : QGraphicsView(parent) {
 
+    nivelActual = nivel;
 
     //create a scene
     scene = new QGraphicsScene();
@@ -34,15 +41,31 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     //color de fondo de la vista (igual al cielo del fondo, evita franjas blancas)
     setBackgroundBrush(QColor(21, 10, 43));
 
-    //fondo de la ciudad cyberpunk.
+    //fondo según el nivel.
     // YA NO es un item de la escena: se dibuja en drawBackground() estirado
     // a TODA la ventana, así al agrandar la ventana no quedan franjas
     // oscuras en los lados (el fondo crece con la ventana).
-    fondoCiudad = QPixmap(":/Sprites/recursosh/fondo_ciudad_cyberpunk_800x600.png");
+    // Se usa la caché del hilo de precarga (ResourceLoader); si el hilo aún
+    // no terminó, se carga directo como respaldo.
+    fondoCiudad = ResourceLoader::background(nivel);
+    if(fondoCiudad.isNull()){
+        QString rutaFondo;
+        switch(nivel){
+        case 2:
+            rutaFondo = ":/Sprites/recursosh/nivel2_desierto_800x600.png";
+            break;
+        case 3:
+            rutaFondo = ":/Sprites/recursosh/nivel3_nieve_800x600.png";
+            break;
+        default:
+            rutaFondo = ":/Sprites/recursosh/fondo_ciudad_cyberpunk_800x600.png";
+        }
+        fondoCiudad = QPixmap(rutaFondo);
+    }
 
     //create an item to add to the scene
 
-    heli = new MyHeli();
+    heli = new MyHeli(nivel);
 
     // Posicionar el helicoptero
     heli->setPos(20, height() - heli->boundingRect().height());
@@ -63,12 +86,13 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     health->setPos(health->x(),health->y()+25);
     scene->addItem(health);
 
-    obstacleManager = new ObstacleManager(scene, this);
+    obstacleManager = new ObstacleManager(scene, nivel, this);
 
     // ===== MANAGER DE SUPERVIVIENTES =====
     // Maneja a los supervivientes en el suelo. Recibe el obstacleManager
-    // para no generar supervivientes dentro de un obstáculo.
-    survivorManager = new SurvivorManager(scene, obstacleManager, this);
+    // para no generar supervivientes dentro de un obstáculo, y el nivel
+    // para usar los sprites correctos (ciudad / desierto / nieve).
+    survivorManager = new SurvivorManager(scene, obstacleManager, nivel, this);
 
     //manager del nivel
     finishLine = nullptr;
@@ -90,8 +114,10 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     barraFondo = nullptr;
     barraRelleno = nullptr;
     btnReintentar = nullptr;
+    btnNiveles = nullptr;
     btnMenu = nullptr;
     proxyReintentar = nullptr;
+    proxyNiveles = nullptr;
     proxyMenu = nullptr;
 
 
@@ -114,7 +140,30 @@ Game::Game(QWidget *parent) : QGraphicsView(parent) {
     connect(levelManager->spawnTimer, SIGNAL(timeout()),
             this, SLOT(spawnObstacles()));
 
-    levelManager->startLevel(30, 3000);
+    // ===== BIDONES DE COMBUSTIBLE =====
+    // Spawn cada 4 segundos (aproximadamente 7-8 bidones por nivel).
+    // Aparecen desde la derecha a una altura aleatoria y se mueven a la izquierda.
+    bidonTimer = new QTimer(this);
+    connect(bidonTimer, SIGNAL(timeout()), this, SLOT(spawnBidon()));
+    bidonTimer->start(4000);
+
+    // Configuración por nivel: cada nivel spawna más rápido. El nivel 3 es
+    // el más largo (35s) para que alcancen a aparecer los 15 supervivientes
+    // (1 por obstáculo, spawn cada 2s → ~17 obstáculos).
+    int tiempoLimite = 30;
+    int spawnMs = 3000;
+    switch(nivel){
+    case 2:
+        tiempoLimite = 30;
+        spawnMs = 2500;
+        break;
+    case 3:
+        tiempoLimite = 35;
+        spawnMs = 2000;
+        break;
+    }
+    levelManager->setLevelNumber(nivel);
+    levelManager->startLevel(tiempoLimite, spawnMs);
 
     //play background music
     /*
@@ -131,6 +180,16 @@ Game::~Game(){
 
     delete survivorManager;
     delete obstacleManager;
+
+    // El heli tiene parte QObject (timers de física, rotor y explosión):
+    // hay que borrarlo ANTES de la escena para detener sus timers y evitar
+    // punteros colgantes al cambiar de nivel. Si ya se destruyó solo
+    // (crash()), el puntero global quedó en nullptr (ver MyHeli::crash).
+    if(heli != nullptr){
+        delete heli;
+        heli = nullptr;
+    }
+
     // La escena se borra al final: elimina el heli, el score, la salud,
     // la zona de aterrizaje y el panel de resultados. Sin esto, cada
     // reintento filtraría una escena completa en memoria.
@@ -155,19 +214,38 @@ void Game::spawnObstacles(){
     ObstacleType tipo;
     int yPos = 0;
 
-    switch(contador % 3){
-    case 0:
-        tipo = ObstacleType::VERTICAL;
-        // yPos se queda en 0, spawnObstacle usa la posición por defecto (parte baja)
-        break;
-    case 1:
-        tipo = ObstacleType::SMALL;
-        break;
-        // yPos se queda en 0, spawnObstacle
-    case 2:
-        tipo = ObstacleType::CEILING;
-        // yPos se queda en 0, spawnObstacle siempre pone arriba (y=0)
-        break;
+    // Patrón de obstáculos según el nivel:
+    // - Nivel 1 (ciudad): los 3 clásicos (vertical, pequeño, techo).
+    // - Niveles 2 y 3 (desierto/nieve): SOLO rocas/hielo del bioma
+    //   (vertical, pequeño y el que CAE). El de techo (CEILING) es
+    //   exclusivo de la ciudad y NO se genera en desierto/nieve.
+    if(nivelActual >= 2){
+        switch(contador % 3){
+        case 0:
+            tipo = ObstacleType::VERTICAL;
+            // yPos se queda en 0, spawnObstacle usa la posición por defecto (parte baja)
+            break;
+        case 1:
+            tipo = ObstacleType::SMALL;
+            break;
+            // yPos se queda en 0, spawnObstacle
+        case 2:
+            tipo = ObstacleType::FALLING;
+            // cae desde arriba en una posición aleatoria (lo coloca spawnObstacle)
+            break;
+        }
+    }else{
+        switch(contador % 3){
+        case 0:
+            tipo = ObstacleType::VERTICAL;
+            break;
+        case 1:
+            tipo = ObstacleType::SMALL;
+            break;
+        case 2:
+            tipo = ObstacleType::CEILING;
+            break;
+        }
     }
 
     obstacleManager->spawnObstacle(tipo, yPos);
@@ -175,12 +253,33 @@ void Game::spawnObstacles(){
     contador++;
 
     // Generar un superviviente DETRÁS del obstáculo recién creado.
-    // Solo se generan 2 por nivel. Así el superviviente aparece "en el mapa"
-    // detrás de un obstáculo y se mueve junto con él (efecto scroll).
+    // El máximo por nivel lo define SurvivorManager (5/10/15). Así el
+    // superviviente aparece "en el mapa" detrás de un obstáculo y se mueve
+    // junto con él (efecto scroll).
     if(!survivorManager->allSpawned()){
         survivorManager->spawnSurvivorBehindObstacle(
             obstacleManager->getObstacle(obstacleManager->getCantidad() - 1));
     }
+}
+
+void Game::spawnBidon(){
+
+    // Si el juego terminó (ganó o perdió), no generar más bidones
+    if(juegoTerminado){
+        return;
+    }
+
+    // Cuando el tiempo llega a 0 LevelManager pone active=false
+    if(!levelManager->isActive()){
+        return;
+    }
+
+    // Aparece desde la derecha, a una altura aleatoria (evita el suelo y el techo)
+    qreal xPos = scene->width() + 20;
+    qreal yPos = 50 + (rand() % static_cast<int>(scene->height() - 150));
+
+    BidonCombustible *bidon = new BidonCombustible(xPos, yPos, scene);
+    scene->addItem(bidon);
 }
 
 void Game::updateSurvivors(){
@@ -303,13 +402,24 @@ void Game::mostrarVictoria(){
     // escalón (A, A-, B+, B, ...).
     int vidas = health->getHealth();
     int rescatados = survivorManager->getTotalRescatados();
+    int objetivo = survivorManager->getTotalObjetivo();
     QString nota = calcularNota(vidas, rescatados);
 
     panelNota->setPlainText(nota);
     panelNota->setDefaultTextColor(QColor(255, 215, 0));  // dorado
 
     panelSub->setPlainText("Vidas: " + QString::number(vidas) + "/3"
-                           + "   Rescatados: " + QString::number(rescatados) + "/2");
+                           + "   Rescatados: " + QString::number(rescatados) + "/" + QString::number(objetivo));
+
+    // Desbloquear el siguiente nivel (se guarda en QSettings para que
+    // persista entre partidas). Completar el nivel N desbloquea el N+1.
+    // El progreso es POR USUARIO: cada cuenta tiene su propio desbloqueo.
+    QSettings settings("HelicopterRescue", "Progreso");
+    QString clave = QString("nivelDesbloqueado_%1").arg(usuarioActual);
+    int desbloqueado = settings.value(clave, 1).toInt();
+    if(nivelActual < 3 && nivelActual + 1 > desbloqueado){
+        settings.setValue(clave, nivelActual + 1);
+    }
 
     // Centrar los textos sobre el panel
     panelTitulo->setPos(scene->width() / 2 - panelTitulo->boundingRect().width() / 2, 140);
@@ -319,6 +429,14 @@ void Game::mostrarVictoria(){
     // La barra de progreso solo se usa en la derrota
     barraFondo->setVisible(false);
     barraRelleno->setVisible(false);
+
+    // El selector de niveles se abre SOLO automáticamente al terminar la
+    // partida (3 segundos para ver el resultado). Si el jugador pulsa
+    // Reintentar / Seleccionar nivel / Volver al menú antes, este timer
+    // se cancela solo (el juego se cierra y el contexto se destruye).
+    QTimer::singleShot(3000, this, [this]() {
+        seleccionarNivel();
+    });
 }
 
 void Game::mostrarDerrota(){
@@ -333,8 +451,9 @@ void Game::mostrarDerrota(){
     panelTitulo->setPlainText("NIVEL FALLIDO");
     panelTitulo->setDefaultTextColor(Qt::red);
 
-    // Porcentaje de rescate: 2 supervivientes = 200 puntos → 0 a 100%
-    int porcentaje = survivorManager->getProgresoTotal() / 2;
+    // Porcentaje de rescate: objetivo*100 puntos = 100%
+    int objetivo = survivorManager->getTotalObjetivo();
+    int porcentaje = survivorManager->getProgresoTotal() / objetivo;
     if(porcentaje > 100){
         porcentaje = 100;
     }
@@ -343,7 +462,7 @@ void Game::mostrarDerrota(){
     panelNota->setDefaultTextColor(porcentaje >= 50 ? Qt::yellow : Qt::red);
 
     int rescatados = survivorManager->getTotalRescatados();
-    panelSub->setPlainText("Rescatados: " + QString::number(rescatados) + "/2");
+    panelSub->setPlainText("Rescatados: " + QString::number(rescatados) + "/" + QString::number(objetivo));
 
     // Barra de progreso simple
     barraFondo->setVisible(true);
@@ -364,6 +483,14 @@ void Game::mostrarDerrota(){
     panelTitulo->setPos(scene->width() / 2 - panelTitulo->boundingRect().width() / 2, 140);
     panelNota->setPos(scene->width() / 2 - panelNota->boundingRect().width() / 2, 210);
     panelSub->setPos(scene->width() / 2 - panelSub->boundingRect().width() / 2, 330);
+
+    // El selector de niveles se abre SOLO automáticamente al terminar la
+    // partida (3 segundos para ver el resultado). Si el jugador pulsa
+    // Reintentar / Seleccionar nivel / Volver al menú antes, este timer
+    // se cancela solo (el juego se cierra y el contexto se destruye).
+    QTimer::singleShot(3000, this, [this]() {
+        seleccionarNivel();
+    });
 }
 
 void Game::crearPanel(){
@@ -421,9 +548,23 @@ void Game::crearPanel(){
         "QPushButton:hover { background-color: #2a2a4e; }"
         "QPushButton:pressed { background-color: #0f0f1e; }");
     proxyReintentar = scene->addWidget(btnReintentar);
-    proxyReintentar->setPos(290, 440);
+    proxyReintentar->setPos(290, 425);
     proxyReintentar->setZValue(1001);
     connect(btnReintentar, &QPushButton::clicked, this, &Game::reintentarNivel);
+
+    btnNiveles = new QPushButton("Seleccionar nivel");
+    btnNiveles->setFixedSize(220, 50);
+    btnNiveles->setCursor(Qt::PointingHandCursor);
+    btnNiveles->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #7dff9b;"
+        " border: 2px solid #7dff9b; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    proxyNiveles = scene->addWidget(btnNiveles);
+    proxyNiveles->setPos(290, 475);
+    proxyNiveles->setZValue(1001);
+    connect(btnNiveles, &QPushButton::clicked, this, &Game::seleccionarNivel);
 
     btnMenu = new QPushButton("Volver al menú");
     btnMenu->setFixedSize(220, 50);
@@ -435,18 +576,19 @@ void Game::crearPanel(){
         "QPushButton:hover { background-color: #2a2a4e; }"
         "QPushButton:pressed { background-color: #0f0f1e; }");
     proxyMenu = scene->addWidget(btnMenu);
-    proxyMenu->setPos(290, 500);
+    proxyMenu->setPos(290, 525);
     proxyMenu->setZValue(1001);
     connect(btnMenu, &QPushButton::clicked, this, &Game::volverAlMenu);
 }
 
 QString Game::calcularNota(int vidas, int rescatados) const{
     // Nota estilo Cuphead: A si vidas completas (3) y todos los
-    // supervivientes rescatados (2). Cada vida perdida o superviviente
+    // supervivientes rescatados. Cada vida perdida o superviviente
     // no rescatado baja un escalón: A, A-, B+, B, B-, C+, C, C-, D, F.
     static const char *escalones[] = {"A", "A-", "B+", "B", "B-",
                                       "C+", "C", "C-", "D", "F"};
-    int deducciones = (3 - vidas) + (2 - rescatados);
+    int objetivo = survivorManager->getTotalObjetivo();
+    int deducciones = (3 - vidas) + (objetivo - rescatados);
     if(deducciones < 0){
         deducciones = 0;
     }
@@ -457,14 +599,22 @@ QString Game::calcularNota(int vidas, int rescatados) const{
 }
 
 void Game::reintentarNivel(){
-    // Crear un nivel nuevo y cerrar este. El puntero global `game` se
-    // actualiza al nuevo juego para que el resto del código (MyHeli,
-    // ObstacleH, Survivor) siga funcionando con el juego vigente.
-    Game *nuevo = new Game();
+    // Crear un nivel nuevo (el mismo nivel) y cerrar este. El puntero
+    // global `game` se actualiza al nuevo juego para que el resto del
+    // código (MyHeli, ObstacleH, Survivor) siga funcionando.
+    Game *nuevo = new Game(nivelActual);
     nuevo->setAttribute(Qt::WA_DeleteOnClose);
     this->close();   // este juego se borra solo (WA_DeleteOnClose)
     game = nuevo;
     nuevo->show();
+}
+
+void Game::seleccionarNivel(){
+    // Abrir el menú de selección de niveles y cerrar este juego.
+    LevelSelect *selector = new LevelSelect();
+    selector->setAttribute(Qt::WA_DeleteOnClose);
+    this->close();
+    selector->show();
 }
 
 void Game::volverAlMenu(){

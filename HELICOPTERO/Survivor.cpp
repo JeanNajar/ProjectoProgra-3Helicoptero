@@ -1,12 +1,13 @@
 #include "Survivor.h"
 #include "GAME.h"
+#include "ResourceLoader.h"
 #include <QTimer>
 #include <QBrush>
 #include <QPen>
 
 extern Game * game;
 
-Survivor::Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene)
+Survivor::Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene, int nivel)
     : QObject(), QGraphicsPixmapItem()
 {
     this->escena = scene;
@@ -15,9 +16,28 @@ Survivor::Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene)
     rescatadoPorProgreso = false;
     heliEncima = false;
 
-    // cargar los 2 fotogramas (brazo derecho / izquierdo levantado)
-    frames[0] = QPixmap(":/Sprites/recursosh/superviviente_frame1.png");
-    frames[1] = QPixmap(":/Sprites/recursosh/superviviente_frame2.png");
+    // cargar los 2 fotogramas según el nivel (brazo derecho / izquierdo
+    // levantado). Se usa la caché del hilo de precarga; si el hilo aún no
+    // terminó, se carga directo como respaldo.
+    QVector<QPixmap> precargadas = ResourceLoader::survivorFrames(nivel);
+    if(precargadas.size() == 2 && !precargadas[0].isNull()){
+        frames[0] = precargadas[0];
+        frames[1] = precargadas[1];
+    }else{
+        QString base;
+        switch(nivel){
+        case 2:
+            base = "superviviente_desierto_frame";
+            break;
+        case 3:
+            base = "superviviente_nieve_frame";
+            break;
+        default:
+            base = "superviviente_frame";
+        }
+        frames[0] = QPixmap(":/Sprites/recursosh/" + base + "1.png");
+        frames[1] = QPixmap(":/Sprites/recursosh/" + base + "2.png");
+    }
     currentFrame = 0;
     setPixmap(frames[currentFrame]);
     setPos(xPos, yPos);

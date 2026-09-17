@@ -1,5 +1,6 @@
 #include "Menu.h"
 #include "Game.h"
+#include "LevelSelect.h"
 
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -52,20 +53,17 @@ Menu::Menu(QWidget *parent) : QWidget(parent) {
     int btnW = 380, btnH = 52;
 
     QPushButton *btnJugar = crearBotonImagen(":/Sprites/recursosh/boton_jugar.png", btnW, btnH);
-    QPushButton *btnNivel = crearBotonImagen(":/Sprites/recursosh/boton_seleccionar_nivel.png", btnW, btnH);
     QPushButton *btnPuntajes = crearBotonImagen(":/Sprites/recursosh/boton_puntajes.png", btnW, btnH);
     QPushButton *btnAyuda = crearBotonImagen(":/Sprites/recursosh/boton_como_jugar.png", btnW, btnH);
     QPushButton *btnSalir = crearBotonImagen(":/Sprites/recursosh/boton_salir.png", btnW, btnH);
 
     layout->addWidget(btnJugar, 0, Qt::AlignHCenter);
-    layout->addWidget(btnNivel, 0, Qt::AlignHCenter);
     layout->addWidget(btnPuntajes, 0, Qt::AlignHCenter);
     layout->addWidget(btnAyuda, 0, Qt::AlignHCenter);
     layout->addWidget(btnSalir, 0, Qt::AlignHCenter);
     layout->addStretch();
 
     connect(btnJugar, &QPushButton::clicked, this, &Menu::jugar);
-    connect(btnNivel, &QPushButton::clicked, this, &Menu::seleccionarNivel);
     connect(btnPuntajes, &QPushButton::clicked, this, &Menu::puntajes);
     connect(btnAyuda, &QPushButton::clicked, this, &Menu::comoJugar);
     connect(btnSalir, &QPushButton::clicked, this, &Menu::salir);
@@ -109,16 +107,12 @@ QPushButton* Menu::crearBotonImagen(const QString &rutaImagen, int w, int h)
 }
 
 void Menu::jugar(){
-    game = new Game();
-    game->setAttribute(Qt::WA_DeleteOnClose);
-    game->show();
-    // Ocultar el menú (no cerrarlo): se vuelve a mostrar al salir del juego
-    // con el botón "Volver al menú" (Game::volverAlMenu).
+    // Al darle PLAY se abre el selector de niveles: el 1 siempre disponible
+    // y el 2 y 3 bloqueados hasta completar el nivel anterior.
+    LevelSelect *selector = new LevelSelect();
+    selector->setAttribute(Qt::WA_DeleteOnClose);
+    selector->show();
     this->hide();
-}
-
-void Menu::seleccionarNivel(){
-    QMessageBox::information(this, "Seleccionar Nivel", "Disponible proximamente.");
 }
 
 void Menu::puntajes(){

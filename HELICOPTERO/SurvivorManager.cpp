@@ -2,13 +2,26 @@
 #include <QDebug>
 
 SurvivorManager::SurvivorManager(QGraphicsScene *scene, ObstacleManager *obstacleManager,
-                                 QObject *parent)
+                                 int nivel, QObject *parent)
     : QObject(parent)
 {
     this->scene = scene;
     this->obstacleManager = obstacleManager;
+    this->nivel = nivel;
     totalGenerados = 0;
     totalRescatados = 0;
+    // Supervivientes por nivel: nivel 1 = 5, nivel 2 = 10, nivel 3 = 15
+    switch(nivel){
+    case 2:
+        maximoSupervivientes = 10;
+        break;
+    case 3:
+        maximoSupervivientes = 15;
+        break;
+    default:
+        maximoSupervivientes = 5;
+        break;
+    }
 }
 
 SurvivorManager::~SurvivorManager(){
@@ -52,8 +65,8 @@ bool SurvivorManager::posicionLibre(qreal xPos, qreal yPos) const{
 
 bool SurvivorManager::spawnSurvivorBehindObstacle(ObstacleH *obstaculo){
     //genera un superviviente adelante de los obstaculos
-    if(totalGenerados >= 2){
-        return false;  // Ya se generaron los 2 deja de generar
+    if(totalGenerados >= maximoSupervivientes){
+        return false;  // Ya se generaron todos los de este nivel
     }
 
     if(obstaculo == nullptr || obstaculo->scene() == nullptr){
@@ -66,8 +79,8 @@ bool SurvivorManager::spawnSurvivorBehindObstacle(ObstacleH *obstaculo){
     // Posicioan X ADELANTE del obstáculo
     qreal xPos = obstaculo->pos().x() + 200;
 
-    // Crear el superviviente
-    Survivor *nuevo = new Survivor(xPos, yPos, scene);
+    // Crear el superviviente (con los sprites del nivel actual)
+    Survivor *nuevo = new Survivor(xPos, yPos, scene, nivel);
     scene->addItem(nuevo);
     supervivientes.append(nuevo);
     totalGenerados++;
@@ -107,11 +120,15 @@ int SurvivorManager::countActive() const{
 }
 
 bool SurvivorManager::allSpawned() const{
-    return totalGenerados >= 2;
+    return totalGenerados >= maximoSupervivientes;
 }
 
 int SurvivorManager::getTotalRescatados() const{
     return totalRescatados;
+}
+
+int SurvivorManager::getTotalObjetivo() const{
+    return maximoSupervivientes;
 }
 
 int SurvivorManager::getProgresoTotal() const{

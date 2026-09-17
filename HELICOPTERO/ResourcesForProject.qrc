@@ -25,5 +25,30 @@
 	<file>recursosh/boton_puntajes.png</file>
 	<file>recursosh/boton_como_jugar.png</file>
 	<file>recursosh/boton_salir.png</file>
+	<file>recursosh/nivel2_desierto_800x600.png</file>
+	<file>recursosh/nivel3_nieve_800x600.png</file>
+	<file>recursosh/superviviente_desierto_frame1.png</file>
+	<file>recursosh/superviviente_desierto_frame2.png</file>
+	<file>recursosh/superviviente_nieve_frame1.png</file>
+	<file>recursosh/superviviente_nieve_frame2.png</file>
+	<file>recursosh/desierto_obstaculo_roca_vertical_60x200.png</file>
+	<file>recursosh/desierto_obstaculo_roca_pequena_48x48.png</file>
+	<file>recursosh/desierto_obstaculo_roca_cayendo_40x40.png</file>
+	<file>recursosh/nieve_obstaculo_espiga_hielo_60x200.png</file>
+	<file>recursosh/nieve_obstaculo_roca_hielo_48x48.png</file>
+	<file>recursosh/nieve_obstaculo_carambano_cayendo_28x70.png</file>
+	<file>recursosh/bala.png</file>
+	<file>recursosh/nivel_card_1_unlocked.png</file>
+	<file>recursosh/nivel_card_2_locked.png</file>
+	<file>recursosh/nivel_card_2_unlocked.png</file>
+	<file>recursosh/nivel_card_3_locked.png</file>
+	<file>recursosh/nivel_card_3_unlocked.png</file>
+	<file>recursosh/seleccionar_nivel_fondo_800x600.png</file>
+	<file>recursosh/login_fondo_640x880.png</file>
+	<file>recursosh/boton_iniciar_sesion.png</file>
+	<file>recursosh/boton_crear_cuenta.png</file>
+	<file>recursosh/boton_registrarse.png</file>
+	<file>recursosh/boton_volver.png</file>
+	<file>recursosh/bidon_combustible_32x32.png</file>
     </qresource>
 </RCC>

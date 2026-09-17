@@ -3,11 +3,12 @@
 #include <QTimer>
 #include <typeinfo>
 
-ObstacleManager::ObstacleManager(QGraphicsScene *scene, QObject *parent):QObject(parent){
+ObstacleManager::ObstacleManager(QGraphicsScene *scene, int nivel, QObject *parent):QObject(parent){
 
     obstaculos = nullptr;
     cantidad = 0;
     this->scene = scene;
+    this->nivel = nivel;
 }
 
 ObstacleManager::~ObstacleManager(){
@@ -35,14 +36,15 @@ cantidad = 0;
 
 void ObstacleManager::spawnObstacle(ObstacleType type,int yPos){
 
-    ObstacleH *nuevo = new ObstacleH(type, this);
+    ObstacleH *nuevo = new ObstacleH(type, this, nivel);
 
     qreal xPos = scene->width();
 
     switch(type){
      case ObstacleType::VERTICAL:
         if (yPos <=0)
-             yPos = static_cast<int>(scene->height()-300);
+             // la base toca el suelo: altura de la escena menos la altura del obstáculo
+             yPos = static_cast<int>(scene->height() - nuevo->boundingRect().height());
         break;
      case ObstacleType::SMALL:
          if (yPos <= 0)
@@ -52,6 +54,11 @@ void ObstacleManager::spawnObstacle(ObstacleType type,int yPos){
      case ObstacleType::CEILING:
          yPos = 0;
              break;
+     case ObstacleType::FALLING:
+         // cae desde arriba en una posición aleatoria (empieza fuera de la pantalla)
+         xPos = 100 + (rand() % 500);
+         yPos = -static_cast<int>(nuevo->boundingRect().height());
+         break;
 
     }
     nuevo->setPos(xPos, yPos);

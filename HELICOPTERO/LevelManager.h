@@ -14,6 +14,9 @@ public:
 
     void startLevel(int timeLimit,int spawnIntervalMs);
 
+    // Indica qué nivel se está jugando (1, 2 o 3)
+    void setLevelNumber(int nivel);
+
     bool isActive() const;
     bool isFinished() const;
     int getTimeRemaining() const;

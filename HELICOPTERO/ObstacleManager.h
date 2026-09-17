@@ -11,7 +11,7 @@ class ObstacleManager : public QObject {
 
 public:
 
- ObstacleManager(QGraphicsScene *scene,QObject *parent = nullptr);
+ ObstacleManager(QGraphicsScene *scene,int nivel = 1,QObject *parent = nullptr);
 
  //destructor
  ~ObstacleManager();
@@ -26,11 +26,12 @@ public:
  // Busca el obstáculo en la matriz y pone su slot en nullptr
 void notifyObstacleDied(ObstacleH *obstaculo);
 
- private:
+private:
      ObstacleH **obstaculos;
      int cantidad;
      QGraphicsScene *scene;
-};
+     int nivel;   // nivel actual (los obstáculos usan el pixmap del nivel)
+ };
 
 
 

@@ -42,6 +42,10 @@ void LevelManager::startLevel(int timeLimit, int spawnIntervalMs){
     spawnTimer->start(spawnIntervalMs);   // Spawn cada X milisegundos
 }
 
+void LevelManager::setLevelNumber(int nivel){
+    levelNumber = nivel;
+}
+
 bool LevelManager::isActive() const{
     return active;//si esta activo el timer
 }
