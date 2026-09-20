@@ -9,6 +9,9 @@
 #include <QGraphicsProxyWidget>
 #include <QPushButton>
 #include <QPixmap>
+#include <QTimer>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 #include "MyHeli.h"
 #include "Score.h"
 #include "Health.h"
@@ -46,6 +49,12 @@ public:
     void mostrarVictoria();  // Nota A/A-/B+... según vidas y rescatados
     void mostrarDerrota();   // Porcentaje de rescate + barra
 
+    // Sistema de logros
+    void mostrarPopupVictoria();  // Popup de nota coloreado por nivel
+    void cargarLogros();
+    void guardarLogro(int nivel, const QString& nota);
+    bool todosNivelesConA();
+
 public slots:
     void spawnObstacles();
     void checkFinishLine();
@@ -54,6 +63,7 @@ public slots:
     void seleccionarNivel();
     void volverAlMenu();
     void spawnBidon();  // Genera un bidón de combustible
+    void reset(int nivel);  // Reinicia el juego en su lugar (sin crear objetos nuevos)
 
     //logica de zona de aterrizaje
 private:
@@ -61,6 +71,9 @@ private:
     bool heliEnZona;
     int tiempoEnZona;
     bool nivelGanado;
+
+    // Contador de patrón de obstáculos (se reinicia al reintentar)
+    int contador;
 
     // Estado del HUD (antes eran variables static locales: se reinician
     // correctamente al reintentar el nivel)
@@ -81,8 +94,29 @@ private:
     QGraphicsProxyWidget *proxyNiveles;
     QGraphicsProxyWidget *proxyMenu;
 
+    // Timers principales del juego (ahora son miembros para poder reiniciarse en reset())
+    QTimer *finishCheckTimer;
+    QTimer *survivorTimer;
+
+    // Timer para cancelar el singleShot de victoria/derrota automática
+    QTimer *resultTimer;
+
+    // Música de fondo
+    QMediaPlayer *bgMusic;
+    QAudioOutput *bgAudio;
+
+    // Sistema de logros
+    QGraphicsRectItem *popupFondo;
+    QGraphicsTextItem *popupNota;
+    QGraphicsTextItem *popupMensaje;
+    QGraphicsTextItem *popupLogro;
+    QGraphicsRectItem *popupBarra;
+    QColor popupColorFondo;
+    QColor popupColorBorde;
+
     void crearPanel();
     QString calcularNota(int vidas, int rescatados) const;
+    void actualizarLogros();
 
     QPixmap fondoCiudad;  // Fondo de la ciudad (se dibuja a toda la ventana)
 

@@ -96,14 +96,27 @@ void Menu::jugar(){
 }
 
 void Menu::puntajes(){
-    QMessageBox::information(this, "Puntajes", "Disponible proximamente.");
+    // Abrir la pantalla de puntajes y logros (página de la ventana única)
+    ventanaPrincipal->mostrarPuntajes();
 }
 
 void Menu::comoJugar(){
-    QMessageBox::information(this, "Como Jugar",
-                             "Flecha arriba / Espacio: subir\n"
-                             "Flecha izquierda / derecha: moverse\n"
-                             "Evita los obstaculos y aterriza en la zona verde.");
+    // Mostrar la imagen del manual de usuario en lugar de un MessageBox.
+    QDialog dialog(this);
+    dialog.setWindowTitle("Cómo Jugar");
+    dialog.setFixedSize(800, 600);
+
+    QLabel *label = new QLabel(&dialog);
+    label->setPixmap(QPixmap(":/Sprites/recursosh/ManualDeUsuario.jpeg")
+                         .scaled(800, 600, Qt::KeepAspectRatio,
+                                 Qt::SmoothTransformation));
+    label->setAlignment(Qt::AlignCenter);
+
+    QVBoxLayout *layout = new QVBoxLayout(&dialog);
+    layout->addWidget(label);
+    dialog.setLayout(layout);
+
+    dialog.exec();
 }
 
 void Menu::salir(){

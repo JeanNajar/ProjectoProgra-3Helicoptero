@@ -4,11 +4,10 @@
 Score::Score(QGraphicsItem *parent): QGraphicsTextItem(parent){
     //empieze en 0
     score =0;
-    //dibujar el texto
-    setPlainText("Score: "+QString::number(score));
-    setDefaultTextColor(Qt::black);
-    setFont(QFont("times",16));
-
+    // Usar fuente más grande para mayor visibilidad
+    setFont(QFont("Arial", 22, QFont::Bold));
+    setDefaultTextColor(Qt::yellow);
+    setPlainText("Score: 0");
 }
 
 void Score::increase(){
@@ -17,4 +16,8 @@ void Score::increase(){
 
 int Score::getScore(){
     return score;
+}
+
+void Score::mostrarRescates(int rescatados, int objetivo){
+    setPlainText(QString("Rescates: %1/%2").arg(rescatados).arg(objetivo));
 }

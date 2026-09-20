@@ -8,6 +8,7 @@ public:
     Score(QGraphicsItem * parent=0);
     void increase();
     int getScore();
+    void mostrarRescates(int rescatados, int objetivo);
 private:
     int score;
 };

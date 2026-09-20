@@ -3,6 +3,7 @@
 #include "RegisterScreen.h"
 #include "Menu.h"
 #include "LevelSelect.h"
+#include "Puntajes.h"
 #include "Game.h"
 
 #include <QStackedWidget>
@@ -27,11 +28,13 @@ VentanaPrincipal::VentanaPrincipal(QWidget *parent) : QMainWindow(parent) {
     registro = new RegisterScreen();
     menu = new Menu();
     selector = new LevelSelect();
+    puntajes = new Puntajes();
 
     stack->addWidget(login);     // índice 0
     stack->addWidget(registro);  // índice 1
     stack->addWidget(menu);      // índice 2
     stack->addWidget(selector);  // índice 3
+    stack->addWidget(puntajes);  // índice 4
 
     juego = nullptr;
 
@@ -41,13 +44,9 @@ VentanaPrincipal::VentanaPrincipal(QWidget *parent) : QMainWindow(parent) {
 
 void VentanaPrincipal::quitarJuego(){
     if(juego != nullptr){
-        // Pausar el juego antes de eliminarlo: sus timers (física, spawns,
-        // supervivientes) consultan game->juegoTerminado y se detienen.
-        juego->juegoTerminado = true;
-        stack->removeWidget(juego);
-        delete juego;   // inmediato: destruye timers y escena al instante
-        juego = nullptr;
-        game = nullptr;
+        // Resetear el juego en su lugar (sin crear objetos nuevos).
+        // Esto cumple el requisito de "todo en un solo frame".
+        juego->reset(juego->nivelActual);
     }
 }
 
@@ -78,18 +77,33 @@ void VentanaPrincipal::mostrarSelector(){
     stack->setCurrentWidget(selector);
 }
 
-void VentanaPrincipal::mostrarJuego(int nivel){
+void VentanaPrincipal::mostrarPuntajes(){
     quitarJuego();
-    juego = new Game(nivel);
-    game = juego;
-    stack->addWidget(juego);
+
+    // Recrear la pantalla para que lea el progreso ACTUALIZADO del usuario
+    // (las notas de cada nivel cambian al completar un nivel).
+    stack->removeWidget(puntajes);
+    delete puntajes;
+    puntajes = new Puntajes();
+    stack->addWidget(puntajes);
+
+    stack->setCurrentWidget(puntajes);
+}
+
+void VentanaPrincipal::mostrarJuego(int nivel){
+    if(juego == nullptr){
+        juego = new Game(nivel);
+        game = juego;
+        stack->addWidget(juego);
+    }
+    juego->reset(nivel);
     stack->setCurrentWidget(juego);
 }
 
 void VentanaPrincipal::reintentarNivel(){
     if(juego != nullptr){
         int nivel = juego->nivelActual;
-        quitarJuego();
-        mostrarJuego(nivel);
+        juego->reset(nivel);
+        stack->setCurrentWidget(juego);
     }
 }

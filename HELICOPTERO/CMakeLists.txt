@@ -53,6 +53,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ResourceLoader.cpp
         LevelSelect.h
         LevelSelect.cpp
+        Puntajes.h
+        Puntajes.cpp
         Bala.h
         Bala.cpp
         BidonCombustible.h

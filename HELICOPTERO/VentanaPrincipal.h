@@ -8,6 +8,7 @@ class LoginScreen;
 class RegisterScreen;
 class Menu;
 class LevelSelect;
+class Puntajes;
 class Game;
 
 // Ventana ÚNICA del juego: todas las pantallas (login, registro, menú,
@@ -24,6 +25,7 @@ public:
     void mostrarRegistro();
     void mostrarMenu();
     void mostrarSelector();
+    void mostrarPuntajes();
     void mostrarJuego(int nivel);
     void reintentarNivel();
 
@@ -33,9 +35,10 @@ private:
     RegisterScreen *registro;
     Menu *menu;
     LevelSelect *selector;
+    Puntajes *puntajes;
     Game *juego;
 
-    // Elimina la página del juego si existe (al salir del nivel)
+    // Resetea la página del juego en su lugar (sin crear objetos nuevos)
     void quitarJuego();
 };
 

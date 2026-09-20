@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "GAME.h"
 #include "ObstacleType.h"
 #include "VentanaPrincipal.h"
 #include "ResourceLoader.h"
@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QMediaPlayer>
 #include <QAudioOutput>
+#include <QFont>
 #include <QGraphicsPixmapItem>
 #include <QColor>
 #include <QPixmap>
@@ -76,13 +77,16 @@ Game::Game(int nivel, QWidget *parent) : QGraphicsView(parent) {
     // Añadirlo a la escena
     scene->addItem(heli);
 
-    //crear el puntaje
+    //crear el puntaje (posicionado en la esquina superior izquierda)
     score =new Score();
+    score->setPos(20, 10);
+    score->setZValue(100);
     scene->addItem(score);
 
-    //crear la vida
+    //crear la vida (posicionada debajo del puntaje, más grande y visible)
     health = new Health();
-    health->setPos(health->x(),health->y()+25);
+    health->setPos(20, 50);
+    health->setZValue(100);
     scene->addItem(health);
 
     obstacleManager = new ObstacleManager(scene, nivel, this);
@@ -100,6 +104,7 @@ Game::Game(int nivel, QWidget *parent) : QGraphicsView(parent) {
     nivelGanado = false;
     mundoEnMovimiento = true;  // El mundo avanza hasta que aparezca la meta
     juegoTerminado = false;    // false: el juego sigue en curso
+    contador = 0;  // Contador de patrón de obstáculos
 
     // Estado del HUD (reiniciable al reintentar el nivel)
     ultimoTiempo = -1;
@@ -122,60 +127,60 @@ Game::Game(int nivel, QWidget *parent) : QGraphicsView(parent) {
 
     levelManager = new LevelManager(this);
 
-    // Timer principal
-    QTimer *finishCheckTimer = new QTimer(this);
+    // Timer principal de verificación de zona de aterrizaje
+    finishCheckTimer = new QTimer(this);
     connect(finishCheckTimer, SIGNAL(timeout()), this, SLOT(checkFinishLine()));
     finishCheckTimer->start(50);
 
-    // Timer de actualización de supervivientes (cada 50ms).
-    // Le dice a cada superviviente si el heli está encima (para el rescate)
-    // y elimina los que ya fueron rescatados.
-    QTimer *survivorTimer = new QTimer(this);
+    // Timer de actualización de supervivientes (cada 50ms)
+    survivorTimer = new QTimer(this);
     connect(survivorTimer, SIGNAL(timeout()), this, SLOT(updateSurvivors()));
     survivorTimer->start(50);
 
+    // Timer para la navegación automática después de victoria/derrota
+    resultTimer = new QTimer(this);
+    resultTimer->setSingleShot(true);
 
-    // Conectar el spawn de obstáculos al timer del nivel
-    connect(levelManager->spawnTimer, SIGNAL(timeout()),
-            this, SLOT(spawnObstacles()));
-
-    // ===== BIDONES DE COMBUSTIBLE =====
-    // Spawn cada 4 segundos (aproximadamente 7-8 bidones por nivel).
-    // Aparecen desde la derecha a una altura aleatoria y se mueven a la izquierda.
-    bidonTimer = new QTimer(this);
-    connect(bidonTimer, SIGNAL(timeout()), this, SLOT(spawnBidon()));
-    bidonTimer->start(4000);
-
-    // Configuración por nivel: cada nivel spawna más rápido. El nivel 3 es
-    // el más largo (35s) para que alcancen a aparecer los 15 supervivientes
-    // (1 por obstáculo, spawn cada 2s → ~17 obstáculos).
-    int tiempoLimite = 30;
-    int spawnMs = 3000;
-    switch(nivel){
-    case 2:
-        tiempoLimite = 30;
-        spawnMs = 2500;
-        break;
-    case 3:
-        tiempoLimite = 35;
-        spawnMs = 2000;
-        break;
-    }
-    levelManager->setLevelNumber(nivel);
-    levelManager->startLevel(tiempoLimite, spawnMs);
-
-    //play background music
-    /*
-    QMediaPlayer *heliSound = new QMediaPlayer();
-    QAudioOutput *audio = new QAudioOutput();
-
-    heliSound->setAudioOutput(audio);
-    audio->setVolume(0.3);
-    heliSound->setSource(QUrl("qrc:/Sounds/recursosh/HelicopteroSound.mp3"));
-    heliSound->play();*/
+    // ===== MÚSICA DE FONDO =====
+    bgMusic = new QMediaPlayer(this);
+    bgAudio = new QAudioOutput(this);
+    bgMusic->setAudioOutput(bgAudio);
+    bgAudio->setVolume(0.3);
+    bgMusic->setSource(QUrl("qrc:/Sounds/recursosh/HelicopteroSound.mp3"));
+    bgMusic->play();
 }
 
 Game::~Game(){
+
+    // Cancelar timers pendientes
+    if(finishCheckTimer != nullptr){
+        finishCheckTimer->stop();
+        finishCheckTimer->deleteLater();
+    }
+    if(survivorTimer != nullptr){
+        survivorTimer->stop();
+        survivorTimer->deleteLater();
+    }
+    if(resultTimer != nullptr){
+        resultTimer->stop();
+        resultTimer->deleteLater();
+    }
+
+    // Detener y liberar música de fondo
+    if(bgMusic != nullptr){
+        bgMusic->stop();
+        bgMusic->deleteLater();
+    }
+    if(bgAudio != nullptr){
+        bgAudio->deleteLater();
+    }
+
+    // Limpiar elementos del popup de logros
+    if(popupFondo != nullptr){ delete popupFondo; popupFondo = nullptr; }
+    if(popupBarra != nullptr){ delete popupBarra; popupBarra = nullptr; }
+    if(popupNota != nullptr){ delete popupNota; popupNota = nullptr; }
+    if(popupMensaje != nullptr){ delete popupMensaje; popupMensaje = nullptr; }
+    if(popupLogro != nullptr){ delete popupLogro; popupLogro = nullptr; }
 
     delete survivorManager;
     delete obstacleManager;
@@ -207,8 +212,6 @@ void Game::spawnObstacles(){
     if(!levelManager->isActive()){
         return;
     }
-
-    static int contador = 0;
 
     ObstacleType tipo;
     int yPos = 0;
@@ -309,8 +312,9 @@ void Game::checkFinishLine(){
     int tiempoActual = levelManager->getTimeRemaining();
     if(tiempoActual != ultimoTiempo){
         ultimoTiempo = tiempoActual;
-        score->setPlainText("Tiempo: " + QString::number(tiempoActual)
-                            + "s  |  Score: " + QString::number(score->getScore()));
+        int rescatados = survivorManager->getTotalRescatados();
+        int objetivo = survivorManager->getTotalObjetivo();
+        score->mostrarRescates(rescatados, objetivo);
     }
 
     //DETECTAR FIN DE NIVEL
@@ -387,32 +391,10 @@ void Game::checkFinishLine(){
 void Game::mostrarVictoria(){
 
     if(juegoTerminado){
-        return;  // ya se mostró un panel
+        return;
     }
-    juegoTerminado = true;  // pausa todo el mundo
+    juegoTerminado = true;
 
-    crearPanel();
-
-    panelTitulo->setPlainText("NIVEL COMPLETADO");
-    panelTitulo->setDefaultTextColor(Qt::green);
-
-    // Nota estilo Cuphead: A si vidas completas y todos los supervivientes
-    // rescatados; cada vida perdida o superviviente no rescatado baja un
-    // escalón (A, A-, B+, B, ...).
-    int vidas = health->getHealth();
-    int rescatados = survivorManager->getTotalRescatados();
-    int objetivo = survivorManager->getTotalObjetivo();
-    QString nota = calcularNota(vidas, rescatados);
-
-    panelNota->setPlainText(nota);
-    panelNota->setDefaultTextColor(QColor(255, 215, 0));  // dorado
-
-    panelSub->setPlainText("Vidas: " + QString::number(vidas) + "/3"
-                           + "   Rescatados: " + QString::number(rescatados) + "/" + QString::number(objetivo));
-
-    // Desbloquear el siguiente nivel (se guarda en QSettings para que
-    // persista entre partidas). Completar el nivel N desbloquea el N+1.
-    // El progreso es POR USUARIO: cada cuenta tiene su propio desbloqueo.
     QSettings settings("HelicopterRescue", "Progreso");
     QString clave = QString("nivelDesbloqueado_%1").arg(usuarioActual);
     int desbloqueado = settings.value(clave, 1).toInt();
@@ -420,22 +402,7 @@ void Game::mostrarVictoria(){
         settings.setValue(clave, nivelActual + 1);
     }
 
-    // Centrar los textos sobre el panel
-    panelTitulo->setPos(scene->width() / 2 - panelTitulo->boundingRect().width() / 2, 140);
-    panelNota->setPos(scene->width() / 2 - panelNota->boundingRect().width() / 2, 210);
-    panelSub->setPos(scene->width() / 2 - panelSub->boundingRect().width() / 2, 330);
-
-    // La barra de progreso solo se usa en la derrota
-    barraFondo->setVisible(false);
-    barraRelleno->setVisible(false);
-
-    // El selector de niveles se abre SOLO automáticamente al terminar la
-    // partida (3 segundos para ver el resultado). Si el jugador pulsa
-    // Reintentar / Seleccionar nivel / Volver al menú antes, este timer
-    // se cancela solo (el juego se cierra y el contexto se destruye).
-    QTimer::singleShot(3000, this, [this]() {
-        seleccionarNivel();
-    });
+    mostrarPopupVictoria();
 }
 
 void Game::mostrarDerrota(){
@@ -486,8 +453,9 @@ void Game::mostrarDerrota(){
     // El selector de niveles se abre SOLO automáticamente al terminar la
     // partida (3 segundos para ver el resultado). Si el jugador pulsa
     // Reintentar / Seleccionar nivel / Volver al menú antes, este timer
-    // se cancela solo (el juego se cierra y el contexto se destruye).
-    QTimer::singleShot(3000, this, [this]() {
+    // se cancela solo.
+    resultTimer->start(3000);
+    connect(resultTimer, &QTimer::timeout, this, [this]() {
         seleccionarNivel();
     });
 }
@@ -597,19 +565,322 @@ QString Game::calcularNota(int vidas, int rescatados) const{
     return QString(escalones[deducciones]);
 }
 
+// ===== SISTEMA DE LOGROS =====
+
+void Game::cargarLogros(){
+    // No se necesita acciones adicionales; los logros se guardan en QSettings
+}
+
+void Game::guardarLogro(int nivel, const QString& nota){
+    QSettings settings("HelicopterRescue", "Progreso");
+    QString clave = QString("logro_nivel_%1").arg(nivel);
+    settings.setValue(clave, nota);
+}
+
+bool Game::todosNivelesConA(){
+    QSettings settings("HelicopterRescue", "Progreso");
+    for(int i = 1; i <= 3; i++){
+        QString clave = QString("logro_nivel_%1").arg(i);
+        if(settings.value(clave).toString() != "A"){
+            return false;
+        }
+    }
+    return true;
+}
+
+void Game::actualizarLogros(){
+    // Verificar si se desbloqueó el logro de todos los A
+    if(todosNivelesConA()){
+        // El logro ya está desbloqueado, no hacer nada extra
+        // Se mostrará en el popup de la próxima victoria
+    }
+}
+
+void Game::mostrarPopupVictoria(){
+    // Limpiar popup anterior si existe
+    if(popupFondo != nullptr){ scene->removeItem(popupFondo); delete popupFondo; popupFondo = nullptr; }
+    if(popupBarra != nullptr){ scene->removeItem(popupBarra); delete popupBarra; popupBarra = nullptr; }
+    if(popupNota != nullptr){ scene->removeItem(popupNota); delete popupNota; popupNota = nullptr; }
+    if(popupMensaje != nullptr){ scene->removeItem(popupMensaje); delete popupMensaje; popupMensaje = nullptr; }
+    if(popupLogro != nullptr){ scene->removeItem(popupLogro); delete popupLogro; popupLogro = nullptr; }
+
+    // Obtener la nota
+    int vidas = health->getHealth();
+    int rescatados = survivorManager->getTotalRescatados();
+    QString nota = calcularNota(vidas, rescatados);
+
+    // Guardar el logro de este nivel
+    guardarLogro(nivelActual, nota);
+    actualizarLogros();
+
+    // ===== COLORES POR NIVEL =====
+    switch(nivelActual){
+    case 1:
+        popupColorFondo = QColor(10, 15, 40);
+        popupColorBorde = QColor(77, 232, 255);
+        break;
+    case 2:
+        popupColorFondo = QColor(40, 20, 5);
+        popupColorBorde = QColor(255, 149, 0);
+        break;
+    case 3:
+        popupColorFondo = QColor(15, 30, 50);
+        popupColorBorde = QColor(170, 220, 255);
+        break;
+    default:
+        popupColorFondo = QColor(10, 15, 40);
+        popupColorBorde = QColor(77, 232, 255);
+    }
+
+    // ===== CREAR POPUP =====
+    popupFondo = new QGraphicsRectItem(150, 100, 500, 350);
+    popupFondo->setBrush(QBrush(popupColorFondo));
+    popupFondo->setPen(QPen(popupColorBorde, 4));
+    popupFondo->setZValue(2000);
+    scene->addItem(popupFondo);
+
+    popupBarra = new QGraphicsRectItem(150, 100, 500, 8);
+    popupBarra->setBrush(QBrush(popupColorBorde));
+    popupBarra->setPen(Qt::NoPen);
+    popupBarra->setZValue(2001);
+    scene->addItem(popupBarra);
+
+    // Título "NIVEL COMPLETADO"
+    QGraphicsTextItem *popupTitulo = new QGraphicsTextItem();
+    popupTitulo->setFont(QFont("times", 20, QFont::Bold));
+    popupTitulo->setDefaultTextColor(popupColorBorde);
+    popupTitulo->setPlainText("NIVEL COMPLETADO");
+    popupTitulo->setZValue(2002);
+    popupTitulo->setPos(400 - popupTitulo->boundingRect().width() / 2, 150);
+    scene->addItem(popupTitulo);
+
+    // La letra grande (A, A-, B+, etc.)
+    popupNota = new QGraphicsTextItem();
+    popupNota->setFont(QFont("times", 96, QFont::Bold));
+    popupNota->setDefaultTextColor(popupColorBorde);
+    popupNota->setPlainText(nota);
+    popupNota->setZValue(2003);
+    popupNota->setPos(400 - popupNota->boundingRect().width() / 2, 190);
+    scene->addItem(popupNota);
+
+    // Mensaje debajo de la nota
+    popupMensaje = new QGraphicsTextItem();
+    popupMensaje->setFont(QFont("times", 18));
+    if(nota == "A"){
+        popupMensaje->setDefaultTextColor(QColor(0, 255, 150));
+        popupMensaje->setPlainText("¡Excelente! ¡Sobresaliente!");
+    }else if(nota.startsWith("B")){
+        popupMensaje->setDefaultTextColor(QColor(255, 255, 100));
+        popupMensaje->setPlainText("¡Buen trabajo! Sigue así");
+    }else{
+        popupMensaje->setDefaultTextColor(QColor(255, 150, 100));
+        popupMensaje->setPlainText("¡Sigue intentando!");
+    }
+    popupMensaje->setZValue(2004);
+    popupMensaje->setPos(400 - popupMensaje->boundingRect().width() / 2, 310);
+    scene->addItem(popupMensaje);
+
+    // ===== LOGRO ESPECIAL: TODOS LOS A =====
+    if(todosNivelesConA()){
+        popupLogro = new QGraphicsTextItem();
+        popupLogro->setFont(QFont("times", 28, QFont::Bold));
+        popupLogro->setDefaultTextColor(QColor(255, 215, 0));
+        popupLogro->setPlainText("★ ¡Consigue todos los logros en A! ★");
+        popupLogro->setZValue(2005);
+        popupLogro->setPos(400 - popupLogro->boundingRect().width() / 2, 370);
+        scene->addItem(popupLogro);
+
+        QGraphicsRectItem *logroFondo = new QGraphicsRectItem(100, 355, 600, 50);
+        logroFondo->setBrush(QBrush(QColor(255, 215, 0, 30)));
+        logroFondo->setPen(QPen(QColor(255, 215, 0), 2));
+        logroFondo->setZValue(2004);
+        scene->addItem(logroFondo);
+    }
+
+    // ===== INFORMACIÓN ADICIONAL =====
+    QGraphicsTextItem *infoRescatados = new QGraphicsTextItem();
+    infoRescatados->setFont(QFont("times", 14));
+    infoRescatados->setDefaultTextColor(Qt::white);
+    infoRescatados->setPlainText(QString("Rescatados: %1/%2").arg(rescatados).arg(survivorManager->getTotalObjetivo()));
+    infoRescatados->setZValue(2002);
+    infoRescatados->setPos(400 - infoRescatados->boundingRect().width() / 2, 430);
+    scene->addItem(infoRescatados);
+
+    // Timer de cierre automático (5 segundos)
+    resultTimer->start(5000);
+    connect(resultTimer, &QTimer::timeout, this, [this]() {
+        seleccionarNivel();
+    });
+}
+
 void Game::reintentarNivel(){
+    // Cancelar cualquier timer automático de victoria/derrota pendiente
+    if(resultTimer != nullptr){
+        resultTimer->stop();
+    }
     // La ventana única recrea la página del juego con el mismo nivel
     ventanaPrincipal->reintentarNivel();
 }
 
 void Game::seleccionarNivel(){
+    // Cancelar el timer automático antes de navegar
+    if(resultTimer != nullptr){
+        resultTimer->stop();
+    }
     // Cambiar a la página del selector de niveles (ventana única)
     ventanaPrincipal->mostrarSelector();
 }
 
 void Game::volverAlMenu(){
+    // Cancelar el timer automático antes de navegar
+    if(resultTimer != nullptr){
+        resultTimer->stop();
+    }
     // Cambiar a la página del menú principal (ventana única)
     ventanaPrincipal->mostrarMenu();
+}
+
+void Game::reset(int nivel){
+    // 0. Cancelar cualquier timer automático de victoria/derrota pendiente
+    if(resultTimer != nullptr){
+        resultTimer->stop();
+    }
+
+    // 1. Resetear estado
+    juegoTerminado = false;
+    nivelActual = nivel;
+    mundoEnMovimiento = true;
+    nivelGanado = false;
+    heliEnZona = false;
+    tiempoEnZona = 0;
+    ultimoTiempo = -1;
+    instruccionMostrada = false;
+    finishLine = nullptr;
+    contador = 0;
+
+    // 2. Detener bidonTimer
+    if(bidonTimer != nullptr){
+        bidonTimer->stop();
+    }
+
+    // 3. Eliminar managers (son hijos de Game, no de la escena)
+    if(survivorManager != nullptr){
+        delete survivorManager;
+        survivorManager = nullptr;
+    }
+    if(obstacleManager != nullptr){
+        delete obstacleManager;
+        obstacleManager = nullptr;
+    }
+    if(levelManager != nullptr){
+        delete levelManager;
+        levelManager = nullptr;
+    }
+
+    // 3.5 Eliminar objetos antiguos de la escena para evitar fugas de memoria
+    if(heli != nullptr){
+        scene->removeItem(heli);
+        delete heli;
+        heli = nullptr;
+    }
+    if(score != nullptr){
+        scene->removeItem(score);
+        delete score;
+        score = nullptr;
+    }
+    if(health != nullptr){
+        scene->removeItem(health);
+        delete health;
+        health = nullptr;
+    }
+
+    // 4. Limpiar la escena (elimina heli, score, health, finishLine,
+    //    panel de resultados y bidones)
+    scene->clear();
+
+    // 5. Resetear punteros de items de escena (ahora dangling)
+    heli = nullptr;
+    score = nullptr;
+    health = nullptr;
+    panelFondo = nullptr;
+    panelTitulo = nullptr;
+    panelNota = nullptr;
+    panelSub = nullptr;
+    barraFondo = nullptr;
+    barraRelleno = nullptr;
+    btnReintentar = nullptr;
+    btnNiveles = nullptr;
+    btnMenu = nullptr;
+    proxyReintentar = nullptr;
+    proxyNiveles = nullptr;
+    proxyMenu = nullptr;
+
+    // 6. Re-crear managers
+    obstacleManager = new ObstacleManager(scene, nivel, this);
+    survivorManager = new SurvivorManager(scene, obstacleManager, nivel, this);
+    levelManager = new LevelManager(this);
+    // Re-conectar el spawn de obstáculos al timer del nivel
+    connect(levelManager->spawnTimer, SIGNAL(timeout()),
+            this, SLOT(spawnObstacles()));
+
+    // 7. Re-crear heli
+    heli = new MyHeli(nivel);
+    heli->setPos(20, height() - heli->boundingRect().height());
+    heli->setFlag(QGraphicsItem::ItemIsFocusable);
+    heli->setFocus();
+    scene->addItem(heli);
+
+    // 8. Re-crear score y health
+    score = new Score();
+    score->setPos(20, 10);
+    score->setZValue(100);
+    scene->addItem(score);
+    health = new Health();
+    health->setPos(20, 50);
+    health->setZValue(100);
+    scene->addItem(health);
+    // Actualizar el HUD inmediatamente
+    health->updateDisplay();
+    {
+        int rescatados = survivorManager->getTotalRescatados();
+        int objetivo = survivorManager->getTotalObjetivo();
+        score->mostrarRescates(rescatados, objetivo);
+    }
+
+    // 9. Re-conectar bidonTimer (ya existe, solo reiniciarlo)
+    if(bidonTimer != nullptr){
+        bidonTimer->stop();
+        bidonTimer->start(4000);
+    }
+
+    // 10. REINICIAR TIMERS PRINCIPALES (finishCheckTimer y survivorTimer)
+    finishCheckTimer->stop();
+    finishCheckTimer->start(50);
+    survivorTimer->stop();
+    survivorTimer->start(50);
+
+    // 11. REINICIAR MÚSICA DE FONDO
+    if(bgMusic != nullptr){
+        bgMusic->stop();
+        bgMusic->setPosition(0);
+        bgMusic->play();
+    }
+
+    // 12. Iniciar nivel
+    int tiempoLimite = 30;
+    int spawnMs = 3000;
+    switch(nivel){
+    case 2:
+        tiempoLimite = 30;
+        spawnMs = 2500;
+        break;
+    case 3:
+        tiempoLimite = 35;
+        spawnMs = 2000;
+        break;
+    }
+    levelManager->setLevelNumber(nivel);
+    levelManager->startLevel(tiempoLimite, spawnMs);
 }
 
 void Game::showEvent(QShowEvent *event){

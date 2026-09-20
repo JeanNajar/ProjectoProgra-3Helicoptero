@@ -50,5 +50,6 @@
 	<file>recursosh/boton_registrarse.png</file>
 	<file>recursosh/boton_volver.png</file>
 	<file>recursosh/bidon_combustible_32x32.png</file>
+    <file>recursosh/ManualDeUsuario.jpeg</file>
     </qresource>
 </RCC>
