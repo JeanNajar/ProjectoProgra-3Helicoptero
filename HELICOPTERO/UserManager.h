@@ -10,11 +10,12 @@
 struct Usuario {
     QString nombreUsuario;
     QString hashContrasena;
-    int mejorScore;   // mejor puntaje del jugador (por ahora siempre 0)
+    int mejorScore;     // mejor puntaje de UNA partida (por ahora siempre 0)
+    int puntajeTotal;    // puntaje ACUMULADO de todas las partidas (ranking)
 };
 
 // Maneja las cuentas en un archivo de TEXTO PLANO "usuarios.dat"
-// (una línea por usuario, formato "usuario:hash:mejorScore").
+// (una linea por usuario, formato "usuario:hash:mejorScore:puntajeTotal").
 // La seguridad la da el hash, no el formato del archivo.
 class UserManager : public QObject {
     Q_OBJECT
@@ -31,11 +32,20 @@ public:
     Usuario* buscarPorNombre(const QString &nombre);
 
     // Registra un usuario nuevo. Devuelve false y llena `error` si el
-    // usuario ya existe o los datos no son válidos.
+    // usuario ya existe o los datos no son validos.
     bool registrar(const QString &nombre, const QString &contrasena, QString &error);
 
     // Verifica usuario + contraseña (compara hashes)
     bool verificarLogin(const QString &nombre, const QString &contrasena);
+
+    // Suma puntos al puntajeTotal acumulado del usuario y guarda a disco.
+    // Nunca baja: se usa al terminar cada partida (victoria o derrota).
+    bool sumarPuntaje(const QString &nombre, int puntos);
+
+    // Copia de todos los usuarios (para armar el ranking). Se devuelve
+    // por valor a propósito: quien arma el ranking ordena SU copia con
+    // su propio bubble sort, sin tocar el orden interno de UserManager.
+    QList<Usuario> obtenerTodos() const;
 
     // Hash SHA-256 en hexadecimal de una contraseña
     QString hashDe(const QString &contrasena) const;

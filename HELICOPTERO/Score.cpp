@@ -14,6 +14,14 @@ void Score::increase(){
     score++;
 }
 
+void Score::sumarPuntos(int puntos){
+    score += puntos;
+}
+
+void Score::sumarPuntos(int puntos){
+    score += puntos;
+}
+
 int Score::getScore(){
     return score;
 }
