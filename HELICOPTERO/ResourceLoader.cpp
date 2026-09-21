@@ -7,9 +7,7 @@ QMutex ResourceLoader::s_mutex;
 ResourceLoader::ResourceLoader(QObject *parent) : QObject(parent) {}
 
 void ResourceLoader::preloadAll(){
-    // Este slot corre en el hilo de trabajo (QThread).
-    // Cargar imágenes es lento (disco + decodificación): hacerlo aquí evita
-    // que la UI se congele cuando el jugador abre un nivel.
+    // Corre en el hilo de trabajo: cargar imagenes aqui evita congelar la UI
     for(int nivel = 1; nivel <= 3; nivel++){
         QString rutaFondo;
         QString baseSurvivor;

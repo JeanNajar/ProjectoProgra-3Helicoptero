@@ -10,9 +10,13 @@
 #include <QFont>
 #include <QBrush>
 #include <QPen>
-#include <QRandomGenerator>
 
 extern Game * game;
+
+// Definición de los estáticos compartidos: un solo reproductor de crash
+// para toda la app (se crea la primera vez que se usa).
+QMediaPlayer * MyHeli::crashSound = nullptr;
+QAudioOutput * MyHeli::crashAudio = nullptr;
 
 MyHeli::MyHeli(int nivel) : QObject(), QGraphicsPixmapItem()
 {
@@ -50,16 +54,13 @@ MyHeli::MyHeli(int nivel) : QObject(), QGraphicsPixmapItem()
     crashed = false;
 
     // ===== COMBUSTIBLE =====
-    // Arranca lleno (100). Se consume ~2.0/s de base y ~5.0/s extra al empujar.
-    // Si llega a 0, el empuje se ignora (solo gravedad).
-    // La barra de gasolina ya NO va encima del heli: se muestra en el HUD
-    // (debajo de la vida) como "GAS", gestionada por Game.
+    // Arranca lleno (100); la barra va en el HUD (gestionada por Game)
     fuel = 100.0;
 
     // ===== VIENTO =====
     windX = 0.0;
     windY = 0.0;
-    windTimer = nullptr;
+    textoViento = nullptr;
 
     if(nivel == 2){
         // Nivel 2 (desierto): viento constante que empuja hacia los obstáculos
@@ -67,13 +68,28 @@ MyHeli::MyHeli(int nivel) : QObject(), QGraphicsPixmapItem()
         windX = 40.0;
         windY = 0.0;
     }else if(nivel == 3){
-        // Nivel 3 (nieve): turbulencia — viento aleatorio que cambia cada ~1.5s
-        windTimer = new QTimer(this);
-        connect(windTimer, &QTimer::timeout, this, [this](){
-            windX = QRandomGenerator::global()->bounded(-60, 61); // -60 a +60
-            windY = QRandomGenerator::global()->bounded(-40, 41); // -40 a +40
+        // Nivel 3 (nieve): 2 ventiscas de 4s (a los 20s y 40s) con empuje
+        // fuerte (400 px/s²) y aviso rojo "Corriente de viento pasando".
+        QTimer::singleShot(20000, this, [this]() {
+            windX = 400.0;
+            windY = 60.0;
+            mostrarAvisoViento(true);
+            QTimer::singleShot(4000, this, [this]() {
+                windX = 0.0;
+                windY = 0.0;
+                mostrarAvisoViento(false);
+            });
         });
-        windTimer->start(1500);
+        QTimer::singleShot(40000, this, [this]() {
+            windX = 400.0;
+            windY = 60.0;
+            mostrarAvisoViento(true);
+            QTimer::singleShot(4000, this, [this]() {
+                windX = 0.0;
+                windY = 0.0;
+                mostrarAvisoViento(false);
+            });
+        });
     }
     // Nivel 1: sin viento (windX = windY = 0)
 
@@ -87,30 +103,35 @@ MyHeli::MyHeli(int nivel) : QObject(), QGraphicsPixmapItem()
     connect(rotorTimer, SIGNAL(timeout()), this, SLOT(updateRotorAnimation()));
     rotorTimer->start(90);
 
-    //sonido de choque
-
-    crashSound = new QMediaPlayer;
-    crashSound->setSource(QUrl("qrc:/Sounds/recursosh/CrashSound.wav"));
-    crashAudio = new QAudioOutput();
-    crashSound->setAudioOutput(crashAudio);
-    crashAudio->setVolume(0.5);
+    // Sonido de choque compartido (se crea una sola vez; evita que Qt
+    // extraiga el .wav del qrc a un temporal en cada nivel)
+    if(MyHeli::crashSound == nullptr){
+        MyHeli::crashSound = new QMediaPlayer;
+        MyHeli::crashSound->setSource(QUrl("qrc:/Sounds/recursosh/CrashSound.wav"));
+        MyHeli::crashAudio = new QAudioOutput();
+        MyHeli::crashSound->setAudioOutput(MyHeli::crashAudio);
+        MyHeli::crashAudio->setVolume(0.5);
+    }
 
 }
 
 //destructor aqui liberamos la memoria
 MyHeli::~MyHeli()
 {
-
+    // Quitar el aviso de viento de la escena (si sigue visible) y borrarlo
     delete physics;
-    delete crashSound;
-    delete crashAudio;
 
+    if(textoViento != nullptr){
+        if(textoViento->scene() != nullptr){
+            textoViento->scene()->removeItem(textoViento);
+        }
+        delete textoViento;
+        textoViento = nullptr;
+    }
 }
 
 void MyHeli::detenerTimers(){
-    // Detiene TODOS los timers del heli (física, rotor, viento y
-    // explosión). Se usa al salir del juego hacia el menú/selector:
-    // sin esto el heli sigue cayendo y el rotor girando en segundo plano.
+    // Detiene TODOS los timers del heli (fisica, rotor, viento, explosion)
     const QList<QTimer*> timers = findChildren<QTimer*>();
     for(QTimer *t : timers){
         t->stop();
@@ -205,8 +226,7 @@ void MyHeli::updatePhysics(){
     double dt = 0.016;
 
     // ===== COMBUSTIBLE =====
-    // Consumo base constante (~1.2/s) + consumo extra mientras thrusting (~3.0/s).
-    // Si fuel llega a 0, thrusting se ignora (solo gravedad).
+    // Consumo base (~1.2/s) + extra mientras thrusting (~3.0/s)
     double consumoBase = 1.2 * dt;
     double consumoExtra = 0.0;
     if(thrusting && fuel > 0.0){
@@ -276,11 +296,7 @@ void MyHeli::updatePhysics(){
         newY = scene()->height() - boundingRect().height();
 
         // ===== SCROLL DEL MUNDO (heli aterrizado) =====
-        // Cuando el heli está en el suelo, el mundo se mueve hacia la
-        // izquierda (los obstáculos y supervivientes avanzan). Para que el
-        // heli se mueva EXACTAMENTE a la misma velocidad que el mundo,
-        // usamos la posición actual x() (sin la inercia del jugador velX)
-        // y le restamos la velocidad de scroll (60px/s = 3px por tick).
+        // Se mueve con el mundo usando x() y la velocidad de scroll (60px/s)
         double scrollVel = 60.0;
         if(game->mundoEnMovimiento){
             newX = x() - scrollVel * dt;
@@ -288,8 +304,7 @@ void MyHeli::updatePhysics(){
                 newX = 0;
             }
         }else{
-            // El mundo se detuvo (la meta apareció): el heli aterrizado
-            // queda QUIETO para poder aterrizar en la zona sin deslizarse.
+            // Mundo detenido (meta visible): el heli queda quieto
             newX = x();
         }
 
@@ -297,8 +312,7 @@ void MyHeli::updatePhysics(){
         checkLanding();
 
         // ===== GASOLINA OBLIGATORIA =====
-        // Si el heli está en el suelo y se quedó sin gasolina, pierde:
-        // no se puede estar parado en el suelo sin combustible.
+        // En el suelo sin gasolina: pierde
         if(!crashed && fuel <= 0.0){
             crash();
         }
@@ -313,6 +327,23 @@ void MyHeli::updatePhysics(){
     double currentAngle = rotation();
     double newAngle = currentAngle + (targetAngle - currentAngle) * 0.15;
     setRotation(newAngle);
+}
+
+void MyHeli::mostrarAvisoViento(bool visible){
+    // Aviso rojo de ventisca; se crea bajo demanda (en el constructor
+    // el heli aún no está en la escena)
+    if(scene() == nullptr){
+        return;
+    }
+    if(textoViento == nullptr){
+        textoViento = new QGraphicsTextItem("Corriente de viento pasando");
+        textoViento->setFont(QFont("Arial", 20, QFont::Bold));
+        textoViento->setDefaultTextColor(Qt::red);
+        textoViento->setZValue(300);
+        scene()->addItem(textoViento);
+    }
+    textoViento->setPos(scene()->width() / 2 - textoViento->boundingRect().width() / 2, 100);
+    textoViento->setVisible(visible);
 }
 
 void MyHeli::checkLanding(){

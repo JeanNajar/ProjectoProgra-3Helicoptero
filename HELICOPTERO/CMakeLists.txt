@@ -57,6 +57,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         LevelSelect.cpp
         Puntajes.h
         Puntajes.cpp
+        Ranking.h
+        Ranking.cpp
         Bala.h
         Bala.cpp
         BidonCombustible.h

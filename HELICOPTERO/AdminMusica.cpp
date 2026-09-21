@@ -15,11 +15,25 @@ AdminMusica * AdminMusica::instancia(){
 }
 
 AdminMusica::AdminMusica(QObject *parent) : QObject(parent){
+    silenciado = false;
     reproductor = new QMediaPlayer(this);
     salida = new QAudioOutput(this);
     reproductor->setAudioOutput(salida);
     salida->setVolume(0.35);   // Música ambiental, sin tapar los efectos
     reproductor->setLoops(QMediaPlayer::Infinite);
+}
+
+void AdminMusica::setMute(bool silenciado){
+    if(this->silenciado == silenciado){
+        return;  // ya está en ese estado
+    }
+    this->silenciado = silenciado;
+    salida->setMuted(silenciado);
+    emit muteCambio(silenciado);
+}
+
+bool AdminMusica::estaSilenciado() const{
+    return silenciado;
 }
 
 void AdminMusica::reproducir(const QString &ruta){

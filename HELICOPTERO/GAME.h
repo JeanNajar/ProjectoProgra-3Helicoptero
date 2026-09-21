@@ -111,16 +111,17 @@ private:
     QPushButton *btnReanudar;
     QPushButton *btnPausaReiniciar;
     QPushButton *btnPausaMenu;
+    QPushButton *btnPausaMute;
     QGraphicsProxyWidget *proxyReanudar;
     QGraphicsProxyWidget *proxyPausaReiniciar;
     QGraphicsProxyWidget *proxyPausaMenu;
+    QGraphicsProxyWidget *proxyPausaMute;
 
     // Timers principales del juego (ahora son miembros para poder reiniciarse en reset())
     QTimer *finishCheckTimer;
     QTimer *survivorTimer;
 
-    // Barra de progreso del nivel: muestra el TIEMPO que falta para que
-    // termine el nivel (no es la vida). Se vacía de 30s/35s hasta 0.
+    // Barra de progreso del nivel: tiempo restante (no es la vida)
     QGraphicsRectItem *barraTiempoFondo;
     QGraphicsRectItem *barraTiempoRelleno;
     QGraphicsTextItem *textoTiempo;

@@ -7,9 +7,8 @@
 class QLineEdit;
 class QPushButton;
 
-// Pantalla de registro de cuenta: usuario + contraseña + confirmar.
-// Crea la cuenta vía UserManager y vuelve al LoginScreen.
-// Es una página de la ventana única (VentanaPrincipal).
+// Pantalla de registro: usuario + contrasena + confirmar; crea la cuenta
+// via UserManager y vuelve al LoginScreen (pagina de la ventana unica).
 class RegisterScreen : public QWidget {
     Q_OBJECT
 

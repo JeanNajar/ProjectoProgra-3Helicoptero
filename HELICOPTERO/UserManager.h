@@ -5,7 +5,7 @@
 #include <QList>
 #include <QString>
 
-// Cuenta de un jugador. La contraseña NUNCA se guarda en texto plano:
+// Cuenta de un jugador. La contrasena NUNCA se guarda en texto plano:
 // solo su hash SHA-256.
 struct Usuario {
     QString nombreUsuario;
@@ -14,9 +14,8 @@ struct Usuario {
     int puntajeTotal;    // puntaje ACUMULADO de todas las partidas (ranking)
 };
 
-// Maneja las cuentas en un archivo de TEXTO PLANO "usuarios.dat"
-// (una linea por usuario, formato "usuario:hash:mejorScore:puntajeTotal").
-// La seguridad la da el hash, no el formato del archivo.
+// Maneja las cuentas en "usuarios.dat" (texto plano, una linea por
+// usuario: "usuario:hash:mejorScore:puntajeTotal"). La seguridad la da el hash.
 class UserManager : public QObject {
     Q_OBJECT
 
@@ -42,9 +41,8 @@ public:
     // Nunca baja: se usa al terminar cada partida (victoria o derrota).
     bool sumarPuntaje(const QString &nombre, int puntos);
 
-    // Copia de todos los usuarios (para armar el ranking). Se devuelve
-    // por valor a propósito: quien arma el ranking ordena SU copia con
-    // su propio bubble sort, sin tocar el orden interno de UserManager.
+    // Copia de todos los usuarios (para el ranking). Se devuelve por valor:
+    // quien arma el ranking ordena SU copia sin tocar el orden interno.
     QList<Usuario> obtenerTodos() const;
 
     // Hash SHA-256 en hexadecimal de una contraseña

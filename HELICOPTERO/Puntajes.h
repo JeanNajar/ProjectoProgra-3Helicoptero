@@ -6,9 +6,8 @@
 
 class QPushButton;
 
-// Pantalla de puntajes y logros: muestra la mejor nota (letra) obtenida
-// en cada nivel y el logro dorado "Todos los A" si está desbloqueado.
-// Las notas las guarda Game::guardarLogro en QSettings (clave logro_nivel_N).
+// Puntajes y logros: mejor nota (letra) por nivel y el logro dorado
+// "Todos los A" si esta desbloqueado (QSettings, clave logro_nivel_N).
 class Puntajes : public QWidget {
     Q_OBJECT
 

@@ -14,9 +14,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // Hilo de precarga de recursos (sprites, sonidos) para que la
-    // pantalla de carga no se congele. El slot preloadAll() corre en un
-    // QThread aparte (ver main.cpp).
+    // Hilo de precarga de recursos (sprites, sonidos): evita congelar la UI
     QThread hiloPrecarga;
     ResourceLoader loader;
     loader.moveToThread(&hiloPrecarga);

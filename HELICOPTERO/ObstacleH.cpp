@@ -4,7 +4,6 @@
 #include <QGraphicsView>
 #include <QTimer>
 #include <QList>
-#include <QDebug>
 #include <QMediaPlayer>
 #include <QAudioOutput>
 
@@ -15,6 +14,11 @@
 
 extern Game * game;
 
+// Definición de los estáticos compartidos: un solo reproductor de crash
+// para TODOS los obstáculos (se crea la primera vez que se usa).
+QMediaPlayer * ObstacleH::CrashSound = nullptr;
+QAudioOutput * ObstacleH::audioOutput = nullptr;
+
 ObstacleH::ObstacleH(ObstacleType type, ObstacleManager *manager, int nivel): QObject(), QGraphicsPixmapItem(){
 
     // Guardar el tipo
@@ -22,9 +26,7 @@ ObstacleH::ObstacleH(ObstacleType type, ObstacleManager *manager, int nivel): QO
     this->manager = manager;
     this->nivel = nivel;
 
-    // Pixmap según el nivel (ciudad / desierto / nieve) y el tipo.
-    // Los obstáculos de desierto y nieve usan sus imágenes propias;
-    // el de techo (CEILING) no tiene variante temática y usa el genérico.
+    // Pixmap segun nivel (ciudad/desierto/nieve) y tipo; el techo usa el generico
     QPixmap pix;
     switch(nivel){
     case 2: // desierto
@@ -60,9 +62,7 @@ ObstacleH::ObstacleH(ObstacleType type, ObstacleManager *manager, int nivel): QO
     default: // ciudad (nivel 1)
         switch(tipo) {
         case ObstacleType::VERTICAL:
-            //torre industrial (obstaculo alto)
-            //se escala para que sea mas gruesa y alta y quede anclada al suelo
-            //(el manager la coloca en y = altura - 300, asi la base toca el fondo)
+            // Torre industrial: se escala gruesa y alta, anclada al suelo
             pix = QPixmap(":/Sprites/recursosh/torre_industrial_obstaculo_40x140.png")
                       .scaled(80, 300, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
             break;
@@ -105,18 +105,19 @@ ObstacleH::ObstacleH(ObstacleType type, ObstacleManager *manager, int nivel): QO
     connect(timer,SIGNAL(timeout()),this,SLOT(move()));
     timer->start(50);
 
-    CrashSound = new QMediaPlayer;
-    CrashSound->setSource(QUrl("qrc:/Sounds/recursosh/CrashSound.wav"));
-
-    audioOutput = new QAudioOutput();
-
-    CrashSound->setAudioOutput(audioOutput);
-    audioOutput->setVolume(0.3);
+    // Sonido de crash compartido: se crea una sola vez (evita que Qt
+    // extraiga el .wav del qrc a un temporal por cada obstaculo)
+    if(ObstacleH::CrashSound == nullptr){
+        ObstacleH::CrashSound = new QMediaPlayer;
+        ObstacleH::CrashSound->setSource(QUrl("qrc:/Sounds/recursosh/CrashSound.wav"));
+        ObstacleH::audioOutput = new QAudioOutput();
+        ObstacleH::CrashSound->setAudioOutput(ObstacleH::audioOutput);
+        ObstacleH::audioOutput->setVolume(0.3);
+    }
 }
 
 ObstacleH::~ObstacleH(){
-    delete CrashSound;
-    delete audioOutput;
+    // El reproductor de crash es estatico/compartido: vive toda la app
 }
 
 ObstacleType ObstacleH::getType() const{

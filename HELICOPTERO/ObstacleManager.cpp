@@ -1,5 +1,4 @@
 #include "ObstacleManager.h"
-#include <QDebug>
 #include <QTimer>
 #include <typeinfo>
 
@@ -86,7 +85,6 @@ void ObstacleManager::spawnObstacle(ObstacleType type,int yPos){
 void ObstacleManager::removerObstacle(int index){
 
     if(index < 0 || index >= cantidad){
-        qDebug() << "ObstacleManager: Índice inválido:" << index;//prevencion para evitar segment fault
         return;
     }
 

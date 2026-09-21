@@ -20,9 +20,7 @@ LevelSelect::LevelSelect(QWidget *parent) : QWidget(parent) {
 
     fondo = QPixmap(":/Sprites/recursosh/seleccionar_nivel_fondo_800x600.png");
 
-    // Nivel más alto desbloqueado (1 por defecto). Completar el nivel N
-    // desbloquea el N+1 (lo guarda Game::mostrarVictoria en QSettings).
-    // El progreso es POR USUARIO: cada cuenta tiene su propio desbloqueo.
+    // Nivel mas alto desbloqueado (1 por defecto); el progreso es POR USUARIO
     QSettings settings("HelicopterRescue", "Progreso");
     QString clave = QString("nivelDesbloqueado_%1").arg(usuarioActual);
     int desbloqueado = settings.value(clave, 1).toInt();

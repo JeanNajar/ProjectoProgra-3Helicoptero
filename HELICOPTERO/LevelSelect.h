@@ -6,10 +6,8 @@
 
 class QPushButton;
 
-// Menú de selección de niveles con cards de imagen (280x180).
-// Los niveles 2 y 3 aparecen BLOQUEADOS hasta que se complete el nivel
-// anterior (progreso guardado en QSettings). Las cards bloqueadas no se
-// pueden pulsar.
+// Seleccion de niveles con cards (280x180); 2 y 3 bloqueados hasta
+// completar el anterior (progreso en QSettings). Las cards bloqueadas no se pulsan.
 class LevelSelect : public QWidget {
     Q_OBJECT
 

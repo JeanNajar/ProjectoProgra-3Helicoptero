@@ -1,5 +1,4 @@
 #include "SurvivorManager.h"
-#include <QDebug>
 
 SurvivorManager::SurvivorManager(QGraphicsScene *scene, ObstacleManager *obstacleManager,
                                  int nivel, QObject *parent)
@@ -40,9 +39,9 @@ SurvivorManager::~SurvivorManager(){
 
 bool SurvivorManager::posicionLibre(qreal xPos, qreal yPos) const{
 
-    // Verifica que la posición no esta chocando con un obstaculo
-
-    QRectF zonaSuperviviente(xPos, yPos, 40, 40);
+    // Zona ampliada 40px a cada lado (media heli): garantiza la
+    // separacion horizontal minima, no solo que no quede encima
+    QRectF zonaSuperviviente(xPos - 40, yPos, 40 + 80, 40);
 
     int cantidad = obstacleManager->getCantidad();
     for(int i = 0; i < cantidad; i++){
@@ -79,13 +78,17 @@ bool SurvivorManager::spawnSurvivorBehindObstacle(ObstacleH *obstaculo){
     // Posicioan X ADELANTE del obstáculo
     qreal xPos = obstaculo->pos().x() + 200;
 
+    // Separacion minima: si queda pegada a otro obstaculo, correr el
+    // superviviente a la derecha hasta tener 40px de espacio
+    while(!posicionLibre(xPos, yPos)){
+        xPos += 10;
+    }
+
     // Crear el superviviente (con los sprites del nivel actual)
     Survivor *nuevo = new Survivor(xPos, yPos, scene, nivel);
     scene->addItem(nuevo);
     supervivientes.append(nuevo);
     totalGenerados++;
-    qDebug() << "SurvivorManager: Superviviente creado adelante del obstáculo en x=" << xPos
-             << "(total:" << totalGenerados << ")";
     return true;
 }
 

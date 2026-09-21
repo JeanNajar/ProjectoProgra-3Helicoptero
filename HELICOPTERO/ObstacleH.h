@@ -20,8 +20,10 @@ public:
 public slots:
     void move();
 private:
-    QMediaPlayer *CrashSound;
-    QAudioOutput *audioOutput;  // Se guarda para liberarlo en el destructor
+    // Sonido de crash COMPARTIDO entre todos los obstaculos (evita que Qt
+    // extraiga el .wav del qrc a un temporal por cada uno: spam de ffprobe)
+    static QMediaPlayer *CrashSound;
+    static QAudioOutput *audioOutput;
     ObstacleType tipo;
     ObstacleManager *manager;
     int nivel;                  // nivel actual (elige el pixmap del obstáculo)

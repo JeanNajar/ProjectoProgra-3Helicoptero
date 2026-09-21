@@ -4,6 +4,7 @@
 #include "Menu.h"
 #include "LevelSelect.h"
 #include "Puntajes.h"
+#include "Ranking.h"
 #include "Game.h"
 #include "AdminMusica.h"
 
@@ -30,12 +31,14 @@ VentanaPrincipal::VentanaPrincipal(QWidget *parent) : QMainWindow(parent) {
     menu = new Menu();
     selector = new LevelSelect();
     puntajes = new Puntajes();
+    ranking = new Ranking();
 
     stack->addWidget(login);     // índice 0
     stack->addWidget(registro);  // índice 1
     stack->addWidget(menu);      // índice 2
     stack->addWidget(selector);  // índice 3
     stack->addWidget(puntajes);  // índice 4
+    stack->addWidget(ranking);   // índice 5
 
     juego = nullptr;
 
@@ -98,6 +101,19 @@ void VentanaPrincipal::mostrarPuntajes(){
     stack->addWidget(puntajes);
 
     stack->setCurrentWidget(puntajes);
+}
+
+void VentanaPrincipal::mostrarRanking(){
+    quitarJuego();
+
+    // Recrear la pantalla para que lea los puntajes ACTUALIZADOS del
+    // usuario (el ranking cambia al terminar cada partida).
+    stack->removeWidget(ranking);
+    delete ranking;
+    ranking = new Ranking();
+    stack->addWidget(ranking);
+
+    stack->setCurrentWidget(ranking);
 }
 
 void VentanaPrincipal::mostrarJuego(int nivel){

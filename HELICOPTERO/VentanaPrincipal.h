@@ -9,11 +9,11 @@ class RegisterScreen;
 class Menu;
 class LevelSelect;
 class Puntajes;
+class Ranking;
 class Game;
 
-// Ventana ÚNICA del juego: todas las pantallas (login, registro, menú,
-// selector de niveles y juego) son páginas de un QStackedWidget. Así no
-// se abren varias ventanas: todo ocurre en una sola pantalla continua.
+// Ventana UNICA: todas las pantallas (login, registro, menu, selector y
+// juego) son paginas de un QStackedWidget; todo ocurre en una sola ventana.
 class VentanaPrincipal : public QMainWindow {
     Q_OBJECT
 
@@ -26,6 +26,7 @@ public:
     void mostrarMenu();
     void mostrarSelector();
     void mostrarPuntajes();
+    void mostrarRanking();
     void mostrarJuego(int nivel);
     void reintentarNivel();
 
@@ -36,6 +37,7 @@ private:
     Menu *menu;
     LevelSelect *selector;
     Puntajes *puntajes;
+    Ranking *ranking;
     Game *juego;
 
     // Resetea la página del juego en su lugar (sin crear objetos nuevos)

@@ -9,9 +9,7 @@ LevelMapGenerator::LevelMapGenerator(int levelDurationMs, int spawnIntervalMs,
 }
 
 LevelMapGenerator::~LevelMapGenerator(){
-    // Seguridad: si el hilo sigue corriendo cuando se destruye el objeto,
-    // pedir que se detenga y ESPERAR a que termine. Sin esto, destruir un
-    // QThread en ejecución es un crash garantizado.
+    // Seguridad: esperar a que el hilo termine antes de destruirlo
     if(isRunning()){
         requestInterruption();
         wait();
@@ -19,9 +17,8 @@ LevelMapGenerator::~LevelMapGenerator(){
 }
 
 void LevelMapGenerator::run(){
-    // ===== CUERPO DEL HILO (se ejecuta en el hilo secundario) =====
-    // Genera el mapa completo del nivel: cuántos obstáculos aparecen,
-    // de qué tipo, y cuáles llevan superviviente detrás.
+    // ===== CUERPO DEL HILO (hilo secundario) =====
+    // Genera el mapa: cuantos obstaculos, de que tipo y cuales llevan superviviente
 
     int totalSpawns = levelDurationMs / spawnIntervalMs;  // 30s / 3s = 10
     int contador = 0;
@@ -50,10 +47,7 @@ void LevelMapGenerator::run(){
         // Los primeros 2 obstáculos del mapa llevan un superviviente detrás
         dato.spawnSurvivor = (contador < 2);
 
-        // Guardar en la cola. El QMutexLocker bloquea el mutex mientras
-        // se modifica la lista y lo libera al salir del bloque {}.
-        // Sin esto, el hilo principal podría leer la lista mientras
-        // este hilo la modifica -> condición de carrera.
+        // QMutexLocker protege la lista mientras el hilo principal la lee
         {
             QMutexLocker candado(&mutex);
             cola.append(dato);

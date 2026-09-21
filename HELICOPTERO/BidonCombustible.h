@@ -6,9 +6,8 @@
 
 class QGraphicsScene;
 
-// Bidón de combustible: pickup que se mueve hacia la izquierda (igual que los
-// obstáculos). Al colisionar con el helicóptero, le resta combustible instantáneo.
-// Se destruye al salir de la pantalla o al ser recogido.
+// Bidon de combustible: pickup que se mueve a la izquierda; al colisionar
+// con el heli le resta combustible. Se destruye al salir o al ser recogido.
 class BidonCombustible : public QObject, public QGraphicsPixmapItem {
     Q_OBJECT
 

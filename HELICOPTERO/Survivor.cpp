@@ -16,9 +16,8 @@ Survivor::Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene, int nivel)
     rescatadoPorProgreso = false;
     heliEncima = false;
 
-    // cargar los 2 fotogramas según el nivel (brazo derecho / izquierdo
-    // levantado). Se usa la caché del hilo de precarga; si el hilo aún no
-    // terminó, se carga directo como respaldo.
+    // 2 fotogramas segun nivel (brazo derecho/izquierdo); usa la cache
+    // del hilo de precarga, con carga directa como respaldo
     QVector<QPixmap> precargadas = ResourceLoader::survivorFrames(nivel);
     if(precargadas.size() == 2 && !precargadas[0].isNull()){
         frames[0] = precargadas[0];

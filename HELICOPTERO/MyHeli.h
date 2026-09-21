@@ -60,11 +60,13 @@ private:
     //viento (empuja al helicóptero)
     double windX;
     double windY;
-    QTimer *windTimer; // nivel 3: recalcula viento random cada 1-2s
+    // Aviso rojo "Corriente de viento pasando" (nivel 3, durante la ventisca)
+    QGraphicsTextItem *textoViento;
 
-    //sonidos
-    QMediaPlayer *crashSound;
-    QAudioOutput *crashAudio;
+    //sonidos (compartidos: un solo reproductor de crash para toda la app,
+    // evita que Qt extraiga el .wav del qrc a un temporal en cada nivel)
+    static QMediaPlayer *crashSound;
+    static QAudioOutput *crashAudio;
 
     //animacion del rotor (4 fotogramas)
     QPixmap rotorFrames[4];
@@ -83,5 +85,7 @@ private:
 
     //funciones
     void checkLanding();
+    // Muestra/oculta el aviso rojo de viento (nivel 3, durante la ventisca)
+    void mostrarAvisoViento(bool visible);
 };
 #endif // MYHELI_H
