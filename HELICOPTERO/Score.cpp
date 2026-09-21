@@ -5,9 +5,9 @@ Score::Score(QGraphicsItem *parent): QGraphicsTextItem(parent){
     //empieze en 0
     score =0;
     // Usar fuente más grande para mayor visibilidad
-    setFont(QFont("Arial", 22, QFont::Bold));
+    setFont(QFont("Arial", 24, QFont::Bold));
     setDefaultTextColor(Qt::yellow);
-    setPlainText("Score: 0");
+    setPlainText("Rescates: 0/0");
 }
 
 void Score::increase(){

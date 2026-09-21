@@ -29,6 +29,10 @@ public:
     // Recarga una cantidad fija de combustible (pickup de bidón)
     void recargarCombustible(double cantidad);
 
+    // Detiene todos los timers del heli (física, rotor, viento, explosión).
+    // Se usa al salir del juego: el heli no debe seguir "vivo" en el menú.
+    void detenerTimers();
+
     // Combustible actual (0–100)
     double getFuel() const;
 
@@ -52,8 +56,6 @@ private:
 
     //combustible (0–100)
     double fuel;
-    QGraphicsRectItem *barraCombustibleFondo; // fondo oscuro de la barra
-    QGraphicsRectItem *barraCombustible;       // relleno que cambia de ancho
 
     //viento (empuja al helicóptero)
     double windX;

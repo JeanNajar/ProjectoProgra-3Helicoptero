@@ -14,8 +14,6 @@ public:
 
 private:
     int health;
-    QGraphicsRectItem *fondoBarra;
-    QGraphicsRectItem *barraVida;
 };
 
 

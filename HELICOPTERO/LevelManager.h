@@ -14,6 +14,10 @@ public:
 
     void startLevel(int timeLimit,int spawnIntervalMs);
 
+    // Detiene los timers del nivel (cuenta regresiva y spawn).
+    // Se usa al salir del juego: el nivel no debe seguir corriendo en el menú.
+    void detenerTimers();
+
     // Indica qué nivel se está jugando (1, 2 o 3)
     void setLevelNumber(int nivel);
 

@@ -16,37 +16,32 @@
 #include <QSettings>
 #include <cstdlib>
 
-//puntero global del juego (definido en main.cpp)
+//Puntero global del juego (definido en main.cpp)
 extern Game * game;
-//ventana única (definida en main.cpp): se usa para navegar entre páginas
+//Ventana única: navega entre páginas
 extern VentanaPrincipal * ventanaPrincipal;
-//usuario que inició sesión (definido en main.cpp): el progreso es por cuenta
+//Usuario actual: el progreso es por cuenta
 extern QString usuarioActual;
 
 Game::Game(int nivel, QWidget *parent) : QGraphicsView(parent) {
 
     nivelActual = nivel;
 
-    //create a scene
+    //Crear la escena
     scene = new QGraphicsScene();
     scene->setSceneRect(0,0,800,600);
 
     setScene(scene);
-    //turnoff horizontal and vertical bars
+    //Sin barras de scroll
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     resize(800, 600);
     setMinimumSize(640, 480);
-    //color de fondo de la vista (igual al cielo del fondo, evita franjas blancas)
+    //Fondo de la vista (igual al cielo, evita franjas blancas)
     setBackgroundBrush(QColor(21, 10, 43));
 
-    //fondo según el nivel.
-    // YA NO es un item de la escena: se dibuja en drawBackground() estirado
-    // a TODA la ventana, así al agrandar la ventana no quedan franjas
-    // oscuras en los lados (el fondo crece con la ventana).
-    // Se usa la caché del hilo de precarga (ResourceLoader); si el hilo aún
-    // no terminó, se carga directo como respaldo.
+    //Fondo según el nivel (se dibuja estirado en drawBackground)
     fondoCiudad = ResourceLoader::background(nivel);
     if(fondoCiudad.isNull()){
         QString rutaFondo;
@@ -63,27 +58,25 @@ Game::Game(int nivel, QWidget *parent) : QGraphicsView(parent) {
         fondoCiudad = QPixmap(rutaFondo);
     }
 
-    //create an item to add to the scene
-
     heli = new MyHeli(nivel);
 
     // Posicionar el helicoptero
     heli->setPos(20, height() - heli->boundingRect().height());
 
-    //make the heli focusable
+    //El heli recibe el foco (teclas)
     heli->setFlag(QGraphicsItem::ItemIsFocusable);
     heli->setFocus();
 
     // Añadirlo a la escena
     scene->addItem(heli);
 
-    //crear el puntaje (posicionado en la esquina superior izquierda)
+    //Puntaje arriba a la izquierda
     score =new Score();
     score->setPos(20, 10);
     score->setZValue(100);
     scene->addItem(score);
 
-    //crear la vida (posicionada debajo del puntaje, más grande y visible)
+    //Vida debajo del puntaje
     health = new Health();
     health->setPos(20, 50);
     health->setZValue(100);
@@ -91,10 +84,7 @@ Game::Game(int nivel, QWidget *parent) : QGraphicsView(parent) {
 
     obstacleManager = new ObstacleManager(scene, nivel, this);
 
-    // ===== MANAGER DE SUPERVIVIENTES =====
-    // Maneja a los supervivientes en el suelo. Recibe el obstacleManager
-    // para no generar supervivientes dentro de un obstáculo, y el nivel
-    // para usar los sprites correctos (ciudad / desierto / nieve).
+    //Manager de supervivientes (suelo)
     survivorManager = new SurvivorManager(scene, obstacleManager, nivel, this);
 
     //manager del nivel
@@ -106,7 +96,7 @@ Game::Game(int nivel, QWidget *parent) : QGraphicsView(parent) {
     juegoTerminado = false;    // false: el juego sigue en curso
     contador = 0;  // Contador de patrón de obstáculos
 
-    // Estado del HUD (reiniciable al reintentar el nivel)
+    //Estado del HUD
     ultimoTiempo = -1;
     instruccionMostrada = false;
 
@@ -123,6 +113,40 @@ Game::Game(int nivel, QWidget *parent) : QGraphicsView(parent) {
     proxyReintentar = nullptr;
     proxyNiveles = nullptr;
     proxyMenu = nullptr;
+    btnOpciones = nullptr;
+    proxyOpciones = nullptr;
+
+    // Pantallita de pausa (se crea bajo demanda con el botón ⋮)
+    pausaActiva = false;
+    pausaFondo = nullptr;
+    pausaTitulo = nullptr;
+    btnReanudar = nullptr;
+    btnPausaReiniciar = nullptr;
+    btnPausaMenu = nullptr;
+    proxyReanudar = nullptr;
+    proxyPausaReiniciar = nullptr;
+    proxyPausaMenu = nullptr;
+
+    // Punteros que se crean bajo demanda: SIEMPRE inicializados a nullptr
+    // (si no, son basura y las guardas if(x != nullptr) crashean).
+    bidonTimer = nullptr;
+    popupFondo = nullptr;
+    popupBarra = nullptr;
+    popupNota = nullptr;
+    popupMensaje = nullptr;
+    popupLogro = nullptr;
+
+    // Barra de progreso del nivel (se crea en reset())
+    barraTiempoFondo = nullptr;
+    barraTiempoRelleno = nullptr;
+    textoTiempo = nullptr;
+    tiempoLimiteTotal = 0;
+
+    // Barra de gasolina del HUD (se crea en reset())
+    barraGasFondo = nullptr;
+    barraGasRelleno = nullptr;
+    textoGas = nullptr;
+    textoGasCritico = nullptr;
 
 
     levelManager = new LevelManager(this);
@@ -137,16 +161,30 @@ Game::Game(int nivel, QWidget *parent) : QGraphicsView(parent) {
     connect(survivorTimer, SIGNAL(timeout()), this, SLOT(updateSurvivors()));
     survivorTimer->start(50);
 
+    // Timer de generación de bidones de combustible.
+    // IMPORTANTE: antes este timer nunca se creaba (solo se inicializaba a
+    // nullptr), por eso los bidones dejaron de aparecer. reset() lo reinicia.
+    bidonTimer = new QTimer(this);
+    connect(bidonTimer, SIGNAL(timeout()), this, SLOT(spawnBidon()));
+
     // Timer para la navegación automática después de victoria/derrota
     resultTimer = new QTimer(this);
     resultTimer->setSingleShot(true);
+    // Conexión ÚNICA (en el constructor): evita conexiones acumuladas
+    // cada vez que se gana o pierde.
+    connect(resultTimer, &QTimer::timeout, this, [this]() {
+        seleccionarNivel();
+    });
 
     // ===== MÚSICA DE FONDO =====
     bgMusic = new QMediaPlayer(this);
     bgAudio = new QAudioOutput(this);
     bgMusic->setAudioOutput(bgAudio);
-    bgAudio->setVolume(0.3);
-    bgMusic->setSource(QUrl("qrc:/Sounds/recursosh/HelicopteroSound.mp3"));
+    bgAudio->setVolume(0.2);
+    // El sonido del heli suena en LOOP hasta que se gane o se pierda el
+    // nivel (mostrarVictoria/mostrarDerrota/pausar lo detienen explícito).
+    bgMusic->setLoops(QMediaPlayer::Infinite);
+    bgMusic->setSource(QUrl("qrc:/Sounds/recursosh/HelicopteroSound.wav"));
     bgMusic->play();
 }
 
@@ -199,6 +237,36 @@ Game::~Game(){
     // reintento filtraría una escena completa en memoria.
     delete scene;
 
+}
+
+void Game::detenerMusica(){
+    // Detiene la música de fondo (se usa al salir del juego hacia el
+    // menú/selector: el juego no debe seguir sonando si no se está jugando).
+    if(bgMusic != nullptr){
+        bgMusic->stop();
+    }
+}
+
+void Game::pausar(){
+    // Detiene TODO el juego (timers + música) cuando se navega fuera.
+    // Sin esto el mundo sigue corriendo en el menú: el nivel termina solo,
+    // el heli cae y puede chocar, y hasta se navega solo al selector.
+    if(finishCheckTimer != nullptr){
+        finishCheckTimer->stop();
+    }
+    if(survivorTimer != nullptr){
+        survivorTimer->stop();
+    }
+    if(bidonTimer != nullptr){
+        bidonTimer->stop();
+    }
+    if(levelManager != nullptr){
+        levelManager->detenerTimers();
+    }
+    if(heli != nullptr){
+        heli->detenerTimers();
+    }
+    detenerMusica();
 }
 
 void Game::spawnObstacles(){
@@ -308,6 +376,9 @@ void Game::checkFinishLine(){
         return;
     }
 
+    // Actualizar la barra de gasolina del HUD (cada 50ms)
+    actualizarBarraGas();
+
     // Solo actualizar el texto si el tiempo cambió
     int tiempoActual = levelManager->getTimeRemaining();
     if(tiempoActual != ultimoTiempo){
@@ -315,6 +386,8 @@ void Game::checkFinishLine(){
         int rescatados = survivorManager->getTotalRescatados();
         int objetivo = survivorManager->getTotalObjetivo();
         score->mostrarRescates(rescatados, objetivo);
+        // Actualizar la barra de progreso del nivel (tiempo restante)
+        actualizarBarraTiempo(tiempoActual);
     }
 
     //DETECTAR FIN DE NIVEL
@@ -388,6 +461,23 @@ void Game::checkFinishLine(){
 }
 
 
+void Game::actualizarBarraGas(){
+    // Barra de gasolina del HUD: se vacía según el combustible del heli.
+    // Muestra la alerta "Gasolina en critico" cuando queda <= 30%.
+    if(heli == nullptr || barraGasRelleno == nullptr){
+        return;
+    }
+    double fuel = heli->getFuel();
+    int ancho = static_cast<int>(150.0 * fuel / 100.0);
+    if(ancho < 0) ancho = 0;
+    if(ancho > 150) ancho = 150;
+    barraGasRelleno->setRect(70, 103, ancho, 14);
+
+    if(textoGasCritico != nullptr){
+        textoGasCritico->setVisible(fuel <= 30.0);
+    }
+}
+
 void Game::mostrarVictoria(){
 
     if(juegoTerminado){
@@ -400,6 +490,11 @@ void Game::mostrarVictoria(){
     int desbloqueado = settings.value(clave, 1).toInt();
     if(nivelActual < 3 && nivelActual + 1 > desbloqueado){
         settings.setValue(clave, nivelActual + 1);
+    }
+
+    // El juego terminó: detener la música de fondo
+    if(bgMusic != nullptr){
+        bgMusic->stop();
     }
 
     mostrarPopupVictoria();
@@ -450,14 +545,12 @@ void Game::mostrarDerrota(){
     panelNota->setPos(scene->width() / 2 - panelNota->boundingRect().width() / 2, 210);
     panelSub->setPos(scene->width() / 2 - panelSub->boundingRect().width() / 2, 330);
 
-    // El selector de niveles se abre SOLO automáticamente al terminar la
-    // partida (3 segundos para ver el resultado). Si el jugador pulsa
-    // Reintentar / Seleccionar nivel / Volver al menú antes, este timer
-    // se cancela solo.
-    resultTimer->start(3000);
-    connect(resultTimer, &QTimer::timeout, this, [this]() {
-        seleccionarNivel();
-    });
+    // El panel se queda en pantalla hasta que el jugador decida
+    // (Reintentar / Seleccionar nivel / Volver al menú). NO navega solo.
+    // Detener la música: el juego terminó, no debe seguir sonando.
+    if(bgMusic != nullptr){
+        bgMusic->stop();
+    }
 }
 
 void Game::crearPanel(){
@@ -663,54 +756,35 @@ void Game::mostrarPopupVictoria(){
     popupNota->setPos(400 - popupNota->boundingRect().width() / 2, 190);
     scene->addItem(popupNota);
 
-    // Mensaje debajo de la nota
-    popupMensaje = new QGraphicsTextItem();
-    popupMensaje->setFont(QFont("times", 18));
-    if(nota == "A"){
-        popupMensaje->setDefaultTextColor(QColor(0, 255, 150));
-        popupMensaje->setPlainText("¡Excelente! ¡Sobresaliente!");
-    }else if(nota.startsWith("B")){
-        popupMensaje->setDefaultTextColor(QColor(255, 255, 100));
-        popupMensaje->setPlainText("¡Buen trabajo! Sigue así");
-    }else{
-        popupMensaje->setDefaultTextColor(QColor(255, 150, 100));
-        popupMensaje->setPlainText("¡Sigue intentando!");
-    }
-    popupMensaje->setZValue(2004);
-    popupMensaje->setPos(400 - popupMensaje->boundingRect().width() / 2, 310);
-    scene->addItem(popupMensaje);
+    // ===== BOTONES =====
+    // Reiniciar y salir al menú: el jugador decide (sin cierre automático).
+    QPushButton *btnVictoriaReiniciar = new QPushButton("Reiniciar");
+    btnVictoriaReiniciar->setFixedSize(220, 50);
+    btnVictoriaReiniciar->setCursor(Qt::PointingHandCursor);
+    btnVictoriaReiniciar->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #4de8ff;"
+        " border: 2px solid #4de8ff; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    QGraphicsProxyWidget *proxyVictoriaReiniciar = scene->addWidget(btnVictoriaReiniciar);
+    proxyVictoriaReiniciar->setPos(290, 330);
+    proxyVictoriaReiniciar->setZValue(2005);
+    connect(btnVictoriaReiniciar, &QPushButton::clicked, this, &Game::reintentarNivel);
 
-    // ===== LOGRO ESPECIAL: TODOS LOS A =====
-    if(todosNivelesConA()){
-        popupLogro = new QGraphicsTextItem();
-        popupLogro->setFont(QFont("times", 28, QFont::Bold));
-        popupLogro->setDefaultTextColor(QColor(255, 215, 0));
-        popupLogro->setPlainText("★ ¡Consigue todos los logros en A! ★");
-        popupLogro->setZValue(2005);
-        popupLogro->setPos(400 - popupLogro->boundingRect().width() / 2, 370);
-        scene->addItem(popupLogro);
-
-        QGraphicsRectItem *logroFondo = new QGraphicsRectItem(100, 355, 600, 50);
-        logroFondo->setBrush(QBrush(QColor(255, 215, 0, 30)));
-        logroFondo->setPen(QPen(QColor(255, 215, 0), 2));
-        logroFondo->setZValue(2004);
-        scene->addItem(logroFondo);
-    }
-
-    // ===== INFORMACIÓN ADICIONAL =====
-    QGraphicsTextItem *infoRescatados = new QGraphicsTextItem();
-    infoRescatados->setFont(QFont("times", 14));
-    infoRescatados->setDefaultTextColor(Qt::white);
-    infoRescatados->setPlainText(QString("Rescatados: %1/%2").arg(rescatados).arg(survivorManager->getTotalObjetivo()));
-    infoRescatados->setZValue(2002);
-    infoRescatados->setPos(400 - infoRescatados->boundingRect().width() / 2, 430);
-    scene->addItem(infoRescatados);
-
-    // Timer de cierre automático (5 segundos)
-    resultTimer->start(5000);
-    connect(resultTimer, &QTimer::timeout, this, [this]() {
-        seleccionarNivel();
-    });
+    QPushButton *btnVictoriaMenu = new QPushButton("Salir al menú");
+    btnVictoriaMenu->setFixedSize(220, 50);
+    btnVictoriaMenu->setCursor(Qt::PointingHandCursor);
+    btnVictoriaMenu->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #ff6b6b;"
+        " border: 2px solid #ff6b6b; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    QGraphicsProxyWidget *proxyVictoriaMenu = scene->addWidget(btnVictoriaMenu);
+    proxyVictoriaMenu->setPos(290, 390);
+    proxyVictoriaMenu->setZValue(2005);
+    connect(btnVictoriaMenu, &QPushButton::clicked, this, &Game::volverAlMenu);
 }
 
 void Game::reintentarNivel(){
@@ -718,8 +792,13 @@ void Game::reintentarNivel(){
     if(resultTimer != nullptr){
         resultTimer->stop();
     }
-    // La ventana única recrea la página del juego con el mismo nivel
-    ventanaPrincipal->reintentarNivel();
+    // Diferir la navegación un tick: el botón que disparó este slot sigue
+    // procesando su evento de mouse; si reset() lo borra ahora (vía
+    // scene->clear()) el botón usaría memoria liberada al terminar el
+    // evento → crash. Con singleShot(0) el reset corre después.
+    QTimer::singleShot(0, this, [this]() {
+        ventanaPrincipal->reintentarNivel();
+    });
 }
 
 void Game::seleccionarNivel(){
@@ -727,8 +806,10 @@ void Game::seleccionarNivel(){
     if(resultTimer != nullptr){
         resultTimer->stop();
     }
-    // Cambiar a la página del selector de niveles (ventana única)
-    ventanaPrincipal->mostrarSelector();
+    // Diferir la navegación un tick (ver reintentarNivel)
+    QTimer::singleShot(0, this, [this]() {
+        ventanaPrincipal->mostrarSelector();
+    });
 }
 
 void Game::volverAlMenu(){
@@ -736,8 +817,139 @@ void Game::volverAlMenu(){
     if(resultTimer != nullptr){
         resultTimer->stop();
     }
-    // Cambiar a la página del menú principal (ventana única)
-    ventanaPrincipal->mostrarMenu();
+    // Diferir la navegación un tick (ver reintentarNivel)
+    QTimer::singleShot(0, this, [this]() {
+        ventanaPrincipal->mostrarMenu();
+    });
+}
+
+void Game::mostrarMenuOpciones(){
+    // Pantallita de pausa (estilo panel de derrota, pero simple):
+    // fondo oscuro + título "PAUSA" + botones Reanudar/Reiniciar/Volver al menú.
+    if(pausaActiva || juegoTerminado){
+        return;  // ya está abierta, o el juego ya ganó/perdió
+    }
+    pausaActiva = true;
+    juegoTerminado = true;  // congela el mundo (heli, obstáculos, supervivientes)
+
+    // Detener la cuenta regresiva del nivel y el spawn de obstáculos:
+    // si no, el nivel termina solo mientras está en pausa.
+    if(levelManager != nullptr){
+        levelManager->detenerTimers();
+    }
+
+    // Pausar la música de fondo
+    if(bgMusic != nullptr){
+        bgMusic->pause();
+    }
+
+    // Fondo oscuro semi-transparente que tapa toda la escena
+    pausaFondo = new QGraphicsRectItem(0, 0, scene->width(), scene->height());
+    pausaFondo->setBrush(QColor(0, 0, 0, 180));
+    pausaFondo->setPen(Qt::NoPen);
+    pausaFondo->setZValue(1000);
+    scene->addItem(pausaFondo);
+
+    // Título "PAUSA"
+    pausaTitulo = new QGraphicsTextItem();
+    pausaTitulo->setFont(QFont("times", 34, QFont::Bold));
+    pausaTitulo->setDefaultTextColor(Qt::white);
+    pausaTitulo->setPlainText("PAUSA");
+    pausaTitulo->setZValue(1001);
+    pausaTitulo->setPos(scene->width() / 2 - pausaTitulo->boundingRect().width() / 2, 150);
+    scene->addItem(pausaTitulo);
+
+    // Botón Reanudar (verde): cierra la pantallita y sigue jugando
+    btnReanudar = new QPushButton("Reanudar");
+    btnReanudar->setFixedSize(220, 50);
+    btnReanudar->setCursor(Qt::PointingHandCursor);
+    btnReanudar->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #7dff9b;"
+        " border: 2px solid #7dff9b; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    proxyReanudar = scene->addWidget(btnReanudar);
+    proxyReanudar->setPos(290, 300);
+    proxyReanudar->setZValue(1001);
+    connect(btnReanudar, &QPushButton::clicked, this, &Game::cerrarMenuOpciones);
+
+    // Botón Reiniciar (cian): reinicia el nivel
+    btnPausaReiniciar = new QPushButton("Reiniciar");
+    btnPausaReiniciar->setFixedSize(220, 50);
+    btnPausaReiniciar->setCursor(Qt::PointingHandCursor);
+    btnPausaReiniciar->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #4de8ff;"
+        " border: 2px solid #4de8ff; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    proxyPausaReiniciar = scene->addWidget(btnPausaReiniciar);
+    proxyPausaReiniciar->setPos(290, 360);
+    proxyPausaReiniciar->setZValue(1001);
+    connect(btnPausaReiniciar, &QPushButton::clicked, this, &Game::reintentarNivel);
+
+    // Botón Volver al menú (rojo)
+    btnPausaMenu = new QPushButton("Volver al menú");
+    btnPausaMenu->setFixedSize(220, 50);
+    btnPausaMenu->setCursor(Qt::PointingHandCursor);
+    btnPausaMenu->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #ff6b6b;"
+        " border: 2px solid #ff6b6b; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    proxyPausaMenu = scene->addWidget(btnPausaMenu);
+    proxyPausaMenu->setPos(290, 420);
+    proxyPausaMenu->setZValue(1001);
+    connect(btnPausaMenu, &QPushButton::clicked, this, &Game::volverAlMenu);
+}
+
+void Game::cerrarMenuOpciones(){
+    // Reanudar: cierra la pantallita de pausa y sigue el juego.
+    // Diferir un tick: el botón que disparó el slot sigue procesando su
+    // evento de mouse; borrarlo ahora crashearía (ver reintentarNivel).
+    QTimer::singleShot(0, this, [this]() {
+        if(!pausaActiva){
+            return;
+        }
+        pausaActiva = false;
+        juegoTerminado = false;  // reanuda el mundo
+
+        // Quitar el panel de pausa
+        if(pausaFondo != nullptr){ scene->removeItem(pausaFondo); delete pausaFondo; pausaFondo = nullptr; }
+        if(pausaTitulo != nullptr){ scene->removeItem(pausaTitulo); delete pausaTitulo; pausaTitulo = nullptr; }
+        if(proxyReanudar != nullptr){ scene->removeItem(proxyReanudar); delete proxyReanudar; proxyReanudar = nullptr; }
+        if(proxyPausaReiniciar != nullptr){ scene->removeItem(proxyPausaReiniciar); delete proxyPausaReiniciar; proxyPausaReiniciar = nullptr; }
+        if(proxyPausaMenu != nullptr){ scene->removeItem(proxyPausaMenu); delete proxyPausaMenu; proxyPausaMenu = nullptr; }
+        btnReanudar = nullptr;
+        btnPausaReiniciar = nullptr;
+        btnPausaMenu = nullptr;
+
+        // Reanudar la cuenta regresiva del nivel y el spawn de obstáculos
+        if(levelManager != nullptr){
+            int spawnMs = 3000;
+            switch(nivelActual){
+            case 2:
+                spawnMs = 2500;
+                break;
+            case 3:
+                spawnMs = 2000;
+                break;
+            }
+            levelManager->startLevel(levelManager->getTimeRemaining(), spawnMs);
+        }
+
+        // Reanudar la música de fondo
+        if(bgMusic != nullptr){
+            bgMusic->play();
+        }
+
+        // Devolver el foco al heli para que las teclas funcionen
+        if(heli != nullptr && heli->scene() != nullptr){
+            heli->setFocus();
+        }
+    });
 }
 
 void Game::reset(int nivel){
@@ -814,6 +1026,34 @@ void Game::reset(int nivel){
     proxyReintentar = nullptr;
     proxyNiveles = nullptr;
     proxyMenu = nullptr;
+    btnOpciones = nullptr;
+    proxyOpciones = nullptr;
+    // La pantallita de pausa también la borró scene->clear()
+    pausaActiva = false;
+    pausaFondo = nullptr;
+    pausaTitulo = nullptr;
+    btnReanudar = nullptr;
+    btnPausaReiniciar = nullptr;
+    btnPausaMenu = nullptr;
+    proxyReanudar = nullptr;
+    proxyPausaReiniciar = nullptr;
+    proxyPausaMenu = nullptr;
+    // Los popups de victoria también los borró scene->clear():
+    // sin esto quedan dangling y la próxima victoria crashea.
+    popupFondo = nullptr;
+    popupBarra = nullptr;
+    popupNota = nullptr;
+    popupMensaje = nullptr;
+    popupLogro = nullptr;
+    // La barra de tiempo del nivel también la borró scene->clear()
+    barraTiempoFondo = nullptr;
+    barraTiempoRelleno = nullptr;
+    textoTiempo = nullptr;
+    // La barra de gasolina del HUD también la borró scene->clear()
+    barraGasFondo = nullptr;
+    barraGasRelleno = nullptr;
+    textoGas = nullptr;
+    textoGasCritico = nullptr;
 
     // 6. Re-crear managers
     obstacleManager = new ObstacleManager(scene, nivel, this);
@@ -847,10 +1087,81 @@ void Game::reset(int nivel){
         score->mostrarRescates(rescatados, objetivo);
     }
 
-    // 9. Re-conectar bidonTimer (ya existe, solo reiniciarlo)
+    // 8.5 Crear la barra de progreso del nivel (tiempo restante).
+    // Arriba al centro: se vacía conforme pasa el tiempo del nivel.
+    barraTiempoFondo = new QGraphicsRectItem(250, 15, 300, 20);
+    barraTiempoFondo->setBrush(QBrush(QColor(30, 30, 60)));
+    barraTiempoFondo->setPen(QPen(QColor(255, 255, 255, 120), 1));
+    barraTiempoFondo->setZValue(100);
+    scene->addItem(barraTiempoFondo);
+
+    barraTiempoRelleno = new QGraphicsRectItem(250, 15, 300, 20);
+    barraTiempoRelleno->setBrush(QBrush(QColor(0, 200, 80)));
+    barraTiempoRelleno->setPen(Qt::NoPen);
+    barraTiempoRelleno->setZValue(101);
+    scene->addItem(barraTiempoRelleno);
+
+    textoTiempo = new QGraphicsTextItem();
+    textoTiempo->setFont(QFont("Arial", 16, QFont::Bold));
+    textoTiempo->setDefaultTextColor(Qt::white);
+    textoTiempo->setZValue(102);
+    textoTiempo->setPos(560, 13);
+    scene->addItem(textoTiempo);
+
+    // 8.6 Barra de gasolina (HUD): debajo de la vida, estilo "GAS".
+    // La barra ya no va encima del heli: se muestra fija en el HUD.
+    textoGas = new QGraphicsTextItem();
+    textoGas->setFont(QFont("Arial", 16, QFont::Bold));
+    textoGas->setDefaultTextColor(Qt::white);
+    textoGas->setPlainText("GAS");
+    textoGas->setZValue(100);
+    textoGas->setPos(20, 100);
+    scene->addItem(textoGas);
+
+    barraGasFondo = new QGraphicsRectItem(70, 103, 150, 14);
+    barraGasFondo->setBrush(QBrush(QColor(60, 60, 60)));
+    barraGasFondo->setPen(QPen(QColor(255, 255, 255, 120), 1));
+    barraGasFondo->setZValue(100);
+    scene->addItem(barraGasFondo);
+
+    barraGasRelleno = new QGraphicsRectItem(70, 103, 150, 14);
+    barraGasRelleno->setBrush(QBrush(QColor(255, 140, 0))); // naranja
+    barraGasRelleno->setPen(Qt::NoPen);
+    barraGasRelleno->setZValue(101);
+    scene->addItem(barraGasRelleno);
+
+    // Alerta de gasolina crítica (visible solo cuando fuel <= 30%)
+    textoGasCritico = new QGraphicsTextItem();
+    textoGasCritico->setFont(QFont("Arial", 14, QFont::Bold));
+    textoGasCritico->setDefaultTextColor(Qt::red);
+    textoGasCritico->setPlainText("Gasolina en critico");
+    textoGasCritico->setZValue(102);
+    textoGasCritico->setPos(20, 123);
+    textoGasCritico->setVisible(false);
+    scene->addItem(textoGasCritico);
+
+    // 8.7 Botón de opciones (⋮) arriba a la derecha: menú para reiniciar
+    // o volver al menú en medio de un nivel (sin tener que perder).
+    btnOpciones = new QPushButton("⋮");
+    btnOpciones->setFixedSize(40, 40);
+    btnOpciones->setCursor(Qt::PointingHandCursor);
+    btnOpciones->setToolTip("Opciones");
+    btnOpciones->setStyleSheet(
+        "QPushButton { background-color: #3a3a3a; color: #ffffff;"
+        " border: 1px solid #666666; border-radius: 6px;"
+        " font-size: 22px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #4a4a4a; }"
+        "QPushButton:pressed { background-color: #2a2a2a; }");
+    proxyOpciones = scene->addWidget(btnOpciones);
+    proxyOpciones->setPos(scene->width() - 50, 10);
+    proxyOpciones->setZValue(500);
+    connect(btnOpciones, &QPushButton::clicked, this, &Game::mostrarMenuOpciones);
+
+    // 9. Re-conectar bidonTimer (ya existe, solo reiniciarlo).
+    // Los bidones aparecen cada 6s (antes 4s: menos frecuentes).
     if(bidonTimer != nullptr){
         bidonTimer->stop();
-        bidonTimer->start(4000);
+        bidonTimer->start(6000);
     }
 
     // 10. REINICIAR TIMERS PRINCIPALES (finishCheckTimer y survivorTimer)
@@ -881,6 +1192,37 @@ void Game::reset(int nivel){
     }
     levelManager->setLevelNumber(nivel);
     levelManager->startLevel(tiempoLimite, spawnMs);
+
+    // Guardar el tiempo total del nivel y llenar la barra de progreso
+    tiempoLimiteTotal = tiempoLimite;
+    actualizarBarraTiempo(tiempoLimite);
+}
+
+void Game::actualizarBarraTiempo(int tiempoRestante){
+    // Barra de progreso del nivel: muestra cuánto falta para que termine
+    // (se vacía de 30s/35s hasta 0). Verde -> amarillo -> rojo.
+    if(barraTiempoRelleno == nullptr || tiempoLimiteTotal <= 0){
+        return;
+    }
+    int ancho = static_cast<int>(300.0 * tiempoRestante / tiempoLimiteTotal);
+    if(ancho < 0) ancho = 0;
+    if(ancho > 300) ancho = 300;
+    barraTiempoRelleno->setRect(250, 15, ancho, 20);
+
+    double fraccion = static_cast<double>(tiempoRestante) / tiempoLimiteTotal;
+    QColor color;
+    if(fraccion > 0.5){
+        color = QColor(0, 200, 80);      // verde: queda mucho tiempo
+    }else if(fraccion > 0.25){
+        color = QColor(255, 200, 0);     // amarillo: la mitad
+    }else{
+        color = QColor(220, 40, 40);     // rojo: queda poco
+    }
+    barraTiempoRelleno->setBrush(color);
+
+    if(textoTiempo != nullptr){
+        textoTiempo->setPlainText(QString("Tiempo: %1s").arg(tiempoRestante));
+    }
 }
 
 void Game::showEvent(QShowEvent *event){

@@ -125,7 +125,8 @@ void Survivor::updateProgress(){
     }
 
     // El heli está encima -> avanzar el progreso.
-    progreso += 2.5;
+    // 100/30 por tick de 50ms = rescate en 1.5s (antes 2s: 2.5 por tick).
+    progreso += 100.0 / 30.0;
     if(progreso > 100){
         progreso = 100;
     }

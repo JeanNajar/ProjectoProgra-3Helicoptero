@@ -47,6 +47,9 @@ void VentanaPrincipal::quitarJuego(){
         // Resetear el juego en su lugar (sin crear objetos nuevos).
         // Esto cumple el requisito de "todo en un solo frame".
         juego->reset(juego->nivelActual);
+        // El juego ya no se ve: pausarlo por completo (timers + música).
+        // reset() los reinicia, así que hay que pararlos después.
+        juego->pausar();
     }
 }
 

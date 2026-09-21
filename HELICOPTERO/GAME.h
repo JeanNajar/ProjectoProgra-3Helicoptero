@@ -48,6 +48,8 @@ public:
     // Pantallas de resultados (estilo Cuphead)
     void mostrarVictoria();  // Nota A/A-/B+... según vidas y rescatados
     void mostrarDerrota();   // Porcentaje de rescate + barra
+    void detenerMusica();    // Detiene la música de fondo (al salir del juego)
+    void pausar();           // Detiene TODO el juego (timers + música) al salir al menú
 
     // Sistema de logros
     void mostrarPopupVictoria();  // Popup de nota coloreado por nivel
@@ -64,6 +66,8 @@ public slots:
     void volverAlMenu();
     void spawnBidon();  // Genera un bidón de combustible
     void reset(int nivel);  // Reinicia el juego en su lugar (sin crear objetos nuevos)
+    void mostrarMenuOpciones();  // Pantallita de pausa (⋮): Reanudar / Reiniciar / Volver al menú
+    void cerrarMenuOpciones();   // Reanudar: cierra la pantallita y sigue el juego
 
     //logica de zona de aterrizaje
 private:
@@ -94,9 +98,39 @@ private:
     QGraphicsProxyWidget *proxyNiveles;
     QGraphicsProxyWidget *proxyMenu;
 
+    // Botón de opciones (⋮) arriba a la derecha: abre la pantallita de
+    // pausa para reiniciar, volver al menú o reanudar en medio de un nivel.
+    QPushButton *btnOpciones;
+    QGraphicsProxyWidget *proxyOpciones;
+
+    // Pantallita de pausa (estilo panel de derrota, pero simple):
+    // fondo oscuro + título "PAUSA" + botones Reanudar/Reiniciar/Volver al menú.
+    bool pausaActiva;              // true mientras la pantallita está abierta
+    QGraphicsRectItem *pausaFondo;
+    QGraphicsTextItem *pausaTitulo;
+    QPushButton *btnReanudar;
+    QPushButton *btnPausaReiniciar;
+    QPushButton *btnPausaMenu;
+    QGraphicsProxyWidget *proxyReanudar;
+    QGraphicsProxyWidget *proxyPausaReiniciar;
+    QGraphicsProxyWidget *proxyPausaMenu;
+
     // Timers principales del juego (ahora son miembros para poder reiniciarse en reset())
     QTimer *finishCheckTimer;
     QTimer *survivorTimer;
+
+    // Barra de progreso del nivel: muestra el TIEMPO que falta para que
+    // termine el nivel (no es la vida). Se vacía de 30s/35s hasta 0.
+    QGraphicsRectItem *barraTiempoFondo;
+    QGraphicsRectItem *barraTiempoRelleno;
+    QGraphicsTextItem *textoTiempo;
+    int tiempoLimiteTotal;   // segundos totales del nivel (para el porcentaje)
+
+    // Barra de gasolina (HUD): debajo de la vida, con alerta de crítico.
+    QGraphicsRectItem *barraGasFondo;
+    QGraphicsRectItem *barraGasRelleno;
+    QGraphicsTextItem *textoGas;
+    QGraphicsTextItem *textoGasCritico;
 
     // Timer para cancelar el singleShot de victoria/derrota automática
     QTimer *resultTimer;
@@ -117,6 +151,8 @@ private:
     void crearPanel();
     QString calcularNota(int vidas, int rescatados) const;
     void actualizarLogros();
+    void actualizarBarraTiempo(int tiempoRestante);
+    void actualizarBarraGas();
 
     QPixmap fondoCiudad;  // Fondo de la ciudad (se dibuja a toda la ventana)
 

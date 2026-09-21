@@ -40,7 +40,7 @@ void BidonCombustible::move(){
         QList<QGraphicsItem*> colliding = collidingItems();
         for(int i = 0; i < colliding.size(); i++){
             if(typeid(*(colliding[i])) == typeid(MyHeli)){
-                heli->recargarCombustible(35.0);
+                heli->recargarCombustible(40.0);
                 escena->removeItem(this);
                 delete this;
                 return;

@@ -52,20 +52,9 @@ MyHeli::MyHeli(int nivel) : QObject(), QGraphicsPixmapItem()
     // ===== COMBUSTIBLE =====
     // Arranca lleno (100). Se consume ~2.0/s de base y ~5.0/s extra al empujar.
     // Si llega a 0, el empuje se ignora (solo gravedad).
+    // La barra de gasolina ya NO va encima del heli: se muestra en el HUD
+    // (debajo de la vida) como "GAS", gestionada por Game.
     fuel = 100.0;
-
-    // Barra de combustible (misma mecánica que la barra de Survivor):
-    // fondo oscuro + relleno que cambia de ancho según el porcentaje.
-    // Se posiciona encima del helicóptero (hija de este, como en Survivor).
-    barraCombustibleFondo = new QGraphicsRectItem(0, 0, boundingRect().width(), 6, this);
-    barraCombustibleFondo->setBrush(QBrush(QColor(60, 60, 60)));
-    barraCombustibleFondo->setPen(QPen(Qt::black));
-    barraCombustibleFondo->setPos(0, -12); // encima del helicóptero
-
-    barraCombustible = new QGraphicsRectItem(0, 0, boundingRect().width(), 6, this);
-    barraCombustible->setBrush(QBrush(QColor(0, 180, 255))); // azul
-    barraCombustible->setPen(QPen(Qt::NoPen));
-    barraCombustible->setPos(0, -12);
 
     // ===== VIENTO =====
     windX = 0.0;
@@ -101,7 +90,7 @@ MyHeli::MyHeli(int nivel) : QObject(), QGraphicsPixmapItem()
     //sonido de choque
 
     crashSound = new QMediaPlayer;
-    crashSound->setSource(QUrl("qrc:/Sounds/recursosh/CrashSound.mp3"));
+    crashSound->setSource(QUrl("qrc:/Sounds/recursosh/CrashSound.wav"));
     crashAudio = new QAudioOutput();
     crashSound->setAudioOutput(crashAudio);
     crashAudio->setVolume(0.5);
@@ -116,6 +105,16 @@ MyHeli::~MyHeli()
     delete crashSound;
     delete crashAudio;
 
+}
+
+void MyHeli::detenerTimers(){
+    // Detiene TODOS los timers del heli (física, rotor, viento y
+    // explosión). Se usa al salir del juego hacia el menú/selector:
+    // sin esto el heli sigue cayendo y el rotor girando en segundo plano.
+    const QList<QTimer*> timers = findChildren<QTimer*>();
+    for(QTimer *t : timers){
+        t->stop();
+    }
 }
 
 void MyHeli::keyPressEvent(QKeyEvent *event){
@@ -206,21 +205,17 @@ void MyHeli::updatePhysics(){
     double dt = 0.016;
 
     // ===== COMBUSTIBLE =====
-    // Consumo base constante (~2.0/s) + consumo extra mientras thrusting (~5.0/s).
+    // Consumo base constante (~1.2/s) + consumo extra mientras thrusting (~3.0/s).
     // Si fuel llega a 0, thrusting se ignora (solo gravedad).
-    double consumoBase = 2.0 * dt;
+    double consumoBase = 1.2 * dt;
     double consumoExtra = 0.0;
     if(thrusting && fuel > 0.0){
-        consumoExtra = 5.0 * dt;
+        consumoExtra = 3.0 * dt;
     }
     fuel -= (consumoBase + consumoExtra);
     if(fuel < 0.0){
         fuel = 0.0;
     }
-
-    // Actualizar barra de combustible (mismo patrón que Survivor)
-    int anchoBarra = static_cast<int>((fuel / 100.0) * boundingRect().width());
-    barraCombustible->setRect(0, 0, anchoBarra, 6);
 
     // ===== EMPUJE / GRAVEDAD =====
     // Si no hay combustible, thrusting se ignora → solo gravedad
@@ -300,6 +295,13 @@ void MyHeli::updatePhysics(){
 
         setPos(newX, newY);
         checkLanding();
+
+        // ===== GASOLINA OBLIGATORIA =====
+        // Si el heli está en el suelo y se quedó sin gasolina, pierde:
+        // no se puede estar parado en el suelo sin combustible.
+        if(!crashed && fuel <= 0.0){
+            crash();
+        }
         return;
     }
 
@@ -316,6 +318,8 @@ void MyHeli::updatePhysics(){
 void MyHeli::checkLanding(){
     //tolerancia de aterrizaje
 
+    // Sin gasolina el heli cae y explota al tocar el suelo (la gasolina
+    // es obligatoria: no se puede volar sin combustible).
     if(physics->SafeLanding(velY)){
         //si atterrizamos
         velY = 0.0;

@@ -42,6 +42,14 @@ void LevelManager::startLevel(int timeLimit, int spawnIntervalMs){
     spawnTimer->start(spawnIntervalMs);   // Spawn cada X milisegundos
 }
 
+void LevelManager::detenerTimers(){
+    // Detiene la cuenta regresiva y el spawn de obstáculos.
+    // Se usa al salir del juego hacia el menú/selector: sin esto el
+    // nivel termina solo en segundo plano y hasta navega solo al selector.
+    levelTimer->stop();
+    spawnTimer->stop();
+}
+
 void LevelManager::setLevelNumber(int nivel){
     levelNumber = nivel;
 }

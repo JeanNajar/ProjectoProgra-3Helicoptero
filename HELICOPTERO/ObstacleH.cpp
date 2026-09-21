@@ -106,7 +106,7 @@ ObstacleH::ObstacleH(ObstacleType type, ObstacleManager *manager, int nivel): QO
     timer->start(50);
 
     CrashSound = new QMediaPlayer;
-    CrashSound->setSource(QUrl("qrc:/Sounds/recursosh/CrashSound.mp3"));
+    CrashSound->setSource(QUrl("qrc:/Sounds/recursosh/CrashSound.wav"));
 
     audioOutput = new QAudioOutput();
 
