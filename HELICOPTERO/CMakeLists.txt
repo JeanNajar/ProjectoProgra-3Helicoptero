@@ -31,6 +31,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ObstacleH.cpp
         GAME.cpp
         GAME.h
+        AdminMusica.h
+        AdminMusica.cpp
         Score.h
         Score.cpp
         Health.h

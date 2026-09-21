@@ -5,6 +5,7 @@
 #include "LevelSelect.h"
 #include "Puntajes.h"
 #include "Game.h"
+#include "AdminMusica.h"
 
 #include <QStackedWidget>
 
@@ -55,15 +56,21 @@ void VentanaPrincipal::quitarJuego(){
 
 void VentanaPrincipal::mostrarLogin(){
     quitarJuego();
+    // Tema del login/registro (Main Theme).
+    AdminMusica::instancia()->reproducirLogin();
     stack->setCurrentWidget(login);
 }
 
 void VentanaPrincipal::mostrarRegistro(){
+    // El registro usa el mismo tema que el login.
+    AdminMusica::instancia()->reproducirLogin();
     stack->setCurrentWidget(registro);
 }
 
 void VentanaPrincipal::mostrarMenu(){
     quitarJuego();
+    // Tema del menú (se usa en menú, selector y puntajes).
+    AdminMusica::instancia()->reproducirMenu();
     stack->setCurrentWidget(menu);
 }
 

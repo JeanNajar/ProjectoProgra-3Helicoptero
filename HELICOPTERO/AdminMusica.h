@@ -2,6 +2,7 @@
 #define ADMINMUSICA_H
 
 #include <QObject>
+#include <QString>
 
 class QMediaPlayer;
 class QAudioOutput;
@@ -31,19 +32,24 @@ public:
     // Reproductor (bucle) para el menú, el selector y los puntajes.
     void reproducirMenu();
 
+    // Tema del nivel indicado (1, 2 o 3). Se reproduce en bucle.
+    void reproducirNivel(int nivel);
+
     // Detiene la música (se llama al entrar a un nivel, que tiene su tema).
     void detener();
 
 private:
     // Constructor privado: solo instancia() lo crea.
-    AdminMusica();
+    AdminMusica(QObject *parent = nullptr);
 
-    // Reproduce el archivo indicado en bucle (espacios codificados).
+    // Reproduce el archivo indicado en bucle (evita reiniciar el mismo tema).
     void reproducir(const QString &ruta);
+
+    static AdminMusica * sInstancia;
 
     QMediaPlayer * reproductor;
     QAudioOutput * salida;
-    QString ultimaRuta;   // evita reiniciar el mismo tema al repetir llamadas
+    QString temaActual;   // evita reiniciar el mismo tema al repetir llamadas
 };
 
 #endif // ADMINMUSICA_H

@@ -1,5 +1,6 @@
 #include "LevelSelect.h"
 #include "VentanaPrincipal.h"
+#include "AdminMusica.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -56,6 +57,9 @@ LevelSelect::LevelSelect(QWidget *parent) : QWidget(parent) {
     layout->addWidget(btnVolver, 0, Qt::AlignHCenter);
 
     connect(btnVolver, &QPushButton::clicked, this, &LevelSelect::volver);
+
+    // Tema del selector de nivel: se reproduce el del menú al entrar.
+    AdminMusica::instancia()->reproducirMenu();
 }
 
 void LevelSelect::paintEvent(QPaintEvent *event)

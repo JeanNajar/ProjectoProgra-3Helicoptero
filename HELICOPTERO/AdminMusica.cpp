@@ -16,7 +16,7 @@ AdminMusica * AdminMusica::instancia(){
 
 AdminMusica::AdminMusica(QObject *parent) : QObject(parent){
     reproductor = new QMediaPlayer(this);
-    salida = new QAudioOutput(thisirk);
+    salida = new QAudioOutput(this);
     reproductor->setAudioOutput(salida);
     salida->setVolume(0.35);   // Música ambiental, sin tapar los efectos
     reproductor->setLoops(QMediaPlayer::Infinite);
@@ -27,7 +27,7 @@ void AdminMusica::reproducir(const QString &ruta){
     // "revuelva" la canción cada vez que se vuelve desde el registro.
     if(ruta == temaActual){
         if(reproductor->playbackState() == QMediaPlayer::PlayingState){
-            return Dispensacion;
+            return;
         }
     }
 

@@ -1,0 +1,5436 @@
+================================================================================
+ARCHIVO: AdminMusica.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\AdminMusica.cpp
+================================================================================
+#include "AdminMusica.h"
+
+#include <QMediaPlayer>
+#include <QAudioOutput>
+#include <QUrl>
+
+// Puntero estÃ¡tico de la instancia Ãºnica.
+AdminMusica * AdminMusica::sInstancia = nullptr;
+
+AdminMusica * AdminMusica::instancia(){
+    if(sInstancia == nullptr){
+        sInstancia = new AdminMusica();
+    }
+    return sInstancia;
+}
+
+AdminMusica::AdminMusica(QObject *parent) : QObject(parent){
+    reproductor = new QMediaPlayer(this);
+    salida = new QAudioOutput(this);
+    reproductor->setAudioOutput(salida);
+    salida->setVolume(0.35);   // MÃºsica ambiental, sin tapar los efectos
+    reproductor->setLoops(QMediaPlayer::Infinite);
+}
+
+void AdminMusica::reproducir(const QString &ruta){
+    // Si ya suena el MISMO tema, no reiniciarlo: evita que el login
+    // "revuelva" la canciÃ³n cada vez que se vuelve desde el registro.
+    if(ruta == temaActual){
+        if(reproductor->playbackState() == QMediaPlayer::PlayingState){
+            return;
+        }
+    }
+
+    temaActual = ruta;
+    reproductor->stop();
+    reproductor->setSource(QUrl(ruta));
+    reproductor->play();
+}
+
+void AdminMusica::reproducirLogin(){
+    reproducir(QStringLiteral("qrc:/Sounds/recursosh/Main Theme.mp3"));
+}
+
+void AdminMusica::reproducirMenu(){
+    reproducir(QStringLiteral("qrc:/Sounds/recursosh/Menu.mp3"));
+}
+
+void AdminMusica::reproducirNivel(int nivel){
+    switch(nivel){
+    case 1:
+        reproducir(QStringLiteral("qrc:/Sounds/recursosh/Level 1.mp3"));
+        break;
+    case 2:
+        reproducir(QStringLiteral("qrc:/Sounds/recursosh/Level 2.mp3"));
+        break;
+    case 3:
+        reproducir(QStringLiteral("qrc:/Sounds/recursosh/Level 3.mp3"));
+        break;
+    default:
+        reproducir(QStringLiteral("qrc:/Sounds/recursosh/Level 1.mp3"));
+        break;
+    }
+}
+
+void AdminMusica::detener(){
+    temaActual.clear();
+    reproductor->stop();
+}
+
+
+================================================================================
+ARCHIVO: AdminMusica.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\AdminMusica.h
+================================================================================
+#ifndef ADMINMUSICA_H
+#define ADMINMUSICA_H
+
+#include <QObject>
+#include <QString>
+
+class QMediaPlayer;
+class QAudioOutput;
+
+// MÃºsica de fondo del juego (singleton).
+//
+// Cuando el usuario navega por la app, cada pantalla debe tener SU tema:
+//   - Login / Registro          -> "Main Theme.mp3"
+//   - MenÃº / Selector / Puntajes -> "Menu.mp3"
+//   - Nivel 1/2/3               -> "Level 1.mp3" / "Level 2.mp3" / "Level 3.mp3"
+//
+// Esta clase centraliza la mÃºsica de las pantallas NO jugables. El nivel
+// (Game) reproduce su propio tema con su reproductor, asÃ­ que al entrar a
+// un nivel se detiene AdminMusica y al salir se reanuda la pantalla activa.
+//
+// Es un singleton: se pide con AdminMusica::instancia().
+class AdminMusica : public QObject {
+    Q_OBJECT
+
+public:
+    // Ãšnico punto de acceso (se crea la primera vez que se usa).
+    static AdminMusica * instancia();
+
+    // Reproductor (bucle) para el login y el registro.
+    void reproducirLogin();
+
+    // Reproductor (bucle) para el menÃº, el selector y los puntajes.
+    void reproducirMenu();
+
+    // Tema del nivel indicado (1, 2 o 3). Se reproduce en bucle.
+    void reproducirNivel(int nivel);
+
+    // Detiene la mÃºsica (se llama al entrar a un nivel, que tiene su tema).
+    void detener();
+
+private:
+    // Constructor privado: solo instancia() lo crea.
+    AdminMusica(QObject *parent = nullptr);
+
+    // Reproduce el archivo indicado en bucle (evita reiniciar el mismo tema).
+    void reproducir(const QString &ruta);
+
+    static AdminMusica * sInstancia;
+
+    QMediaPlayer * reproductor;
+    QAudioOutput * salida;
+    QString temaActual;   // evita reiniciar el mismo tema al repetir llamadas
+};
+
+#endif // ADMINMUSICA_H
+
+
+================================================================================
+ARCHIVO: Bala.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Bala.cpp
+================================================================================
+#include "Bala.h"
+#include "ObstacleH.h"
+
+#include <QGraphicsScene>
+#include <QTimer>
+#include <QPixmap>
+#include <typeinfo>
+
+Bala::Bala(qreal xPos, qreal yPos, QGraphicsScene *escena)
+    : QObject(), QGraphicsPixmapItem()
+{
+    this->escena = escena;
+
+    setPixmap(QPixmap(":/Sprites/recursosh/bala.png"));
+    setPos(xPos, yPos);
+
+    // mover la bala cada 16ms (8px por tick = 500px/s)
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(move()));
+    timer->start(16);
+}
+
+void Bala::move(){
+
+    if(scene() == nullptr){
+        return;
+    }
+
+    // colisiÃ³n con obstÃ¡culos: la bala le pega y se destruye
+    QList<QGraphicsItem*> colliding = collidingItems();
+    for(int i = 0; i < colliding.size(); i++){
+        if(typeid(*(colliding[i])) == typeid(ObstacleH)){
+            ObstacleH *obstaculo = dynamic_cast<ObstacleH*>(colliding[i]);
+            if(obstaculo != nullptr){
+                obstaculo->recibirImpacto();
+            }
+            escena->removeItem(this);
+            delete this;
+            return;
+        }
+    }
+
+    // avanzar hacia la derecha
+    setPos(x() + 8, y());
+
+    // saliÃ³ de la pantalla: se destruye sola
+    if(x() > escena->width()){
+        escena->removeItem(this);
+        delete this;
+    }
+}
+
+
+================================================================================
+ARCHIVO: Bala.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Bala.h
+================================================================================
+#ifndef BALA_H
+#define BALA_H
+
+#include <QObject>
+#include <QGraphicsPixmapItem>
+
+class QGraphicsScene;
+
+// Proyectil disparado por el helicÃ³ptero (solo desde el nivel 2).
+// Avanza hacia la derecha y destruye los obstÃ¡culos que toca.
+class Bala : public QObject, public QGraphicsPixmapItem {
+    Q_OBJECT
+
+public:
+    Bala(qreal xPos, qreal yPos, QGraphicsScene *escena);
+
+public slots:
+    void move();
+
+private:
+    QGraphicsScene *escena;
+};
+
+#endif // BALA_H
+
+
+================================================================================
+ARCHIVO: BidonCombustible.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\BidonCombustible.cpp
+================================================================================
+#include "BidonCombustible.h"
+#include "MyHeli.h"
+#include "GAME.h"
+
+#include <QGraphicsScene>
+#include <QTimer>
+#include <QPixmap>
+#include <typeinfo>
+
+extern Game *game;
+
+BidonCombustible::BidonCombustible(qreal xPos, qreal yPos, QGraphicsScene *escena)
+    : QObject(), QGraphicsPixmapItem()
+{
+    this->escena = escena;
+
+    setPixmap(QPixmap(":/Sprites/recursosh/bidon_combustible_32x32.png"));
+    setPos(xPos, yPos);
+
+    // Mover hacia la izquierda cada 16ms (3px por tick = 187.5px/s, igual que obstÃ¡culos)
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(move()));
+    timer->start(16);
+}
+
+void BidonCombustible::move(){
+
+    if(scene() == nullptr){
+        return;
+    }
+
+    // Si el juego terminÃ³, no hacer nada
+    if(game == nullptr || game->juegoTerminado){
+        return;
+    }
+
+    // ColisiÃ³n con el helicÃ³ptero: recargar combustible y destruir el bidÃ³n
+    MyHeli *heli = game->heli;
+    if(heli != nullptr && heli->scene() != nullptr){
+        QList<QGraphicsItem*> colliding = collidingItems();
+        for(int i = 0; i < colliding.size(); i++){
+            if(typeid(*(colliding[i])) == typeid(MyHeli)){
+                heli->recargarCombustible(40.0);
+                escena->removeItem(this);
+                delete this;
+                return;
+            }
+        }
+    }
+
+    // Avanzar hacia la izquierda
+    setPos(x() - 3, y());
+
+    // SaliÃ³ de la pantalla por la izquierda: destruir
+    if(x() + boundingRect().width() < 0){
+        escena->removeItem(this);
+        delete this;
+    }
+}
+
+
+================================================================================
+ARCHIVO: BidonCombustible.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\BidonCombustible.h
+================================================================================
+#ifndef BIDONCOMBUSTIBLE_H
+#define BIDONCOMBUSTIBLE_H
+
+#include <QObject>
+#include <QGraphicsPixmapItem>
+
+class QGraphicsScene;
+
+// BidÃ³n de combustible: pickup que se mueve hacia la izquierda (igual que los
+// obstÃ¡culos). Al colisionar con el helicÃ³ptero, le resta combustible instantÃ¡neo.
+// Se destruye al salir de la pantalla o al ser recogido.
+class BidonCombustible : public QObject, public QGraphicsPixmapItem {
+    Q_OBJECT
+
+public:
+    BidonCombustible(qreal xPos, qreal yPos, QGraphicsScene *escena);
+
+public slots:
+    void move();
+
+private:
+    QGraphicsScene *escena;
+};
+
+#endif // BIDONCOMBUSTIBLE_H
+
+
+================================================================================
+ARCHIVO: FinishLine.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\FinishLine.cpp
+================================================================================
+#include "FinishLine.h"
+#include <QGraphicsScene>
+#include <QBrush>
+#include <QPen>
+#include <QColor>
+
+FinishLine::FinishLine(QGraphicsScene *scene, QObject *parent)
+    : QObject(parent), QGraphicsRectItem()
+{
+
+    int zonaAncho = 150;
+    int zonaAlto = 40;
+    int zonaX = static_cast<int>(scene->width()) - 200;
+    int zonaY = static_cast<int>(scene->height()) - zonaAlto;
+
+    setRect(zonaX, zonaY, zonaAncho, zonaAlto);
+
+
+    QBrush brush(QColor(0, 200, 0, 40));   // Verde
+    QPen pen(Qt::white, 3);                // Borde blanco
+    setBrush(brush);
+    setPen(pen);
+
+    // Agregar a la escena
+    scene->addItem(this);
+}
+
+
+================================================================================
+ARCHIVO: FinishLine.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\FinishLine.h
+================================================================================
+#ifndef FINISHLINE_H
+#define FINISHLINE_H
+
+#include <QObject>
+#include <QGraphicsRectItem>
+
+class FinishLine : public QObject, public QGraphicsRectItem {
+    Q_OBJECT
+
+public:
+    FinishLine(QGraphicsScene *scene, QObject *parent = nullptr);
+};
+
+
+#endif // FINISHLINE_H
+
+
+================================================================================
+ARCHIVO: GAME.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\GAME.cpp
+================================================================================
+#include "GAME.h"
+#include "ObstacleType.h"
+#include "VentanaPrincipal.h"
+#include "ResourceLoader.h"
+#include "AdminMusica.h"
+
+#include <QTimer>
+#include <QMediaPlayer>
+#include <QAudioOutput>
+#include <QFont>
+#include <QGraphicsPixmapItem>
+#include <QColor>
+#include <QPixmap>
+#include <QPainter>
+#include <QShowEvent>
+#include <QResizeEvent>
+#include <QSettings>
+#include <cstdlib>
+
+//Puntero global del juego (definido en main.cpp)
+extern Game * game;
+//Ventana ÃƒÂºnica: navega entre pÃƒÂ¡ginas
+extern VentanaPrincipal * ventanaPrincipal;
+//Usuario actual: el progreso es por cuenta
+extern QString usuarioActual;
+
+Game::Game(int nivel, QWidget *parent) : QGraphicsView(parent) {
+
+    nivelActual = nivel;
+
+    //Crear la escena
+    scene = new QGraphicsScene();
+    scene->setSceneRect(0,0,800,600);
+
+    setScene(scene);
+    //Sin barras de scroll
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    resize(800, 600);
+    setMinimumSize(640, 480);
+    //Fondo de la vista (igual al cielo, evita franjas blancas)
+    setBackgroundBrush(QColor(21, 10, 43));
+
+    //Fondo segÃƒÂºn el nivel (se dibuja estirado en drawBackground)
+    fondoCiudad = ResourceLoader::background(nivel);
+    if(fondoCiudad.isNull()){
+        QString rutaFondo;
+        switch(nivel){
+        case 2:
+            rutaFondo = ":/Sprites/recursosh/nivel2_desierto_800x600.png";
+            break;
+        case 3:
+            rutaFondo = ":/Sprites/recursosh/nivel3_nieve_800x600.png";
+            break;
+        default:
+            rutaFondo = ":/Sprites/recursosh/fondo_ciudad_cyberpunk_800x600.png";
+        }
+        fondoCiudad = QPixmap(rutaFondo);
+    }
+
+    heli = new MyHeli(nivel);
+
+    // Posicionar el helicoptero
+    heli->setPos(20, height() - heli->boundingRect().height());
+
+    //El heli recibe el foco (teclas)
+    heli->setFlag(QGraphicsItem::ItemIsFocusable);
+    heli->setFocus();
+
+    // AÃƒÂ±adirlo a la escena
+    scene->addItem(heli);
+
+    //Puntaje arriba a la izquierda
+    score =new Score();
+    score->setPos(20, 10);
+    score->setZValue(100);
+    scene->addItem(score);
+
+    //Vida debajo del puntaje
+    health = new Health();
+    health->setPos(20, 50);
+    health->setZValue(100);
+    scene->addItem(health);
+
+    obstacleManager = new ObstacleManager(scene, nivel, this);
+
+    //Manager de supervivientes (suelo)
+    survivorManager = new SurvivorManager(scene, obstacleManager, nivel, this);
+
+    //manager del nivel
+    finishLine = nullptr;
+    heliEnZona = false;
+    tiempoEnZona = 0;
+    nivelGanado = false;
+    mundoEnMovimiento = true;  // El mundo avanza hasta que aparezca la meta
+    juegoTerminado = false;    // false: el juego sigue en curso
+    contador = 0;  // Contador de patrÃƒÂ³n de obstÃƒÂ¡culos
+
+    //Estado del HUD
+    ultimoTiempo = -1;
+    instruccionMostrada = false;
+
+    // Panel de resultados (se crea la primera vez que se gana o pierde)
+    panelFondo = nullptr;
+    panelTitulo = nullptr;
+    panelNota = nullptr;
+    panelSub = nullptr;
+    barraFondo = nullptr;
+    barraRelleno = nullptr;
+    btnReintentar = nullptr;
+    btnNiveles = nullptr;
+    btnMenu = nullptr;
+    proxyReintentar = nullptr;
+    proxyNiveles = nullptr;
+    proxyMenu = nullptr;
+    btnOpciones = nullptr;
+    proxyOpciones = nullptr;
+
+    // Pantallita de pausa (se crea bajo demanda con el botÃƒÂ³n Ã¢â€¹Â®)
+    pausaActiva = false;
+    pausaFondo = nullptr;
+    pausaTitulo = nullptr;
+    btnReanudar = nullptr;
+    btnPausaReiniciar = nullptr;
+    btnPausaMenu = nullptr;
+    proxyReanudar = nullptr;
+    proxyPausaReiniciar = nullptr;
+    proxyPausaMenu = nullptr;
+
+    // Punteros que se crean bajo demanda: SIEMPRE inicializados a nullptr
+    // (si no, son basura y las guardas if(x != nullptr) crashean).
+    bidonTimer = nullptr;
+    popupFondo = nullptr;
+    popupBarra = nullptr;
+    popupNota = nullptr;
+    popupMensaje = nullptr;
+    popupLogro = nullptr;
+
+    // Barra de progreso del nivel (se crea en reset())
+    barraTiempoFondo = nullptr;
+    barraTiempoRelleno = nullptr;
+    textoTiempo = nullptr;
+    tiempoLimiteTotal = 0;
+
+    // Barra de gasolina del HUD (se crea en reset())
+    barraGasFondo = nullptr;
+    barraGasRelleno = nullptr;
+    textoGas = nullptr;
+    textoGasCritico = nullptr;
+
+
+    levelManager = new LevelManager(this);
+
+    // Timer principal de verificaciÃƒÂ³n de zona de aterrizaje
+    finishCheckTimer = new QTimer(this);
+    connect(finishCheckTimer, SIGNAL(timeout()), this, SLOT(checkFinishLine()));
+    finishCheckTimer->start(50);
+
+    // Timer de actualizaciÃƒÂ³n de supervivientes (cada 50ms)
+    survivorTimer = new QTimer(this);
+    connect(survivorTimer, SIGNAL(timeout()), this, SLOT(updateSurvivors()));
+    survivorTimer->start(50);
+
+    // Timer de generaciÃƒÂ³n de bidones de combustible.
+    // IMPORTANTE: antes este timer nunca se creaba (solo se inicializaba a
+    // nullptr), por eso los bidones dejaron de aparecer. reset() lo reinicia.
+    bidonTimer = new QTimer(this);
+    connect(bidonTimer, SIGNAL(timeout()), this, SLOT(spawnBidon()));
+
+    // Timer para la navegaciÃƒÂ³n automÃƒÂ¡tica despuÃƒÂ©s de victoria/derrota
+    resultTimer = new QTimer(this);
+    resultTimer->setSingleShot(true);
+    // ConexiÃƒÂ³n ÃƒÅ¡NICA (en el constructor): evita conexiones acumuladas
+    // cada vez que se gana o pierde.
+    connect(resultTimer, &QTimer::timeout, this, [this]() {
+        seleccionarNivel();
+    });
+
+    // ===== MUSICA DEL NIVEL =====
+    // El nivel tiene SU propio tema (Level 1/2/3.mp3), que reproduce el
+    // singleton AdminMusica en bucle. Al entrar a un nivel se detiene la
+    // mÃƒÂºsica de las pantallas (login/menÃƒÂº) para que solo suene este tema.
+    AdminMusica::instancia()->reproducirNivel(nivelActual);
+}
+
+Game::~Game(){
+
+    // Cancelar timers pendientes
+    if(finishCheckTimer != nullptr){
+        finishCheckTimer->stop();
+        finishCheckTimer->deleteLater();
+    }
+    if(survivorTimer != nullptr){
+        survivorTimer->stop();
+        survivorTimer->deleteLater();
+    }
+    if(resultTimer != nullptr){
+        resultTimer->stop();
+        resultTimer->deleteLater();
+    }
+
+    // Detener y liberar mÃƒÂºsica de fondo
+    if(bgMusic != nullptr){
+        bgMusic->stop();
+        bgMusic->deleteLater();
+    }
+    if(bgAudio != nullptr){
+        bgAudio->deleteLater();
+    }
+
+    // Limpiar elementos del popup de logros
+    if(popupFondo != nullptr){ delete popupFondo; popupFondo = nullptr; }
+    if(popupBarra != nullptr){ delete popupBarra; popupBarra = nullptr; }
+    if(popupNota != nullptr){ delete popupNota; popupNota = nullptr; }
+    if(popupMensaje != nullptr){ delete popupMensaje; popupMensaje = nullptr; }
+    if(popupLogro != nullptr){ delete popupLogro; popupLogro = nullptr; }
+
+    delete survivorManager;
+    delete obstacleManager;
+
+    // El heli tiene parte QObject (timers de fÃƒÂ­sica, rotor y explosiÃƒÂ³n):
+    // hay que borrarlo ANTES de la escena para detener sus timers y evitar
+    // punteros colgantes al cambiar de nivel. Si ya se destruyÃƒÂ³ solo
+    // (crash()), el puntero global quedÃƒÂ³ en nullptr (ver MyHeli::crash).
+    if(heli != nullptr){
+        delete heli;
+        heli = nullptr;
+    }
+
+    // La escena se borra al final: elimina el heli, el score, la salud,
+    // la zona de aterrizaje y el panel de resultados. Sin esto, cada
+    // reintento filtrarÃƒÂ­a una escena completa en memoria.
+    delete scene;
+
+}
+
+void Game::detenerMusica(){
+    // Detiene la mÃƒÂºsica de fondo (se usa al salir del juego hacia el
+    // menÃƒÂº/selector: el juego no debe seguir sonando si no se estÃƒÂ¡ jugando).
+    if(bgMusic != nullptr){
+        bgMusic->stop();
+    }
+}
+
+void Game::pausar(){
+    // Detiene TODO el juego (timers + mÃƒÂºsica) cuando se navega fuera.
+    // Sin esto el mundo sigue corriendo en el menÃƒÂº: el nivel termina solo,
+    // el heli cae y puede chocar, y hasta se navega solo al selector.
+    if(finishCheckTimer != nullptr){
+        finishCheckTimer->stop();
+    }
+    if(survivorTimer != nullptr){
+        survivorTimer->stop();
+    }
+    if(bidonTimer != nullptr){
+        bidonTimer->stop();
+    }
+    if(levelManager != nullptr){
+        levelManager->detenerTimers();
+    }
+    if(heli != nullptr){
+        heli->detenerTimers();
+    }
+    detenerMusica();
+}
+
+void Game::spawnObstacles(){
+
+    // Si el juego terminÃƒÂ³ (ganÃƒÂ³ o perdiÃƒÂ³), no generar mÃƒÂ¡s obstÃƒÂ¡culos
+    if(juegoTerminado){
+        return;
+    }
+
+    // Cuando el tiempo llega a 0 LevelManager pone active=false,
+    if(!levelManager->isActive()){
+        return;
+    }
+
+    ObstacleType tipo;
+    int yPos = 0;
+
+    // PatrÃƒÂ³n de obstÃƒÂ¡culos segÃƒÂºn el nivel:
+    // - Nivel 1 (ciudad): los 3 clÃƒÂ¡sicos (vertical, pequeÃƒÂ±o, techo).
+    // - Niveles 2 y 3 (desierto/nieve): SOLO rocas/hielo del bioma
+    //   (vertical, pequeÃƒÂ±o y el que CAE). El de techo (CEILING) es
+    //   exclusivo de la ciudad y NO se genera en desierto/nieve.
+    if(nivelActual >= 2){
+        switch(contador % 3){
+        case 0:
+            tipo = ObstacleType::VERTICAL;
+            // yPos se queda en 0, spawnObstacle usa la posiciÃƒÂ³n por defecto (parte baja)
+            break;
+        case 1:
+            tipo = ObstacleType::SMALL;
+            break;
+            // yPos se queda en 0, spawnObstacle
+        case 2:
+            tipo = ObstacleType::FALLING;
+            // cae desde arriba en una posiciÃƒÂ³n aleatoria (lo coloca spawnObstacle)
+            break;
+        }
+    }else{
+        switch(contador % 3){
+        case 0:
+            tipo = ObstacleType::VERTICAL;
+            break;
+        case 1:
+            tipo = ObstacleType::SMALL;
+            break;
+        case 2:
+            tipo = ObstacleType::CEILING;
+            break;
+        }
+    }
+
+    obstacleManager->spawnObstacle(tipo, yPos);
+
+    contador++;
+
+    // Generar un superviviente DETRÃƒÂS del obstÃƒÂ¡culo reciÃƒÂ©n creado.
+    // El mÃƒÂ¡ximo por nivel lo define SurvivorManager (5/10/15). AsÃƒÂ­ el
+    // superviviente aparece "en el mapa" detrÃƒÂ¡s de un obstÃƒÂ¡culo y se mueve
+    // junto con ÃƒÂ©l (efecto scroll).
+    if(!survivorManager->allSpawned()){
+        survivorManager->spawnSurvivorBehindObstacle(
+            obstacleManager->getObstacle(obstacleManager->getCantidad() - 1));
+    }
+}
+
+void Game::spawnBidon(){
+
+    // Si el juego terminÃƒÂ³ (ganÃƒÂ³ o perdiÃƒÂ³), no generar mÃƒÂ¡s bidones
+    if(juegoTerminado){
+        return;
+    }
+
+    // Cuando el tiempo llega a 0 LevelManager pone active=false
+    if(!levelManager->isActive()){
+        return;
+    }
+
+    // Aparece desde la derecha, a una altura aleatoria (evita el suelo y el techo)
+    qreal xPos = scene->width() + 20;
+    qreal yPos = 50 + (rand() % static_cast<int>(scene->height() - 150));
+
+    BidonCombustible *bidon = new BidonCombustible(xPos, yPos, scene);
+    scene->addItem(bidon);
+}
+
+void Game::updateSurvivors(){
+    // Si el juego terminÃƒÂ³, no actualizar supervivientes
+    // (evita tocar el heli si ya fue destruido)
+    if(juegoTerminado){
+        return;
+    }
+
+    // Le dice a cada superviviente si el heli estÃƒÂ¡ encima (para el rescate)
+    // y elimina los que ya fueron rescatados.
+    if(heli == nullptr || heli->scene() == nullptr){
+        return;
+    }
+    QRectF heliRect(heli->pos(), heli->boundingRect().size());
+    survivorManager->updateAll(heliRect);
+}
+
+
+void Game::checkFinishLine(){
+
+    // Si el juego terminÃƒÂ³ (ganÃƒÂ³ o perdiÃƒÂ³), no hacer nada mÃƒÂ¡s
+    if(juegoTerminado){
+        return;
+    }
+
+    // Actualizar la barra de gasolina del HUD (cada 50ms)
+    actualizarBarraGas();
+
+    // Solo actualizar el texto si el tiempo cambiÃƒÂ³
+    int tiempoActual = levelManager->getTimeRemaining();
+    if(tiempoActual != ultimoTiempo){
+        ultimoTiempo = tiempoActual;
+        int rescatados = survivorManager->getTotalRescatados();
+        int objetivo = survivorManager->getTotalObjetivo();
+        score->mostrarRescates(rescatados, objetivo);
+        // Actualizar la barra de progreso del nivel (tiempo restante)
+        actualizarBarraTiempo(tiempoActual);
+    }
+
+    //DETECTAR FIN DE NIVEL
+
+    if(levelManager->isFinished() && !instruccionMostrada){
+        instruccionMostrada = true;
+
+        QGraphicsTextItem *instruccion = new QGraphicsTextItem("Tiempo terminado! Aterriza en la zona VERDE");
+        instruccion->setDefaultTextColor(Qt::yellow);
+        instruccion->setFont(QFont("times", 18));
+        instruccion->setPos(scene->width() / 2 - 200, 60);
+        scene->addItem(instruccion);
+
+        //evita puntero colgante
+        if(heli->scene() != nullptr){
+            heli->setFocus();
+        }
+    }
+
+    // CREAR LA ZONA CUANDO LA PANTALLA ESTÃƒâ€° LIMPIA
+
+    if(finishLine == nullptr && levelManager->isFinished() && !nivelGanado){
+        // si ya no hay obstÃƒÂ¡culos en pantalla
+        if(obstacleManager->countVisible() == 0){
+            // Crear la zona de aterrizaje
+            finishLine = new FinishLine(scene);
+            // El mapa deja de avanzar: el heli aterrizado ya no se desliza,
+            // da la sensaciÃƒÂ³n de que el mundo se detuvo y solo falta aterrizar.
+            mundoEnMovimiento = false;
+        }else{
+            // TodavÃƒÂ­a hay obstÃƒÂ¡culos, esperar al siguiente tick
+            return;
+        }
+    }
+
+    //VERIFICAR ATERRIZAJE EN LA ZONA
+    // Solo verificar si la zona ya existe y el nivel terminÃƒÂ³
+    if(finishLine == nullptr || !levelManager->isFinished() || nivelGanado){
+        return;
+    }
+    //evita segmentation fault
+    if(heli->scene() == nullptr){
+        return;
+    }
+    // Verificar si el helicÃƒÂ³ptero estÃƒÂ¡ ATERRIZADO y sobre la zona
+    bool heliEnSuelo = (heli->y() + heli->boundingRect().height() >= scene->height() - 2);
+
+    // Verificar si el heli colisiona con la zona
+    QList<QGraphicsItem*> colliding = heli->collidingItems();
+    bool sobreZona = false;
+    for(int i = 0; i < colliding.size(); i++){
+        if(colliding[i] == finishLine){
+            sobreZona = true;
+            break;
+        }
+    }
+
+    if(heliEnSuelo && sobreZona){
+        // El heli estÃƒÂ¡ aterrizado sobre la zona Ã¢â€ â€™ sumar tiempo
+        tiempoEnZona++;
+
+        // 40 ticks = 2 segundos
+        if(tiempoEnZona >= 40){
+            nivelGanado = true;
+            mostrarVictoria();
+        }
+    }else{
+        // El heli no estÃƒÂ¡ en la zona reinicia el contador
+        tiempoEnZona = 0;
+    }
+}
+
+
+void Game::actualizarBarraGas(){
+    // Barra de gasolina del HUD: se vacÃƒÂ­a segÃƒÂºn el combustible del heli.
+    // Muestra la alerta "Gasolina en critico" cuando queda <= 30%.
+    if(heli == nullptr || barraGasRelleno == nullptr){
+        return;
+    }
+    double fuel = heli->getFuel();
+    int ancho = static_cast<int>(150.0 * fuel / 100.0);
+    if(ancho < 0) ancho = 0;
+    if(ancho > 150) ancho = 150;
+    barraGasRelleno->setRect(70, 103, ancho, 14);
+
+    if(textoGasCritico != nullptr){
+        textoGasCritico->setVisible(fuel <= 30.0);
+    }
+}
+
+void Game::mostrarVictoria(){
+
+    if(juegoTerminado){
+        return;
+    }
+    juegoTerminado = true;
+
+    QSettings settings("HelicopterRescue", "Progreso");
+    QString clave = QString("nivelDesbloqueado_%1").arg(usuarioActual);
+    int desbloqueado = settings.value(clave, 1).toInt();
+    if(nivelActual < 3 && nivelActual + 1 > desbloqueado){
+        settings.setValue(clave, nivelActual + 1);
+    }
+
+    // El juego terminÃƒÂ³: detener la mÃƒÂºsica de fondo
+    if(bgMusic != nullptr){
+        bgMusic->stop();
+    }
+
+    mostrarPopupVictoria();
+}
+
+void Game::mostrarDerrota(){
+
+    if(juegoTerminado){
+        return;  // ya se mostrÃƒÂ³ un panel
+    }
+    juegoTerminado = true;  // pausa todo el mundo
+
+    crearPanel();
+
+    panelTitulo->setPlainText("NIVEL FALLIDO");
+    panelTitulo->setDefaultTextColor(Qt::red);
+
+    // Porcentaje de rescate: objetivo*100 puntos = 100%
+    int objetivo = survivorManager->getTotalObjetivo();
+    int porcentaje = survivorManager->getProgresoTotal() / objetivo;
+    if(porcentaje > 100){
+        porcentaje = 100;
+    }
+
+    panelNota->setPlainText(QString::number(porcentaje) + "%");
+    panelNota->setDefaultTextColor(porcentaje >= 50 ? Qt::yellow : Qt::red);
+
+    int rescatados = survivorManager->getTotalRescatados();
+    panelSub->setPlainText("Rescatados: " + QString::number(rescatados) + "/" + QString::number(objetivo));
+
+    // Barra de progreso simple
+    barraFondo->setVisible(true);
+    barraRelleno->setVisible(true);
+    int ancho = static_cast<int>(300.0 * porcentaje / 100.0);
+    barraRelleno->setRect(250, 380, ancho, 24);
+    QColor colorBarra;
+    if(porcentaje >= 66){
+        colorBarra = QColor(0, 200, 80);      // verde
+    }else if(porcentaje >= 33){
+        colorBarra = QColor(255, 200, 0);     // amarillo
+    }else{
+        colorBarra = QColor(220, 40, 40);     // rojo
+    }
+    barraRelleno->setBrush(colorBarra);
+
+    // Centrar los textos sobre el panel
+    panelTitulo->setPos(scene->width() / 2 - panelTitulo->boundingRect().width() / 2, 140);
+    panelNota->setPos(scene->width() / 2 - panelNota->boundingRect().width() / 2, 210);
+    panelSub->setPos(scene->width() / 2 - panelSub->boundingRect().width() / 2, 330);
+
+    // El panel se queda en pantalla hasta que el jugador decida
+    // (Reintentar / Seleccionar nivel / Volver al menÃƒÂº). NO navega solo.
+    // Detener la mÃƒÂºsica: el juego terminÃƒÂ³, no debe seguir sonando.
+    if(bgMusic != nullptr){
+        bgMusic->stop();
+    }
+}
+
+void Game::crearPanel(){
+
+    if(panelFondo != nullptr){
+        return;  // ya creado
+    }
+
+    // Fondo oscuro semi-transparente que tapa toda la escena
+    panelFondo = new QGraphicsRectItem(0, 0, scene->width(), scene->height());
+    panelFondo->setBrush(QColor(0, 0, 0, 180));
+    panelFondo->setPen(Qt::NoPen);
+    panelFondo->setZValue(1000);
+    scene->addItem(panelFondo);
+
+    panelTitulo = new QGraphicsTextItem();
+    panelTitulo->setFont(QFont("times", 34, QFont::Bold));
+    panelTitulo->setZValue(1001);
+    scene->addItem(panelTitulo);
+
+    panelNota = new QGraphicsTextItem();
+    panelNota->setFont(QFont("times", 72, QFont::Bold));
+    panelNota->setZValue(1001);
+    scene->addItem(panelNota);
+
+    panelSub = new QGraphicsTextItem();
+    panelSub->setDefaultTextColor(Qt::white);
+    panelSub->setFont(QFont("times", 16));
+    panelSub->setZValue(1001);
+    scene->addItem(panelSub);
+
+    // Barra de progreso (solo visible en la derrota)
+    barraFondo = new QGraphicsRectItem(250, 380, 300, 24);
+    barraFondo->setBrush(QColor(40, 40, 40));
+    barraFondo->setPen(QPen(Qt::black));
+    barraFondo->setZValue(1001);
+    barraFondo->setVisible(false);
+    scene->addItem(barraFondo);
+
+    barraRelleno = new QGraphicsRectItem(250, 380, 0, 24);
+    barraRelleno->setBrush(QColor(0, 200, 80));
+    barraRelleno->setPen(Qt::NoPen);
+    barraRelleno->setZValue(1002);
+    barraRelleno->setVisible(false);
+    scene->addItem(barraRelleno);
+
+    // Botones (widgets Qt incrustados en la escena, escalan con fitInView)
+    btnReintentar = new QPushButton("Reintentar");
+    btnReintentar->setFixedSize(220, 50);
+    btnReintentar->setCursor(Qt::PointingHandCursor);
+    btnReintentar->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #4de8ff;"
+        " border: 2px solid #4de8ff; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    proxyReintentar = scene->addWidget(btnReintentar);
+    proxyReintentar->setPos(290, 425);
+    proxyReintentar->setZValue(1001);
+    connect(btnReintentar, &QPushButton::clicked, this, &Game::reintentarNivel);
+
+    btnNiveles = new QPushButton("Seleccionar nivel");
+    btnNiveles->setFixedSize(220, 50);
+    btnNiveles->setCursor(Qt::PointingHandCursor);
+    btnNiveles->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #7dff9b;"
+        " border: 2px solid #7dff9b; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    proxyNiveles = scene->addWidget(btnNiveles);
+    proxyNiveles->setPos(290, 475);
+    proxyNiveles->setZValue(1001);
+    connect(btnNiveles, &QPushButton::clicked, this, &Game::seleccionarNivel);
+
+    btnMenu = new QPushButton("Volver al menÃƒÂº");
+    btnMenu->setFixedSize(220, 50);
+    btnMenu->setCursor(Qt::PointingHandCursor);
+    btnMenu->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #ff6b6b;"
+        " border: 2px solid #ff6b6b; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    proxyMenu = scene->addWidget(btnMenu);
+    proxyMenu->setPos(290, 525);
+    proxyMenu->setZValue(1001);
+    connect(btnMenu, &QPushButton::clicked, this, &Game::volverAlMenu);
+}
+
+QString Game::calcularNota(int vidas, int rescatados) const{
+    // Nota estilo Cuphead: A si vidas completas (3) y todos los
+    // supervivientes rescatados. Cada vida perdida o superviviente
+    // no rescatado baja un escalÃƒÂ³n: A, A-, B+, B, B-, C+, C, C-, D, F.
+    static const char *escalones[] = {"A", "A-", "B+", "B", "B-",
+                                      "C+", "C", "C-", "D", "F"};
+    int objetivo = survivorManager->getTotalObjetivo();
+    int deducciones = (3 - vidas) + (objetivo - rescatados);
+    if(deducciones < 0){
+        deducciones = 0;
+    }
+    if(deducciones > 9){
+        deducciones = 9;
+    }
+    return QString(escalones[deducciones]);
+}
+
+// ===== SISTEMA DE LOGROS =====
+
+void Game::cargarLogros(){
+    // No se necesita acciones adicionales; los logros se guardan en QSettings
+}
+
+void Game::guardarLogro(int nivel, const QString& nota){
+    QSettings settings("HelicopterRescue", "Progreso");
+    QString clave = QString("logro_nivel_%1").arg(nivel);
+    settings.setValue(clave, nota);
+}
+
+bool Game::todosNivelesConA(){
+    QSettings settings("HelicopterRescue", "Progreso");
+    for(int i = 1; i <= 3; i++){
+        QString clave = QString("logro_nivel_%1").arg(i);
+        if(settings.value(clave).toString() != "A"){
+            return false;
+        }
+    }
+    return true;
+}
+
+void Game::actualizarLogros(){
+    // Verificar si se desbloqueÃƒÂ³ el logro de todos los A
+    if(todosNivelesConA()){
+        // El logro ya estÃƒÂ¡ desbloqueado, no hacer nada extra
+        // Se mostrarÃƒÂ¡ en el popup de la prÃƒÂ³xima victoria
+    }
+}
+
+void Game::mostrarPopupVictoria(){
+    // Limpiar popup anterior si existe
+    if(popupFondo != nullptr){ scene->removeItem(popupFondo); delete popupFondo; popupFondo = nullptr; }
+    if(popupBarra != nullptr){ scene->removeItem(popupBarra); delete popupBarra; popupBarra = nullptr; }
+    if(popupNota != nullptr){ scene->removeItem(popupNota); delete popupNota; popupNota = nullptr; }
+    if(popupMensaje != nullptr){ scene->removeItem(popupMensaje); delete popupMensaje; popupMensaje = nullptr; }
+    if(popupLogro != nullptr){ scene->removeItem(popupLogro); delete popupLogro; popupLogro = nullptr; }
+
+    // Obtener la nota
+    int vidas = health->getHealth();
+    int rescatados = survivorManager->getTotalRescatados();
+    QString nota = calcularNota(vidas, rescatados);
+
+    // Guardar el logro de este nivel
+    guardarLogro(nivelActual, nota);
+    actualizarLogros();
+
+    // ===== COLORES POR NIVEL =====
+    switch(nivelActual){
+    case 1:
+        popupColorFondo = QColor(10, 15, 40);
+        popupColorBorde = QColor(77, 232, 255);
+        break;
+    case 2:
+        popupColorFondo = QColor(40, 20, 5);
+        popupColorBorde = QColor(255, 149, 0);
+        break;
+    case 3:
+        popupColorFondo = QColor(15, 30, 50);
+        popupColorBorde = QColor(170, 220, 255);
+        break;
+    default:
+        popupColorFondo = QColor(10, 15, 40);
+        popupColorBorde = QColor(77, 232, 255);
+    }
+
+    // ===== CREAR POPUP =====
+    popupFondo = new QGraphicsRectItem(150, 100, 500, 350);
+    popupFondo->setBrush(QBrush(popupColorFondo));
+    popupFondo->setPen(QPen(popupColorBorde, 4));
+    popupFondo->setZValue(2000);
+    scene->addItem(popupFondo);
+
+    popupBarra = new QGraphicsRectItem(150, 100, 500, 8);
+    popupBarra->setBrush(QBrush(popupColorBorde));
+    popupBarra->setPen(Qt::NoPen);
+    popupBarra->setZValue(2001);
+    scene->addItem(popupBarra);
+
+    // TÃƒÂ­tulo "NIVEL COMPLETADO"
+    QGraphicsTextItem *popupTitulo = new QGraphicsTextItem();
+    popupTitulo->setFont(QFont("times", 20, QFont::Bold));
+    popupTitulo->setDefaultTextColor(popupColorBorde);
+    popupTitulo->setPlainText("NIVEL COMPLETADO");
+    popupTitulo->setZValue(2002);
+    popupTitulo->setPos(400 - popupTitulo->boundingRect().width() / 2, 150);
+    scene->addItem(popupTitulo);
+
+    // La letra grande (A, A-, B+, etc.)
+    popupNota = new QGraphicsTextItem();
+    popupNota->setFont(QFont("times", 96, QFont::Bold));
+    popupNota->setDefaultTextColor(popupColorBorde);
+    popupNota->setPlainText(nota);
+    popupNota->setZValue(2003);
+    popupNota->setPos(400 - popupNota->boundingRect().width() / 2, 190);
+    scene->addItem(popupNota);
+
+    // ===== BOTONES =====
+    // Reiniciar y salir al menÃƒÂº: el jugador decide (sin cierre automÃƒÂ¡tico).
+    QPushButton *btnVictoriaReiniciar = new QPushButton("Reiniciar");
+    btnVictoriaReiniciar->setFixedSize(220, 50);
+    btnVictoriaReiniciar->setCursor(Qt::PointingHandCursor);
+    btnVictoriaReiniciar->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #4de8ff;"
+        " border: 2px solid #4de8ff; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    QGraphicsProxyWidget *proxyVictoriaReiniciar = scene->addWidget(btnVictoriaReiniciar);
+    proxyVictoriaReiniciar->setPos(290, 330);
+    proxyVictoriaReiniciar->setZValue(2005);
+    connect(btnVictoriaReiniciar, &QPushButton::clicked, this, &Game::reintentarNivel);
+
+    QPushButton *btnVictoriaMenu = new QPushButton("Salir al menÃƒÂº");
+    btnVictoriaMenu->setFixedSize(220, 50);
+    btnVictoriaMenu->setCursor(Qt::PointingHandCursor);
+    btnVictoriaMenu->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #ff6b6b;"
+        " border: 2px solid #ff6b6b; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    QGraphicsProxyWidget *proxyVictoriaMenu = scene->addWidget(btnVictoriaMenu);
+    proxyVictoriaMenu->setPos(290, 390);
+    proxyVictoriaMenu->setZValue(2005);
+    connect(btnVictoriaMenu, &QPushButton::clicked, this, &Game::volverAlMenu);
+}
+
+void Game::reintentarNivel(){
+    // Cancelar cualquier timer automÃƒÂ¡tico de victoria/derrota pendiente
+    if(resultTimer != nullptr){
+        resultTimer->stop();
+    }
+    // Diferir la navegaciÃƒÂ³n un tick: el botÃƒÂ³n que disparÃƒÂ³ este slot sigue
+    // procesando su evento de mouse; si reset() lo borra ahora (vÃƒÂ­a
+    // scene->clear()) el botÃƒÂ³n usarÃƒÂ­a memoria liberada al terminar el
+    // evento Ã¢â€ â€™ crash. Con singleShot(0) el reset corre despuÃƒÂ©s.
+    QTimer::singleShot(0, this, [this]() {
+        ventanaPrincipal->reintentarNivel();
+    });
+}
+
+void Game::seleccionarNivel(){
+    // Cancelar el timer automÃƒÂ¡tico antes de navegar
+    if(resultTimer != nullptr){
+        resultTimer->stop();
+    }
+    // Diferir la navegaciÃƒÂ³n un tick (ver reintentarNivel)
+    QTimer::singleShot(0, this, [this]() {
+        ventanaPrincipal->mostrarSelector();
+    });
+}
+
+void Game::volverAlMenu(){
+    // Cancelar el timer automÃƒÂ¡tico antes de navegar
+    if(resultTimer != nullptr){
+        resultTimer->stop();
+    }
+    // Diferir la navegaciÃƒÂ³n un tick (ver reintentarNivel)
+    QTimer::singleShot(0, this, [this]() {
+        ventanaPrincipal->mostrarMenu();
+    });
+}
+
+void Game::mostrarMenuOpciones(){
+    // Pantallita de pausa (estilo panel de derrota, pero simple):
+    // fondo oscuro + tÃƒÂ­tulo "PAUSA" + botones Reanudar/Reiniciar/Volver al menÃƒÂº.
+    if(pausaActiva || juegoTerminado){
+        return;  // ya estÃƒÂ¡ abierta, o el juego ya ganÃƒÂ³/perdiÃƒÂ³
+    }
+    pausaActiva = true;
+    juegoTerminado = true;  // congela el mundo (heli, obstÃƒÂ¡culos, supervivientes)
+
+    // Detener la cuenta regresiva del nivel y el spawn de obstÃƒÂ¡culos:
+    // si no, el nivel termina solo mientras estÃƒÂ¡ en pausa.
+    if(levelManager != nullptr){
+        levelManager->detenerTimers();
+    }
+
+    // Pausar la mÃƒÂºsica de fondo
+    if(bgMusic != nullptr){
+        bgMusic->pause();
+    }
+
+    // Fondo oscuro semi-transparente que tapa toda la escena
+    pausaFondo = new QGraphicsRectItem(0, 0, scene->width(), scene->height());
+    pausaFondo->setBrush(QColor(0, 0, 0, 180));
+    pausaFondo->setPen(Qt::NoPen);
+    pausaFondo->setZValue(1000);
+    scene->addItem(pausaFondo);
+
+    // TÃƒÂ­tulo "PAUSA"
+    pausaTitulo = new QGraphicsTextItem();
+    pausaTitulo->setFont(QFont("times", 34, QFont::Bold));
+    pausaTitulo->setDefaultTextColor(Qt::white);
+    pausaTitulo->setPlainText("PAUSA");
+    pausaTitulo->setZValue(1001);
+    pausaTitulo->setPos(scene->width() / 2 - pausaTitulo->boundingRect().width() / 2, 150);
+    scene->addItem(pausaTitulo);
+
+    // BotÃƒÂ³n Reanudar (verde): cierra la pantallita y sigue jugando
+    btnReanudar = new QPushButton("Reanudar");
+    btnReanudar->setFixedSize(220, 50);
+    btnReanudar->setCursor(Qt::PointingHandCursor);
+    btnReanudar->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #7dff9b;"
+        " border: 2px solid #7dff9b; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    proxyReanudar = scene->addWidget(btnReanudar);
+    proxyReanudar->setPos(290, 300);
+    proxyReanudar->setZValue(1001);
+    connect(btnReanudar, &QPushButton::clicked, this, &Game::cerrarMenuOpciones);
+
+    // BotÃƒÂ³n Reiniciar (cian): reinicia el nivel
+    btnPausaReiniciar = new QPushButton("Reiniciar");
+    btnPausaReiniciar->setFixedSize(220, 50);
+    btnPausaReiniciar->setCursor(Qt::PointingHandCursor);
+    btnPausaReiniciar->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #4de8ff;"
+        " border: 2px solid #4de8ff; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    proxyPausaReiniciar = scene->addWidget(btnPausaReiniciar);
+    proxyPausaReiniciar->setPos(290, 360);
+    proxyPausaReiniciar->setZValue(1001);
+    connect(btnPausaReiniciar, &QPushButton::clicked, this, &Game::reintentarNivel);
+
+    // BotÃƒÂ³n Volver al menÃƒÂº (rojo)
+    btnPausaMenu = new QPushButton("Volver al menÃƒÂº");
+    btnPausaMenu->setFixedSize(220, 50);
+    btnPausaMenu->setCursor(Qt::PointingHandCursor);
+    btnPausaMenu->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #ff6b6b;"
+        " border: 2px solid #ff6b6b; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    proxyPausaMenu = scene->addWidget(btnPausaMenu);
+    proxyPausaMenu->setPos(290, 420);
+    proxyPausaMenu->setZValue(1001);
+    connect(btnPausaMenu, &QPushButton::clicked, this, &Game::volverAlMenu);
+}
+
+void Game::cerrarMenuOpciones(){
+    // Reanudar: cierra la pantallita de pausa y sigue el juego.
+    // Diferir un tick: el botÃƒÂ³n que disparÃƒÂ³ el slot sigue procesando su
+    // evento de mouse; borrarlo ahora crashearÃƒÂ­a (ver reintentarNivel).
+    QTimer::singleShot(0, this, [this]() {
+        if(!pausaActiva){
+            return;
+        }
+        pausaActiva = false;
+        juegoTerminado = false;  // reanuda el mundo
+
+        // Quitar el panel de pausa
+        if(pausaFondo != nullptr){ scene->removeItem(pausaFondo); delete pausaFondo; pausaFondo = nullptr; }
+        if(pausaTitulo != nullptr){ scene->removeItem(pausaTitulo); delete pausaTitulo; pausaTitulo = nullptr; }
+        if(proxyReanudar != nullptr){ scene->removeItem(proxyReanudar); delete proxyReanudar; proxyReanudar = nullptr; }
+        if(proxyPausaReiniciar != nullptr){ scene->removeItem(proxyPausaReiniciar); delete proxyPausaReiniciar; proxyPausaReiniciar = nullptr; }
+        if(proxyPausaMenu != nullptr){ scene->removeItem(proxyPausaMenu); delete proxyPausaMenu; proxyPausaMenu = nullptr; }
+        btnReanudar = nullptr;
+        btnPausaReiniciar = nullptr;
+        btnPausaMenu = nullptr;
+
+        // Reanudar la cuenta regresiva del nivel y el spawn de obstÃƒÂ¡culos
+        if(levelManager != nullptr){
+            int spawnMs = 3000;
+            switch(nivelActual){
+            case 2:
+                spawnMs = 2500;
+                break;
+            case 3:
+                spawnMs = 2000;
+                break;
+            }
+            levelManager->startLevel(levelManager->getTimeRemaining(), spawnMs);
+        }
+
+        // Reanudar la mÃƒÂºsica de fondo
+        if(bgMusic != nullptr){
+            bgMusic->play();
+        }
+
+        // Devolver el foco al heli para que las teclas funcionen
+        if(heli != nullptr && heli->scene() != nullptr){
+            heli->setFocus();
+        }
+    });
+}
+
+void Game::reset(int nivel){
+    // 0. Cancelar cualquier timer automÃƒÂ¡tico de victoria/derrota pendiente
+    if(resultTimer != nullptr){
+        resultTimer->stop();
+    }
+
+    // 1. Resetear estado
+    juegoTerminado = false;
+    nivelActual = nivel;
+    mundoEnMovimiento = true;
+    nivelGanado = false;
+    heliEnZona = false;
+    tiempoEnZona = 0;
+    ultimoTiempo = -1;
+    instruccionMostrada = false;
+    finishLine = nullptr;
+    contador = 0;
+
+    // 1.5 Actualizar el fondo segun el nuevo nivel (bug: faltaba esto,
+    // por eso el fondo quedaba pegado al del primer nivel jugado)
+    fondoCiudad = ResourceLoader::background(nivel);
+    if(fondoCiudad.isNull()){
+        QString rutaFondo;
+        switch(nivel){
+        case 2:
+            rutaFondo = ":/Sprites/recursosh/nivel2_desierto_800x600.png";
+            break;
+        case 3:
+            rutaFondo = ":/Sprites/recursosh/nivel3_nieve_800x600.png";
+            break;
+        default:
+            rutaFondo = ":/Sprites/recursosh/fondo_ciudad_cyberpunk_800x600.png";
+        }
+        fondoCiudad = QPixmap(rutaFondo);
+    }
+
+    // 2. Detener bidonTimer
+    if(bidonTimer != nullptr){
+        bidonTimer->stop();
+    }
+
+    // 3. Eliminar managers (son hijos de Game, no de la escena)
+    if(survivorManager != nullptr){
+        delete survivorManager;
+        survivorManager = nullptr;
+    }
+    if(obstacleManager != nullptr){
+        delete obstacleManager;
+        obstacleManager = nullptr;
+    }
+    if(levelManager != nullptr){
+        delete levelManager;
+        levelManager = nullptr;
+    }
+
+    // 3.5 Eliminar objetos antiguos de la escena para evitar fugas de memoria
+    if(heli != nullptr){
+        scene->removeItem(heli);
+        delete heli;
+        heli = nullptr;
+    }
+    if(score != nullptr){
+        scene->removeItem(score);
+        delete score;
+        score = nullptr;
+    }
+    if(health != nullptr){
+        scene->removeItem(health);
+        delete health;
+        health = nullptr;
+    }
+
+    // 4. Limpiar la escena (elimina heli, score, health, finishLine,
+    //    panel de resultados y bidones)
+    scene->clear();
+
+    // 5. Resetear punteros de items de escena (ahora dangling)
+    heli = nullptr;
+    score = nullptr;
+    health = nullptr;
+    panelFondo = nullptr;
+    panelTitulo = nullptr;
+    panelNota = nullptr;
+    panelSub = nullptr;
+    barraFondo = nullptr;
+    barraRelleno = nullptr;
+    btnReintentar = nullptr;
+    btnNiveles = nullptr;
+    btnMenu = nullptr;
+    proxyReintentar = nullptr;
+    proxyNiveles = nullptr;
+    proxyMenu = nullptr;
+    btnOpciones = nullptr;
+    proxyOpciones = nullptr;
+    // La pantallita de pausa tambiÃƒÂ©n la borrÃƒÂ³ scene->clear()
+    pausaActiva = false;
+    pausaFondo = nullptr;
+    pausaTitulo = nullptr;
+    btnReanudar = nullptr;
+    btnPausaReiniciar = nullptr;
+    btnPausaMenu = nullptr;
+    proxyReanudar = nullptr;
+    proxyPausaReiniciar = nullptr;
+    proxyPausaMenu = nullptr;
+    // Los popups de victoria tambiÃƒÂ©n los borrÃƒÂ³ scene->clear():
+    // sin esto quedan dangling y la prÃƒÂ³xima victoria crashea.
+    popupFondo = nullptr;
+    popupBarra = nullptr;
+    popupNota = nullptr;
+    popupMensaje = nullptr;
+    popupLogro = nullptr;
+    // La barra de tiempo del nivel tambiÃƒÂ©n la borrÃƒÂ³ scene->clear()
+    barraTiempoFondo = nullptr;
+    barraTiempoRelleno = nullptr;
+    textoTiempo = nullptr;
+    // La barra de gasolina del HUD tambiÃƒÂ©n la borrÃƒÂ³ scene->clear()
+    barraGasFondo = nullptr;
+    barraGasRelleno = nullptr;
+    textoGas = nullptr;
+    textoGasCritico = nullptr;
+
+    // 6. Re-crear managers
+    obstacleManager = new ObstacleManager(scene, nivel, this);
+    survivorManager = new SurvivorManager(scene, obstacleManager, nivel, this);
+    levelManager = new LevelManager(this);
+    // Re-conectar el spawn de obstÃƒÂ¡culos al timer del nivel
+    connect(levelManager->spawnTimer, SIGNAL(timeout()),
+            this, SLOT(spawnObstacles()));
+
+    // 7. Re-crear heli
+    heli = new MyHeli(nivel);
+    heli->setPos(20, height() - heli->boundingRect().height());
+    heli->setFlag(QGraphicsItem::ItemIsFocusable);
+    heli->setFocus();
+    scene->addItem(heli);
+
+    // 8. Re-crear score y health
+    score = new Score();
+    score->setPos(20, 10);
+    score->setZValue(100);
+    scene->addItem(score);
+    health = new Health();
+    health->setPos(20, 50);
+    health->setZValue(100);
+    scene->addItem(health);
+    // Actualizar el HUD inmediatamente
+    health->updateDisplay();
+    {
+        int rescatados = survivorManager->getTotalRescatados();
+        int objetivo = survivorManager->getTotalObjetivo();
+        score->mostrarRescates(rescatados, objetivo);
+    }
+
+    // 8.5 Crear la barra de progreso del nivel (tiempo restante).
+    // Arriba al centro: se vacÃƒÂ­a conforme pasa el tiempo del nivel.
+    barraTiempoFondo = new QGraphicsRectItem(250, 15, 300, 20);
+    barraTiempoFondo->setBrush(QBrush(QColor(30, 30, 60)));
+    barraTiempoFondo->setPen(QPen(QColor(255, 255, 255, 120), 1));
+    barraTiempoFondo->setZValue(100);
+    scene->addItem(barraTiempoFondo);
+
+    barraTiempoRelleno = new QGraphicsRectItem(250, 15, 300, 20);
+    barraTiempoRelleno->setBrush(QBrush(QColor(0, 200, 80)));
+    barraTiempoRelleno->setPen(Qt::NoPen);
+    barraTiempoRelleno->setZValue(101);
+    scene->addItem(barraTiempoRelleno);
+
+    textoTiempo = new QGraphicsTextItem();
+    textoTiempo->setFont(QFont("Arial", 16, QFont::Bold));
+    textoTiempo->setDefaultTextColor(Qt::white);
+    textoTiempo->setZValue(102);
+    textoTiempo->setPos(560, 13);
+    scene->addItem(textoTiempo);
+
+    // 8.6 Barra de gasolina (HUD): debajo de la vida, estilo "GAS".
+    // La barra ya no va encima del heli: se muestra fija en el HUD.
+    textoGas = new QGraphicsTextItem();
+    textoGas->setFont(QFont("Arial", 16, QFont::Bold));
+    textoGas->setDefaultTextColor(Qt::white);
+    textoGas->setPlainText("GAS");
+    textoGas->setZValue(100);
+    textoGas->setPos(20, 100);
+    scene->addItem(textoGas);
+
+    barraGasFondo = new QGraphicsRectItem(70, 103, 150, 14);
+    barraGasFondo->setBrush(QBrush(QColor(60, 60, 60)));
+    barraGasFondo->setPen(QPen(QColor(255, 255, 255, 120), 1));
+    barraGasFondo->setZValue(100);
+    scene->addItem(barraGasFondo);
+
+    barraGasRelleno = new QGraphicsRectItem(70, 103, 150, 14);
+    barraGasRelleno->setBrush(QBrush(QColor(255, 140, 0))); // naranja
+    barraGasRelleno->setPen(Qt::NoPen);
+    barraGasRelleno->setZValue(101);
+    scene->addItem(barraGasRelleno);
+
+    // Alerta de gasolina crÃƒÂ­tica (visible solo cuando fuel <= 30%)
+    textoGasCritico = new QGraphicsTextItem();
+    textoGasCritico->setFont(QFont("Arial", 14, QFont::Bold));
+    textoGasCritico->setDefaultTextColor(Qt::red);
+    textoGasCritico->setPlainText("Gasolina en critico");
+    textoGasCritico->setZValue(102);
+    textoGasCritico->setPos(20, 123);
+    textoGasCritico->setVisible(false);
+    scene->addItem(textoGasCritico);
+
+    // 8.7 BotÃƒÂ³n de opciones (Ã¢â€¹Â®) arriba a la derecha: menÃƒÂº para reiniciar
+    // o volver al menÃƒÂº en medio de un nivel (sin tener que perder).
+    btnOpciones = new QPushButton("Ã¢â€¹Â®");
+    btnOpciones->setFixedSize(40, 40);
+    btnOpciones->setCursor(Qt::PointingHandCursor);
+    btnOpciones->setToolTip("Opciones");
+    btnOpciones->setStyleSheet(
+        "QPushButton { background-color: #3a3a3a; color: #ffffff;"
+        " border: 1px solid #666666; border-radius: 6px;"
+        " font-size: 22px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #4a4a4a; }"
+        "QPushButton:pressed { background-color: #2a2a2a; }");
+    proxyOpciones = scene->addWidget(btnOpciones);
+    proxyOpciones->setPos(scene->width() - 50, 10);
+    proxyOpciones->setZValue(500);
+    connect(btnOpciones, &QPushButton::clicked, this, &Game::mostrarMenuOpciones);
+
+    // 9. Re-conectar bidonTimer (ya existe, solo reiniciarlo).
+    // Los bidones aparecen cada 6s (antes 4s: menos frecuentes).
+    if(bidonTimer != nullptr){
+        bidonTimer->stop();
+        bidonTimer->start(6000);
+    }
+
+    // 10. REINICIAR TIMERS PRINCIPALES (finishCheckTimer y survivorTimer)
+    finishCheckTimer->stop();
+    finishCheckTimer->start(50);
+    survivorTimer->stop();
+    survivorTimer->start(50);
+
+    // 11. REINICIAR MÃƒÅ¡SICA DE FONDO
+    if(bgMusic != nullptr){
+        bgMusic->stop();
+        bgMusic->setPosition(0);
+        bgMusic->play();
+    }
+
+    // 12. Iniciar nivel
+    int tiempoLimite = 30;
+    int spawnMs = 3000;
+    switch(nivel){
+    case 2:
+        tiempoLimite = 30;
+        spawnMs = 2500;
+        break;
+    case 3:
+        tiempoLimite = 35;
+        spawnMs = 2000;
+        break;
+    }
+    levelManager->setLevelNumber(nivel);
+    levelManager->startLevel(tiempoLimite, spawnMs);
+
+    // Guardar el tiempo total del nivel y llenar la barra de progreso
+    tiempoLimiteTotal = tiempoLimite;
+    actualizarBarraTiempo(tiempoLimite);
+}
+
+void Game::actualizarBarraTiempo(int tiempoRestante){
+    // Barra de progreso del nivel: muestra cuÃƒÂ¡nto falta para que termine
+    // (se vacÃƒÂ­a de 30s/35s hasta 0). Verde -> amarillo -> rojo.
+    if(barraTiempoRelleno == nullptr || tiempoLimiteTotal <= 0){
+        return;
+    }
+    int ancho = static_cast<int>(300.0 * tiempoRestante / tiempoLimiteTotal);
+    if(ancho < 0) ancho = 0;
+    if(ancho > 300) ancho = 300;
+    barraTiempoRelleno->setRect(250, 15, ancho, 20);
+
+    double fraccion = static_cast<double>(tiempoRestante) / tiempoLimiteTotal;
+    QColor color;
+    if(fraccion > 0.5){
+        color = QColor(0, 200, 80);      // verde: queda mucho tiempo
+    }else if(fraccion > 0.25){
+        color = QColor(255, 200, 0);     // amarillo: la mitad
+    }else{
+        color = QColor(220, 40, 40);     // rojo: queda poco
+    }
+    barraTiempoRelleno->setBrush(color);
+
+    if(textoTiempo != nullptr){
+        textoTiempo->setPlainText(QString("Tiempo: %1s").arg(tiempoRestante));
+    }
+}
+
+void Game::showEvent(QShowEvent *event){
+    QGraphicsView::showEvent(event);
+    //escala la escena para que quepa completa en la ventana
+    //(evita que el heli y el suelo se corten en el borde inferior)
+    fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+
+    // Al mostrarse la pÃƒÂ¡gina del juego, darle el foco al heli para que
+    // las teclas (subir, moverse, disparar) funcionen de inmediato.
+    if(heli != nullptr && heli->scene() != nullptr){
+        heli->setFocus();
+    }
+}
+
+void Game::resizeEvent(QResizeEvent *event){
+    QGraphicsView::resizeEvent(event);
+    // Re-escalar la escena cada vez que se redimensiona la ventana.
+    // KeepAspectRatio: la escena 800x600 se escala proporcionalmente y
+    // las franjas sobrantes se rellenan con el fondo de la ciudad
+    // (drawBackground), asÃƒÂ­ nunca se ve deformada ni cortada.
+    fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+}
+
+void Game::drawBackground(QPainter *painter, const QRectF &rect){
+    // Dibujar el fondo de la ciudad estirado a TODA la ventana.
+    // Al redimensionar, el fondo crece con la ventana: no quedan franjas
+    // oscuras en los lados (antes el fondo era un item de la escena y solo
+    // cubrÃƒÂ­a los 800x600 de la escena).
+    painter->save();
+    painter->resetTransform();  // dibujar en coordenadas de la ventana
+    painter->drawPixmap(viewport()->rect(), fondoCiudad);
+    painter->restore();
+}
+
+
+================================================================================
+ARCHIVO: GAME.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\GAME.h
+================================================================================
+#ifndef GAME_H
+#define GAME_H
+
+#include <QGraphicsView>
+#include <QWidget>
+#include <QGraphicsScene>
+#include <QGraphicsRectItem>
+#include <QGraphicsTextItem>
+#include <QGraphicsProxyWidget>
+#include <QPushButton>
+#include <QPixmap>
+#include <QTimer>
+#include <QMediaPlayer>
+#include <QAudioOutput>
+#include "MyHeli.h"
+#include "Score.h"
+#include "Health.h"
+#include "ObstacleManager.h"
+#include "LevelManager.h"
+#include "FinishLine.h"
+#include "SurvivorManager.h"
+#include "BidonCombustible.h"
+
+class Game : public QGraphicsView {
+    Q_OBJECT //
+
+public:
+    // Constructor: recibe el nivel a jugar (1, 2 o 3)
+    Game(int nivel = 1, QWidget *parent = nullptr);
+
+    // Destructor
+    ~Game();
+
+    // Atributos principales del juego
+    QGraphicsScene * scene;
+    MyHeli * heli;
+    Score * score;
+    Health * health;
+    ObstacleManager * obstacleManager;
+    LevelManager * levelManager;
+    FinishLine * finishLine;
+    SurvivorManager * survivorManager;  // Maneja a los supervivientes
+    int nivelActual;         // Nivel que se estÃ¡ jugando (1, 2 o 3)
+    bool mundoEnMovimiento;  // true: el mundo avanza (scroll). false: la meta apareciÃ³ y todo se detiene
+    bool juegoTerminado;     // true cuando se gana o pierde: pausa todo el mundo
+    QTimer *bidonTimer;     // Timer que genera bidones de combustible
+
+    // Pantallas de resultados (estilo Cuphead)
+    void mostrarVictoria();  // Nota A/A-/B+... segÃºn vidas y rescatados
+    void mostrarDerrota();   // Porcentaje de rescate + barra
+    void detenerMusica();    // Detiene la mÃºsica de fondo (al salir del juego)
+    void pausar();           // Detiene TODO el juego (timers + mÃºsica) al salir al menÃº
+
+    // Sistema de logros
+    void mostrarPopupVictoria();  // Popup de nota coloreado por nivel
+    void cargarLogros();
+    void guardarLogro(int nivel, const QString& nota);
+    bool todosNivelesConA();
+
+public slots:
+    void spawnObstacles();
+    void checkFinishLine();
+    void updateSurvivors();
+    void reintentarNivel();
+    void seleccionarNivel();
+    void volverAlMenu();
+    void spawnBidon();  // Genera un bidÃ³n de combustible
+    void reset(int nivel);  // Reinicia el juego en su lugar (sin crear objetos nuevos)
+    void mostrarMenuOpciones();  // Pantallita de pausa (â‹®): Reanudar / Reiniciar / Volver al menÃº
+    void cerrarMenuOpciones();   // Reanudar: cierra la pantallita y sigue el juego
+
+    //logica de zona de aterrizaje
+private:
+
+    bool heliEnZona;
+    int tiempoEnZona;
+    bool nivelGanado;
+
+    // Contador de patrÃ³n de obstÃ¡culos (se reinicia al reintentar)
+    int contador;
+
+    // Estado del HUD (antes eran variables static locales: se reinician
+    // correctamente al reintentar el nivel)
+    int ultimoTiempo;
+    bool instruccionMostrada;
+
+    // Panel de resultados (se crea la primera vez que se gana o pierde)
+    QGraphicsRectItem *panelFondo;
+    QGraphicsTextItem *panelTitulo;
+    QGraphicsTextItem *panelNota;
+    QGraphicsTextItem *panelSub;
+    QGraphicsRectItem *barraFondo;
+    QGraphicsRectItem *barraRelleno;
+    QPushButton *btnReintentar;
+    QPushButton *btnNiveles;
+    QPushButton *btnMenu;
+    QGraphicsProxyWidget *proxyReintentar;
+    QGraphicsProxyWidget *proxyNiveles;
+    QGraphicsProxyWidget *proxyMenu;
+
+    // BotÃ³n de opciones (â‹®) arriba a la derecha: abre la pantallita de
+    // pausa para reiniciar, volver al menÃº o reanudar en medio de un nivel.
+    QPushButton *btnOpciones;
+    QGraphicsProxyWidget *proxyOpciones;
+
+    // Pantallita de pausa (estilo panel de derrota, pero simple):
+    // fondo oscuro + tÃ­tulo "PAUSA" + botones Reanudar/Reiniciar/Volver al menÃº.
+    bool pausaActiva;              // true mientras la pantallita estÃ¡ abierta
+    QGraphicsRectItem *pausaFondo;
+    QGraphicsTextItem *pausaTitulo;
+    QPushButton *btnReanudar;
+    QPushButton *btnPausaReiniciar;
+    QPushButton *btnPausaMenu;
+    QGraphicsProxyWidget *proxyReanudar;
+    QGraphicsProxyWidget *proxyPausaReiniciar;
+    QGraphicsProxyWidget *proxyPausaMenu;
+
+    // Timers principales del juego (ahora son miembros para poder reiniciarse en reset())
+    QTimer *finishCheckTimer;
+    QTimer *survivorTimer;
+
+    // Barra de progreso del nivel: muestra el TIEMPO que falta para que
+    // termine el nivel (no es la vida). Se vacÃ­a de 30s/35s hasta 0.
+    QGraphicsRectItem *barraTiempoFondo;
+    QGraphicsRectItem *barraTiempoRelleno;
+    QGraphicsTextItem *textoTiempo;
+    int tiempoLimiteTotal;   // segundos totales del nivel (para el porcentaje)
+
+    // Barra de gasolina (HUD): debajo de la vida, con alerta de crÃ­tico.
+    QGraphicsRectItem *barraGasFondo;
+    QGraphicsRectItem *barraGasRelleno;
+    QGraphicsTextItem *textoGas;
+    QGraphicsTextItem *textoGasCritico;
+
+    // Timer para cancelar el singleShot de victoria/derrota automÃ¡tica
+    QTimer *resultTimer;
+
+    // MÃºsica de fondo
+    QMediaPlayer *bgMusic;
+    QAudioOutput *bgAudio;
+
+    // Sistema de logros
+    QGraphicsRectItem *popupFondo;
+    QGraphicsTextItem *popupNota;
+    QGraphicsTextItem *popupMensaje;
+    QGraphicsTextItem *popupLogro;
+    QGraphicsRectItem *popupBarra;
+    QColor popupColorFondo;
+    QColor popupColorBorde;
+
+    void crearPanel();
+    QString calcularNota(int vidas, int rescatados) const;
+    void actualizarLogros();
+    void actualizarBarraTiempo(int tiempoRestante);
+    void actualizarBarraGas();
+
+    QPixmap fondoCiudad;  // Fondo de la ciudad (se dibuja a toda la ventana)
+
+protected:
+    //ajusta la vista para que toda la escena siempre sea visible
+    void showEvent(QShowEvent *event) override;
+    //re-escala la escena cuando se redimensiona la ventana
+    void resizeEvent(QResizeEvent *event) override;
+    //dibuja el fondo de la ciudad estirado a TODA la ventana
+    void drawBackground(QPainter *painter, const QRectF &rect) override;
+};
+
+#endif // GAME_H
+
+
+================================================================================
+ARCHIVO: Health.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Health.cpp
+================================================================================
+#include "Health.h"
+#include <QFont>
+
+Health::Health(QGraphicsItem *parent): QGraphicsTextItem(parent){
+    //empieze en 3
+    health = 3;
+    // Usar fuente mucho mÃ¡s grande para mayor visibilidad
+    setFont(QFont("Arial", 28, QFont::Bold));
+    setDefaultTextColor(Qt::red);
+    updateDisplay();
+}
+
+void Health::decrease(){
+    health--;
+    updateDisplay();
+}
+
+int Health::getHealth(){
+    return health;
+}
+
+void Health::updateDisplay(){
+    // Mostrar corazones rojos segÃºn la cantidad de vidas
+    // (los corazones ya indican la vida: no hace falta barra adicional)
+    QString corazones;
+    for(int i = 0; i < 3; i++){
+        if(i < health){
+            corazones += QString::fromUtf8("â¤ï¸ ");
+        } else {
+            corazones += QString::fromUtf8("ðŸ–¤ ");
+        }
+    }
+    setPlainText(corazones);
+}
+
+
+================================================================================
+ARCHIVO: Health.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Health.h
+================================================================================
+#ifndef HEALTH_H
+#define HEALTH_H
+
+#include <QGraphicsTextItem>
+#include <QGraphicsRectItem>
+
+class Health: public QGraphicsTextItem{
+public:
+
+    Health(QGraphicsItem * parent=0);
+    void decrease();
+    int getHealth();
+    void updateDisplay();
+
+private:
+    int health;
+};
+
+
+#endif // HEALTH_H
+
+
+================================================================================
+ARCHIVO: LevelManager.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\LevelManager.cpp
+================================================================================
+#include "LevelManager.h"
+
+LevelManager::LevelManager(QObject *parent)
+    : QObject(parent)
+{
+    active = false;
+    finished = false;
+    timeRemaining = 0;
+    levelNumber = 1;
+
+    //timer, cuenta 1 segundo a la vez
+
+    levelTimer = new QTimer(this);
+    connect(levelTimer, &QTimer::timeout, this, [this]() {
+        if(timeRemaining > 0){
+            timeRemaining--;
+        }
+        if(timeRemaining <= 0){
+            levelTimer->stop();
+            active = false;
+            finished = true;
+        }
+    });
+
+    // Timer de spawn
+    spawnTimer = new QTimer(this);
+}
+
+
+LevelManager::~LevelManager(){
+    levelTimer->stop();
+    spawnTimer->stop();
+}
+
+void LevelManager::startLevel(int timeLimit, int spawnIntervalMs){
+    timeRemaining = timeLimit;
+    active = true;
+    finished = false;
+
+    // Iniciar timers
+    levelTimer->start(1000);              // Cuenta 1 segundo a la vez
+    spawnTimer->start(spawnIntervalMs);   // Spawn cada X milisegundos
+}
+
+void LevelManager::detenerTimers(){
+    // Detiene la cuenta regresiva y el spawn de obstÃ¡culos.
+    // Se usa al salir del juego hacia el menÃº/selector: sin esto el
+    // nivel termina solo en segundo plano y hasta navega solo al selector.
+    levelTimer->stop();
+    spawnTimer->stop();
+}
+
+void LevelManager::setLevelNumber(int nivel){
+    levelNumber = nivel;
+}
+
+bool LevelManager::isActive() const{
+    return active;//si esta activo el timer
+}
+
+bool LevelManager::isFinished() const{
+    return finished;//si ya termino el timer
+}
+
+int LevelManager::getTimeRemaining() const{
+    return timeRemaining;//tiempo restante
+}
+
+int LevelManager::getLevelNumber() const{
+    return levelNumber;//el # de nivel
+}
+
+
+================================================================================
+ARCHIVO: LevelManager.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\LevelManager.h
+================================================================================
+#ifndef LEVELMANAGER_H
+#define LEVELMANAGER_H
+
+#include <QObject>
+#include <QTimer>
+#include <QGraphicsTextItem>
+
+class LevelManager : public QObject{
+    Q_OBJECT
+
+public:
+    LevelManager(QObject *parent = nullptr);
+    ~LevelManager();
+
+    void startLevel(int timeLimit,int spawnIntervalMs);
+
+    // Detiene los timers del nivel (cuenta regresiva y spawn).
+    // Se usa al salir del juego: el nivel no debe seguir corriendo en el menÃº.
+    void detenerTimers();
+
+    // Indica quÃ© nivel se estÃ¡ jugando (1, 2 o 3)
+    void setLevelNumber(int nivel);
+
+    bool isActive() const;
+    bool isFinished() const;
+    int getTimeRemaining() const;
+    int getLevelNumber() const;
+
+    // Temporizador del nivel segundos restantes
+    QTimer *levelTimer;
+    // Timer que dispara el spawn de obstÃ¡culos
+    QTimer *spawnTimer;
+
+
+private:
+    bool active;       //revisa si el nivel estÃ¡ en curso
+    bool finished;     // revisa si el nivel ya terminÃ³
+    int timeRemaining; // segundos restantes
+    int levelNumber;   // NÃºmero del nivel actual
+
+};
+
+#endif // LEVELMANAGER_H
+
+
+================================================================================
+ARCHIVO: LevelMapGenerator.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\LevelMapGenerator.cpp
+================================================================================
+#include "LevelMapGenerator.h"
+
+LevelMapGenerator::LevelMapGenerator(int levelDurationMs, int spawnIntervalMs,
+                                     QObject *parent)
+    : QThread(parent)
+{
+    this->levelDurationMs = levelDurationMs;
+    this->spawnIntervalMs = spawnIntervalMs;
+}
+
+LevelMapGenerator::~LevelMapGenerator(){
+    // Seguridad: si el hilo sigue corriendo cuando se destruye el objeto,
+    // pedir que se detenga y ESPERAR a que termine. Sin esto, destruir un
+    // QThread en ejecuciÃ³n es un crash garantizado.
+    if(isRunning()){
+        requestInterruption();
+        wait();
+    }
+}
+
+void LevelMapGenerator::run(){
+    // ===== CUERPO DEL HILO (se ejecuta en el hilo secundario) =====
+    // Genera el mapa completo del nivel: cuÃ¡ntos obstÃ¡culos aparecen,
+    // de quÃ© tipo, y cuÃ¡les llevan superviviente detrÃ¡s.
+
+    int totalSpawns = levelDurationMs / spawnIntervalMs;  // 30s / 3s = 10
+    int contador = 0;
+
+    for(int i = 0; i < totalSpawns; i++){
+        // Permitir detener el hilo limpiamente (requestInterruption)
+        if(isInterruptionRequested()){
+            break;
+        }
+
+        SpawnData dato;
+
+        // Tipo cÃ­clico: VERTICAL -> SMALL -> CEILING -> VERTICAL -> ...
+        switch(contador % 3){
+        case 0:
+            dato.type = ObstacleType::VERTICAL;
+            break;
+        case 1:
+            dato.type = ObstacleType::SMALL;
+            break;
+        case 2:
+            dato.type = ObstacleType::CEILING;
+            break;
+        }
+
+        // Los primeros 2 obstÃ¡culos del mapa llevan un superviviente detrÃ¡s
+        dato.spawnSurvivor = (contador < 2);
+
+        // Guardar en la cola. El QMutexLocker bloquea el mutex mientras
+        // se modifica la lista y lo libera al salir del bloque {}.
+        // Sin esto, el hilo principal podrÃ­a leer la lista mientras
+        // este hilo la modifica -> condiciÃ³n de carrera.
+        {
+            QMutexLocker candado(&mutex);
+            cola.append(dato);
+        }
+
+        contador++;
+    }
+}
+
+bool LevelMapGenerator::hasNext() const{
+    QMutexLocker candado(&mutex);
+    return !cola.isEmpty();
+}
+
+LevelMapGenerator::SpawnData LevelMapGenerator::next(){
+    QMutexLocker candado(&mutex);
+    SpawnData dato = cola.first();
+    cola.removeFirst();
+    return dato;
+}
+
+int LevelMapGenerator::count() const{
+    QMutexLocker candado(&mutex);
+    return cola.size();
+}
+
+
+================================================================================
+ARCHIVO: LevelMapGenerator.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\LevelMapGenerator.h
+================================================================================
+#ifndef LEVELMAPGENERATOR_H
+#define LEVELMAPGENERATOR_H
+
+#include <QThread>
+#include <QMutex>
+#include <QList>
+#include "ObstacleType.h"
+
+/**
+ * @brief Hilo PRODUCTOR que pre-genera el "mapa" del nivel.
+ *
+ * PATRÃ“N PRODUCTOR-CONSUMIDOR:
+ *  - Este hilo (productor) genera TODA la secuencia de obstÃ¡culos y
+ *    supervivientes del nivel ANTES de que el juego los necesite.
+ *  - El hilo principal (consumidor) va tomando los datos de la cola
+ *    con hasNext()/next() cada vez que el timer de spawn dispara.
+ *
+ * Â¿POR QUÃ‰ UN HILO Y NO GENERARLO EN EL JUEGO?
+ *  - Separa el DISEÃ‘O del nivel (datos) del RENDERIZADO (grÃ¡ficos).
+ *  - El mapa queda "pre-hecho": el juego solo consume, nunca calcula.
+ *  - El hilo NUNCA toca QGraphicsScene (no es thread-safe): solo
+ *    produce datos planos (tipo de obstÃ¡culo, si lleva superviviente).
+ *
+ * SEGURIDAD:
+ *  - La cola estÃ¡ protegida con QMutex (evita condiciones de carrera).
+ *  - El destructor espera (wait()) a que el hilo termine antes de
+ *    liberar memoria (evita crash al cerrar el juego).
+ */
+class LevelMapGenerator : public QThread {
+    Q_OBJECT
+
+public:
+    /**
+     * @brief Un "bloque" del mapa: quÃ© obstÃ¡culo aparece y si lleva
+     *        un superviviente detrÃ¡s.
+     */
+    struct SpawnData {
+        ObstacleType type;      // Tipo de obstÃ¡culo (VERTICAL/SMALL/CEILING)
+        bool spawnSurvivor;     // Â¿Generar un superviviente detrÃ¡s?
+    };
+
+    /**
+     * @param levelDurationMs  DuraciÃ³n del nivel en milisegundos (30s = 30000)
+     * @param spawnIntervalMs  Cada cuÃ¡ntos ms aparece un obstÃ¡culo (3000)
+     */
+    LevelMapGenerator(int levelDurationMs, int spawnIntervalMs,
+                      QObject *parent = nullptr);
+    ~LevelMapGenerator();
+
+    /**
+     * @brief Cuerpo del hilo: genera el mapa completo y lo guarda en la cola.
+     *        Se ejecuta en el hilo secundario cuando se llama start().
+     */
+    void run() override;
+
+    // ===== API PARA EL HILO PRINCIPAL (consumidor) =====
+
+    /**
+     * @brief Â¿Quedan datos en la cola? (consulta segura con mutex)
+     */
+    bool hasNext() const;
+
+    /**
+     * @brief Toma el siguiente bloque del mapa y lo saca de la cola.
+     */
+    SpawnData next();
+
+    /**
+     * @brief CuÃ¡ntos bloques quedan por consumir.
+     */
+    int count() const;
+
+private:
+    int levelDurationMs;    // DuraciÃ³n total del nivel
+    int spawnIntervalMs;    // Intervalo entre obstÃ¡culos
+
+    QList<SpawnData> cola;  // Cola de datos generados (compartida)
+    mutable QMutex mutex;   // Candado: solo un hilo accede a la cola a la vez
+};
+
+#endif // LEVELMAPGENERATOR_H
+
+
+================================================================================
+ARCHIVO: LevelSelect.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\LevelSelect.cpp
+================================================================================
+#include "LevelSelect.h"
+#include "VentanaPrincipal.h"
+
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QIcon>
+#include <QPainter>
+#include <QSettings>
+
+//punteros globales (definidos en main.cpp)
+extern VentanaPrincipal * ventanaPrincipal;
+extern QString usuarioActual;
+
+LevelSelect::LevelSelect(QWidget *parent) : QWidget(parent) {
+
+    // Es una pÃ¡gina de la ventana Ãºnica: el tamaÃ±o lo define la ventana
+    // (800x600, mismo tamaÃ±o nativo del fondo del selector).
+
+    fondo = QPixmap(":/Sprites/recursosh/seleccionar_nivel_fondo_800x600.png");
+
+    // Nivel mÃ¡s alto desbloqueado (1 por defecto). Completar el nivel N
+    // desbloquea el N+1 (lo guarda Game::mostrarVictoria en QSettings).
+    // El progreso es POR USUARIO: cada cuenta tiene su propio desbloqueo.
+    QSettings settings("HelicopterRescue", "Progreso");
+    QString clave = QString("nivelDesbloqueado_%1").arg(usuarioActual);
+    int desbloqueado = settings.value(clave, 1).toInt();
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(30, 70, 30, 30);
+    layout->setSpacing(20);
+
+    layout->addStretch();
+
+    // Las 3 cards en una fila (230x148 escaladas desde 280x180 para que
+    // las tres entren en los 800px del fondo)
+    QHBoxLayout *fila = new QHBoxLayout();
+    fila->setSpacing(20);
+    for(int i = 1; i <= 3; i++){
+        QPushButton *card = crearCardNivel(i, i <= desbloqueado);
+        fila->addWidget(card);
+    }
+    layout->addLayout(fila);
+
+    layout->addStretch();
+
+    QPushButton *btnVolver = new QPushButton("VOLVER");
+    btnVolver->setFixedSize(220, 50);
+    btnVolver->setCursor(Qt::PointingHandCursor);
+    btnVolver->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #ff6b6b;"
+        " border: 2px solid #ff6b6b; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    layout->addWidget(btnVolver, 0, Qt::AlignHCenter);
+
+    connect(btnVolver, &QPushButton::clicked, this, &LevelSelect::volver);
+}
+
+void LevelSelect::paintEvent(QPaintEvent *event)
+{
+    // Fondo oscuro + imagen del selector escalada y centrada
+    QPainter painter(this);
+    painter.fillRect(rect(), QColor(21, 10, 43));
+
+    QPixmap escalado = fondo.scaled(size(), Qt::KeepAspectRatio,
+                                    Qt::SmoothTransformation);
+    int x = (width() - escalado.width()) / 2;
+    int y = (height() - escalado.height()) / 2;
+    painter.drawPixmap(x, y, escalado);
+
+    QWidget::paintEvent(event);
+}
+
+QPushButton* LevelSelect::crearCardNivel(int nivel, bool desbloqueado)
+{
+    QPushButton *card = new QPushButton(this);
+    card->setFixedSize(230, 148);
+
+    if(desbloqueado){
+        // Card desbloqueada: imagen a color y clickeable
+        card->setIcon(QIcon(QString(":/Sprites/recursosh/nivel_card_%1_unlocked.png").arg(nivel)));
+        card->setCursor(Qt::PointingHandCursor);
+        connect(card, &QPushButton::clicked, this,
+                [this, nivel]() { jugarNivel(nivel); });
+    }else{
+        // Card bloqueada: imagen con candado y NO clickeable
+        card->setIcon(QIcon(QString(":/Sprites/recursosh/nivel_card_%1_locked.png").arg(nivel)));
+        card->setEnabled(false);
+    }
+
+    card->setIconSize(QSize(230, 148));
+    card->setFlat(true);
+    card->setStyleSheet(
+        "QPushButton { border: none; background: transparent; }"
+        "QPushButton:hover { border: 2px solid #4de8ff; border-radius: 6px; }"
+        "QPushButton:pressed { background: rgba(0, 0, 0, 80); }");
+
+    return card;
+}
+
+void LevelSelect::jugarNivel(int nivel){
+    // Crear el juego con el nivel elegido (pÃ¡gina nueva en la ventana Ãºnica)
+    ventanaPrincipal->mostrarJuego(nivel);
+}
+
+void LevelSelect::volver(){
+    // Regresar al menÃº principal (cambia de pÃ¡gina en la ventana Ãºnica)
+    ventanaPrincipal->mostrarMenu();
+}
+
+
+================================================================================
+ARCHIVO: LevelSelect.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\LevelSelect.h
+================================================================================
+#ifndef LEVELSELECT_H
+#define LEVELSELECT_H
+
+#include <QWidget>
+#include <QPixmap>
+
+class QPushButton;
+
+// MenÃº de selecciÃ³n de niveles con cards de imagen (280x180).
+// Los niveles 2 y 3 aparecen BLOQUEADOS hasta que se complete el nivel
+// anterior (progreso guardado en QSettings). Las cards bloqueadas no se
+// pueden pulsar.
+class LevelSelect : public QWidget {
+    Q_OBJECT
+
+public:
+    LevelSelect(QWidget *parent = nullptr);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
+private slots:
+    void jugarNivel(int nivel);
+    void volver();
+
+private:
+    QPixmap fondo;
+    QPushButton* crearCardNivel(int nivel, bool desbloqueado);
+};
+
+#endif // LEVELSELECT_H
+
+
+================================================================================
+ARCHIVO: LoginScreen.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\LoginScreen.cpp
+================================================================================
+#include "LoginScreen.h"
+#include "UserManager.h"
+#include "VentanaPrincipal.h"
+
+#include <QVBoxLayout>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QLabel>
+#include <QIcon>
+#include <QPainter>
+#include <QMessageBox>
+
+//punteros globales (definidos en main.cpp)
+extern UserManager * userManager;
+extern VentanaPrincipal * ventanaPrincipal;
+extern QString usuarioActual;
+
+LoginScreen::LoginScreen(QWidget *parent) : QWidget(parent) {
+
+    // Es una pÃ¡gina de la ventana Ãºnica: el tamaÃ±o lo define la ventana
+    // (800x600). El fondo se estira para llenar toda la pantalla.
+
+    fondo = QPixmap(":/Sprites/recursosh/login_fondo_640x880.png");
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(120, 150, 120, 60);
+    layout->setSpacing(16);
+
+    QLabel *titulo = new QLabel("INICIAR SESIÃ“N");
+    titulo->setAlignment(Qt::AlignCenter);
+    titulo->setAttribute(Qt::WA_StyledBackground, true);
+    titulo->setStyleSheet(
+        "QLabel {"
+        "  color: #4de8ff;"
+        "  font-family: 'Consolas';"
+        "  font-size: 20px;"
+        "  font-weight: bold;"
+        "  letter-spacing: 3px;"
+        "  background-color: rgba(15, 10, 25, 160);"
+        "  border: 1px solid #4de8ff;"
+        "  border-radius: 4px;"
+        "  padding: 10px;"
+        "}"
+        );
+    layout->addWidget(titulo);
+    layout->addSpacing(10);
+
+    QString estiloCampo =
+        "QLineEdit { background-color: rgba(15, 10, 25, 200); color: #ffffff;"
+        " border: 1px solid #4de8ff; border-radius: 4px; padding: 10px;"
+        " font-size: 16px; }"
+        "QLineEdit:focus { border: 2px solid #4de8ff; }";
+
+    campoUsuario = new QLineEdit();
+    campoUsuario->setPlaceholderText("Usuario");
+    campoUsuario->setStyleSheet(estiloCampo);
+    layout->addWidget(campoUsuario);
+
+    campoContrasena = new QLineEdit();
+    campoContrasena->setPlaceholderText("ContraseÃ±a");
+    campoContrasena->setEchoMode(QLineEdit::Password);
+    campoContrasena->setStyleSheet(estiloCampo);
+    layout->addWidget(campoContrasena);
+
+    layout->addSpacing(10);
+
+    // Botones como QIcon sin borde (igual que en el menÃº principal)
+    QPushButton *btnIniciar = crearBotonImagen(":/Sprites/recursosh/boton_iniciar_sesion.png", 380, 52);
+    QPushButton *btnCrear = crearBotonImagen(":/Sprites/recursosh/boton_crear_cuenta.png", 380, 52);
+    layout->addWidget(btnIniciar, 0, Qt::AlignHCenter);
+    layout->addWidget(btnCrear, 0, Qt::AlignHCenter);
+    layout->addStretch();
+
+    connect(btnIniciar, &QPushButton::clicked, this, &LoginScreen::iniciarSesion);
+    connect(btnCrear, &QPushButton::clicked, this, &LoginScreen::crearCuenta);
+
+    // Enter en el campo de contraseÃ±a tambiÃ©n inicia sesiÃ³n
+    connect(campoContrasena, &QLineEdit::returnPressed, this, &LoginScreen::iniciarSesion);
+}
+
+void LoginScreen::paintEvent(QPaintEvent *event)
+{
+    // Fondo estirado a TODA la ventana (sin barras laterales ni franjas).
+    // La imagen 640x880 se adapta a cualquier tamaÃ±o de la ventana.
+    QPainter painter(this);
+    painter.fillRect(rect(), QColor(21, 10, 43));
+    painter.drawPixmap(rect(), fondo);
+
+    QWidget::paintEvent(event);
+}
+
+QPushButton* LoginScreen::crearBotonImagen(const QString &rutaImagen, int w, int h)
+{
+    QPushButton *boton = new QPushButton(this);
+    boton->setIcon(QIcon(rutaImagen));
+    boton->setIconSize(QSize(w, h));
+    boton->setFixedSize(w, h);
+    boton->setFlat(true);
+    boton->setCursor(Qt::PointingHandCursor);
+    boton->setStyleSheet(
+        "QPushButton { border: none; background: transparent; }"
+        "QPushButton:hover { background: rgba(255, 255, 255, 25); border-radius: 4px; }"
+        "QPushButton:pressed { background: rgba(0,0,0,60); border-radius: 4px; }"
+        );
+    return boton;
+}
+
+void LoginScreen::iniciarSesion(){
+
+    QString nombre = campoUsuario->text().trimmed();
+    QString contrasena = campoContrasena->text();
+
+    if(nombre.isEmpty() || contrasena.isEmpty()){
+        QMessageBox::warning(this, "Iniciar SesiÃ³n", "IngresÃ¡ usuario y contraseÃ±a.");
+        return;
+    }
+
+    if(userManager == nullptr || !userManager->verificarLogin(nombre, contrasena)){
+        QMessageBox::warning(this, "Iniciar SesiÃ³n", "Usuario o contraseÃ±a incorrectos.");
+        return;
+    }
+
+    // Login correcto: guardar el usuario logueado y pasar al menÃº
+    // (cambia de pÃ¡gina en la ventana Ãºnica, no abre una ventana nueva)
+    usuarioActual = nombre;
+    ventanaPrincipal->mostrarMenu();
+}
+
+void LoginScreen::crearCuenta(){
+    // Cambiar a la pÃ¡gina de registro (dentro de la misma ventana)
+    ventanaPrincipal->mostrarRegistro();
+}
+
+
+================================================================================
+ARCHIVO: LoginScreen.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\LoginScreen.h
+================================================================================
+#ifndef LOGINSCREEN_H
+#define LOGINSCREEN_H
+
+#include <QWidget>
+#include <QPixmap>
+
+class QLineEdit;
+class QPushButton;
+
+// Pantalla de inicio de sesiÃ³n: aparece ANTES del menÃº. Pide
+// usuario/contraseÃ±a y valida contra UserManager (usuarios.dat).
+// Es una pÃ¡gina de la ventana Ãºnica (VentanaPrincipal).
+class LoginScreen : public QWidget {
+    Q_OBJECT
+
+public:
+    LoginScreen(QWidget *parent = nullptr);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
+private slots:
+    void iniciarSesion();
+    void crearCuenta();
+
+private:
+    QPixmap fondo;
+    QLineEdit *campoUsuario;
+    QLineEdit *campoContrasena;
+    QPushButton* crearBotonImagen(const QString &rutaImagen, int w, int h);
+};
+
+#endif // LOGINSCREEN_H
+
+
+================================================================================
+ARCHIVO: main.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\main.cpp
+================================================================================
+#include <QApplication>
+#include <QThread>
+#include "Game.h"
+#include "VentanaPrincipal.h"
+#include "UserManager.h"
+#include "ResourceLoader.h"
+
+Game * game;
+VentanaPrincipal * ventanaPrincipal;
+UserManager * userManager;
+QString usuarioActual;
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+
+    // Hilo de precarga de recursos (sprites, sonidos) para que la
+    // pantalla de carga no se congele. El slot preloadAll() corre en un
+    // QThread aparte (ver main.cpp).
+    QThread hiloPrecarga;
+    ResourceLoader loader;
+    loader.moveToThread(&hiloPrecarga);
+    QObject::connect(&hiloPrecarga, &QThread::started, &loader, &ResourceLoader::preloadAll);
+    hiloPrecarga.start();
+
+    userManager = new UserManager();
+    userManager->cargarUsuarios();
+
+    VentanaPrincipal w;
+    ventanaPrincipal = &w;
+    w.show();
+
+    return a.exec();
+}
+
+
+================================================================================
+ARCHIVO: Menu.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Menu.cpp
+================================================================================
+#include "Menu.h"
+#include "VentanaPrincipal.h"
+
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPainter>
+#include <QIcon>
+
+
+//puntero global de la ventana Ãºnica (definido en main.cpp)
+extern VentanaPrincipal * ventanaPrincipal;
+
+Menu::Menu(QWidget *parent) : QWidget(parent) {
+
+    // Es una pÃ¡gina de la ventana Ãºnica: el tamaÃ±o lo define la ventana
+    // (800x600). El fondo se estira para llenar toda la pantalla.
+
+
+    fondo = QPixmap(":/Sprites/recursosh/menu_fondo_v2_640x880.png");
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(40,50,40,40);
+    layout->setSpacing(18);
+
+    QLabel *titulo = new QLabel("HELICOPTER RESCUE");
+    titulo->setAlignment(Qt::AlignCenter);
+    titulo->setAttribute(Qt::WA_StyledBackground, true);
+    titulo->setStyleSheet(
+        "QLabel {"
+        "  color: #4de8ff;"
+        "  font-family: 'Consolas';"
+        "  font-size: 20px;"
+        "  font-weight: bold;"
+        "  letter-spacing: 3px;"
+        "  background-color: rgba(15, 10, 25, 160);"
+        "  border: 1px solid #4de8ff;"
+        "  border-radius: 4px;"
+        "  padding: 12px;"
+        "}"
+        );
+    layout->addWidget(titulo);
+    layout->addSpacing(20);
+
+    int btnW = 380, btnH = 52;
+
+    QPushButton *btnJugar = crearBotonImagen(":/Sprites/recursosh/boton_jugar.png", btnW, btnH);
+    QPushButton *btnPuntajes = crearBotonImagen(":/Sprites/recursosh/boton_puntajes.png", btnW, btnH);
+    QPushButton *btnAyuda = crearBotonImagen(":/Sprites/recursosh/boton_como_jugar.png", btnW, btnH);
+    QPushButton *btnSalir = crearBotonImagen(":/Sprites/recursosh/boton_salir.png", btnW, btnH);
+
+    layout->addWidget(btnJugar, 0, Qt::AlignHCenter);
+    layout->addWidget(btnPuntajes, 0, Qt::AlignHCenter);
+    layout->addWidget(btnAyuda, 0, Qt::AlignHCenter);
+    layout->addWidget(btnSalir, 0, Qt::AlignHCenter);
+    layout->addStretch();
+
+    connect(btnJugar, &QPushButton::clicked, this, &Menu::jugar);
+    connect(btnPuntajes, &QPushButton::clicked, this, &Menu::puntajes);
+    connect(btnAyuda, &QPushButton::clicked, this, &Menu::comoJugar);
+    connect(btnSalir, &QPushButton::clicked, this, &Menu::salir);
+}
+
+void Menu::paintEvent(QPaintEvent *event)
+{
+    // Fondo estirado a TODA la ventana (sin barras laterales ni franjas)
+    QPainter painter(this);
+    painter.fillRect(rect(), QColor(21, 10, 43));
+    painter.drawPixmap(rect(), fondo);
+
+    QWidget::paintEvent(event);
+}
+
+QPushButton* Menu::crearBotonImagen(const QString &rutaImagen, int w, int h)
+{
+    QPushButton *boton = new QPushButton(this);
+    boton->setIcon(QIcon(rutaImagen));
+    boton->setIconSize(QSize(w, h));
+    boton->setFixedSize(w, h);
+    boton->setFlat(true);
+    boton->setCursor(Qt::PointingHandCursor);
+    boton->setStyleSheet(
+        "QPushButton { border: none; background: transparent; }"
+        "QPushButton:hover { background: rgba(255, 255, 255, 25); border-radius: 4px; }"
+        "QPushButton:pressed { background: rgba(0,0,0,60); border-radius: 4px; }"
+        );
+    return boton;
+}
+
+void Menu::jugar(){
+    // Al darle PLAY se abre el selector de niveles: el 1 siempre disponible
+    // y el 2 y 3 bloqueados hasta completar el nivel anterior.
+    // Cambia de pÃ¡gina en la ventana Ãºnica (no abre una ventana nueva).
+    ventanaPrincipal->mostrarSelector();
+}
+
+void Menu::puntajes(){
+    // Abrir la pantalla de puntajes y logros (pÃ¡gina de la ventana Ãºnica)
+    ventanaPrincipal->mostrarPuntajes();
+}
+
+void Menu::comoJugar(){
+    // Mostrar la imagen del manual de usuario en lugar de un MessageBox.
+    QDialog dialog(this);
+    dialog.setWindowTitle("CÃ³mo Jugar");
+    dialog.setFixedSize(800, 600);
+
+    QLabel *label = new QLabel(&dialog);
+    label->setPixmap(QPixmap(":/Sprites/recursosh/ManualDeUsuario.jpeg")
+                         .scaled(800, 600, Qt::KeepAspectRatio,
+                                 Qt::SmoothTransformation));
+    label->setAlignment(Qt::AlignCenter);
+
+    QVBoxLayout *layout = new QVBoxLayout(&dialog);
+    layout->addWidget(label);
+    dialog.setLayout(layout);
+
+    dialog.exec();
+}
+
+void Menu::salir(){
+    // Cerrar la ventana Ãºnica (cierra toda la aplicaciÃ³n)
+    ventanaPrincipal->close();
+}
+
+
+================================================================================
+ARCHIVO: Menu.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Menu.h
+================================================================================
+#ifndef MENU_H
+#define MENU_H
+
+#include <QWidget>
+#include <QPixmap>
+
+class QPushButton;
+
+class Menu : public QWidget {
+    Q_OBJECT
+
+public:
+    Menu(QWidget *parent = nullptr);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
+private slots:
+    void jugar();
+    void puntajes();
+    void comoJugar();
+    void salir();
+
+private:
+    QPixmap fondo;
+    QPushButton* crearBotonImagen(const QString &rutaImagen, int w, int h);
+};
+
+#endif // MENU_H
+
+
+================================================================================
+ARCHIVO: MyHeli.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\MyHeli.cpp
+================================================================================
+#include "MyHeli.h"
+#include "GAME.h"
+#include "Bala.h"
+#include <QKeyEvent>
+#include <QGraphicsScene>
+#include <QAudioOutput>
+#include <QGraphicsItem>
+#include <QTimer>
+#include <QGraphicsTextItem>
+#include <QFont>
+#include <QBrush>
+#include <QPen>
+#include <QRandomGenerator>
+
+extern Game * game;
+
+MyHeli::MyHeli(int nivel) : QObject(), QGraphicsPixmapItem()
+{
+    this->nivel = nivel;
+    // Las balas solo estÃ¡n disponibles desde el nivel 2 (desierto)
+    puedeDisparar = (nivel >= 2);
+    ultimoDisparo.start();
+
+    //cargar los 4 fotogramas del rotor girando
+    rotorFrames[0] = QPixmap(":/Sprites/recursosh/helicoptero_frame1.png");
+    rotorFrames[1] = QPixmap(":/Sprites/recursosh/helicoptero_frame2.png");
+    rotorFrames[2] = QPixmap(":/Sprites/recursosh/helicoptero_frame3.png");
+    rotorFrames[3] = QPixmap(":/Sprites/recursosh/helicoptero_frame4.png");
+    currentFrame = 0;
+    setPixmap(rotorFrames[currentFrame]);
+
+    //cargas los fotogramas de la explosion
+    explosionFrames[0] = QPixmap(":/Sprites/recursosh/explosion_frame1.png");
+    explosionFrames[1] = QPixmap(":/Sprites/recursosh/explosion_frame2.png");
+    explosionFrames[2] = QPixmap(":/Sprites/recursosh/explosion_frame3.png");
+    explosionFrames[3] = QPixmap(":/Sprites/recursosh/explosion_frame4.png");
+    explosionFrames[4] = QPixmap(":/Sprites/recursosh/explosion_frame5.png");
+    explosionFrame = 0;
+
+    //esto sirve para que el punto de en medio sea el origen del helicoptero
+    setTransformOriginPoint(boundingRect().center());
+
+    //inicializacion de fisicas
+    physics = new Physics();
+    velX = 0.0;
+    velY = 0.0;
+    thrusting = false;
+    movingLeft = false;
+    movingRight = false;
+    crashed = false;
+
+    // ===== COMBUSTIBLE =====
+    // Arranca lleno (100). Se consume ~2.0/s de base y ~5.0/s extra al empujar.
+    // Si llega a 0, el empuje se ignora (solo gravedad).
+    // La barra de gasolina ya NO va encima del heli: se muestra en el HUD
+    // (debajo de la vida) como "GAS", gestionada por Game.
+    fuel = 100.0;
+
+    // ===== VIENTO =====
+    windX = 0.0;
+    windY = 0.0;
+    windTimer = nullptr;
+
+    if(nivel == 2){
+        // Nivel 2 (desierto): viento constante que empuja hacia los obstÃ¡culos
+        // (los obstÃ¡culos vienen de la derecha â†’ windX positivo empuja a la derecha)
+        windX = 40.0;
+        windY = 0.0;
+    }else if(nivel == 3){
+        // Nivel 3 (nieve): turbulencia â€” viento aleatorio que cambia cada ~1.5s
+        windTimer = new QTimer(this);
+        connect(windTimer, &QTimer::timeout, this, [this](){
+            windX = QRandomGenerator::global()->bounded(-60, 61); // -60 a +60
+            windY = QRandomGenerator::global()->bounded(-40, 41); // -40 a +40
+        });
+        windTimer->start(1500);
+    }
+    // Nivel 1: sin viento (windX = windY = 0)
+
+    //timer para las fisicas
+    QTimer *physicsTimer = new QTimer(this);
+    connect(physicsTimer, SIGNAL(timeout()), this, SLOT(updatePhysics()));
+    physicsTimer->start(16);
+
+    //timer aparte para la animacion del rotor
+    rotorTimer = new QTimer(this);
+    connect(rotorTimer, SIGNAL(timeout()), this, SLOT(updateRotorAnimation()));
+    rotorTimer->start(90);
+
+    //sonido de choque
+
+    crashSound = new QMediaPlayer;
+    crashSound->setSource(QUrl("qrc:/Sounds/recursosh/CrashSound.wav"));
+    crashAudio = new QAudioOutput();
+    crashSound->setAudioOutput(crashAudio);
+    crashAudio->setVolume(0.5);
+
+}
+
+//destructor aqui liberamos la memoria
+MyHeli::~MyHeli()
+{
+
+    delete physics;
+    delete crashSound;
+    delete crashAudio;
+
+}
+
+void MyHeli::detenerTimers(){
+    // Detiene TODOS los timers del heli (fÃ­sica, rotor, viento y
+    // explosiÃ³n). Se usa al salir del juego hacia el menÃº/selector:
+    // sin esto el heli sigue cayendo y el rotor girando en segundo plano.
+    const QList<QTimer*> timers = findChildren<QTimer*>();
+    for(QTimer *t : timers){
+        t->stop();
+    }
+}
+
+void MyHeli::keyPressEvent(QKeyEvent *event){
+    //el if para poder usar las dos el espacio y la flecha para arriba
+    if(event->key() == Qt::Key_Up|| event->key() == Qt::Key_Space){
+        //subir
+        thrusting = true;
+    }else if(event->key()==Qt::Key_Left){
+        //moverse a la izquierda
+        movingLeft=true;
+    }else if(event->key() == Qt::Key_Right){
+        //moverse a la derecha
+        movingRight=true;
+    }else if(event->key() == Qt::Key_X){
+        //disparar una bala (solo nivel 2 y 3)
+        disparar();
+    }
+
+    //esto sirve para no se propague a otros elementos
+    event->accept();
+}
+
+void MyHeli::recargarCombustible(double cantidad){
+    fuel += cantidad;
+    if(fuel > 100.0){
+        fuel = 100.0;
+    }
+}
+
+double MyHeli::getFuel() const{
+    return fuel;
+}
+
+void MyHeli::keyReleaseEvent(QKeyEvent *event){
+    //esta parte sirve para detectar cuando se suelta la tecla
+
+    if (event->key() == Qt::Key_Up || event->key() == Qt::Key_Space){
+        thrusting = false;
+    }else if(event->key() == Qt::Key_Left){
+        movingLeft = false;
+    }else if(event->key() == Qt::Key_Right){
+        movingRight = false;
+    }
+
+    event->accept();
+}
+
+void MyHeli::disparar(){
+
+    // solo desde el nivel 2, y no cuando el juego terminÃ³
+    if(!puedeDisparar){
+        return;
+    }
+    if(game == nullptr || game->juegoTerminado){
+        return;
+    }
+    if(scene() == nullptr){
+        return;
+    }
+
+    // cooldown de 400ms entre disparos
+    if(ultimoDisparo.elapsed() < 400){
+        return;
+    }
+    ultimoDisparo.restart();
+
+    // la bala sale del lado derecho del heli, centrada verticalmente
+    qreal bx = x() + boundingRect().width();
+    qreal by = y() + boundingRect().height() / 2.0 - 4.0; // -4 para centrar la bala (8px de alto)
+
+    Bala *bala = new Bala(bx, by, scene());
+    scene()->addItem(bala);
+}
+
+//actualizar las fisicas con el qtimer
+void MyHeli::updatePhysics(){
+
+    //asignamos a null si el heli se estrella
+    if(scene() == nullptr){
+        return;
+    }
+
+    // Si el juego terminÃ³ (ganÃ³ o perdiÃ³), el heli se congela
+    if(game == nullptr || game->juegoTerminado){
+        return;
+    }
+
+    double dt = 0.016;
+
+    // ===== COMBUSTIBLE =====
+    // Consumo base constante (~1.2/s) + consumo extra mientras thrusting (~3.0/s).
+    // Si fuel llega a 0, thrusting se ignora (solo gravedad).
+    double consumoBase = 1.2 * dt;
+    double consumoExtra = 0.0;
+    if(thrusting && fuel > 0.0){
+        consumoExtra = 3.0 * dt;
+    }
+    fuel -= (consumoBase + consumoExtra);
+    if(fuel < 0.0){
+        fuel = 0.0;
+    }
+
+    // ===== EMPUJE / GRAVEDAD =====
+    // Si no hay combustible, thrusting se ignora â†’ solo gravedad
+    if(thrusting && fuel > 0.0){
+        //aplicamos el empuje
+        physics->applyThrust(velY,dt);
+    }else{
+        //aplicamos la gravedad
+        physics->applyGravity(velY,dt);
+    }
+
+    if(movingLeft){
+        //acelerar hacia la izquierda
+        velX-=600.0 * dt;
+        if(velX< -physics->getMaxHorizontalSpeed()){
+            velX = -physics->getMaxHorizontalSpeed();
+        }
+
+    }else if(movingRight){
+        //acelerar hacia la derecha
+        velX+= 600.0 * dt;
+        if(velX > physics->getMaxHorizontalSpeed()){
+            velX = physics->getMaxHorizontalSpeed();
+        }
+    }else{
+        //inercia si no se toca ninguna tecla
+        physics->applyFriction(velX, dt);
+    }
+
+    // ===== VIENTO =====
+    // Empuja al helicÃ³ptero en la direcciÃ³n del viento (se suma a la velocidad).
+    velX += windX * dt;
+    velY += windY * dt;
+
+    //movimientos (la formula de posicion)
+
+    double newX = x() + velX * dt;
+    double newY = y() + velY * dt;
+
+    //limite izquierdo
+    if(newX<0){
+        newX = 0;
+        velX = 0;
+    }
+
+    //limite derecho
+    if(newX + boundingRect().width() > scene()->width()){
+        newX = scene()->width() - boundingRect().width();
+        velX = 0;
+    }
+
+    if(newY < 0){
+        newY = 0;
+        velY = 0;
+    }
+
+    if(newY + boundingRect().height() >= scene()->height()){
+        newY = scene()->height() - boundingRect().height();
+
+        // ===== SCROLL DEL MUNDO (heli aterrizado) =====
+        // Cuando el heli estÃ¡ en el suelo, el mundo se mueve hacia la
+        // izquierda (los obstÃ¡culos y supervivientes avanzan). Para que el
+        // heli se mueva EXACTAMENTE a la misma velocidad que el mundo,
+        // usamos la posiciÃ³n actual x() (sin la inercia del jugador velX)
+        // y le restamos la velocidad de scroll (60px/s = 3px por tick).
+        double scrollVel = 60.0;
+        if(game->mundoEnMovimiento){
+            newX = x() - scrollVel * dt;
+            if(newX < 0){
+                newX = 0;
+            }
+        }else{
+            // El mundo se detuvo (la meta apareciÃ³): el heli aterrizado
+            // queda QUIETO para poder aterrizar en la zona sin deslizarse.
+            newX = x();
+        }
+
+        setPos(newX, newY);
+        checkLanding();
+
+        // ===== GASOLINA OBLIGATORIA =====
+        // Si el heli estÃ¡ en el suelo y se quedÃ³ sin gasolina, pierde:
+        // no se puede estar parado en el suelo sin combustible.
+        if(!crashed && fuel <= 0.0){
+            crash();
+        }
+        return;
+    }
+
+    setPos(newX,newY);
+
+    //controla el angulo segun la velocidad
+    double targetAngle = physics->calculateTilt(velY, velX);
+
+    double currentAngle = rotation();
+    double newAngle = currentAngle + (targetAngle - currentAngle) * 0.15;
+    setRotation(newAngle);
+}
+
+void MyHeli::checkLanding(){
+    //tolerancia de aterrizaje
+
+    // Sin gasolina el heli cae y explota al tocar el suelo (la gasolina
+    // es obligatoria: no se puede volar sin combustible).
+    if(physics->SafeLanding(velY)){
+        //si atterrizamos
+        velY = 0.0;
+        setRotation(0.0);
+    }else{
+        // destruir el helicÃ³ptero
+        crash();
+    }
+}
+
+//avanza al siguiente fotograma para simular el giro de la helice
+void MyHeli::updateRotorAnimation(){
+
+    currentFrame = (currentFrame + 1) % 4;
+    setPixmap(rotorFrames[currentFrame]);
+}
+
+void MyHeli::crash()
+{
+    if(crashed)
+    {
+        return; // ya esta explotando, no reinicar la animacion
+    }
+    crashed = true;
+
+    // Avisar al juego: el heli se destruyÃ³ â†’ mostrar pantalla de derrota
+    // (con porcentaje de rescate y barra). Esto tambiÃ©n pausa el mundo.
+    if(game != nullptr && !game->juegoTerminado){
+        game->mostrarDerrota();
+    }
+
+    // Sonido de choque
+    if(crashSound->playbackState() == QMediaPlayer::StoppedState){
+        crashSound->play();
+    }
+
+    // Detener animacion del rotor
+    rotorTimer->stop();
+
+    // Centrar la explosion donde estaba el helicoptero
+    QPointF centro = pos() + boundingRect().center();
+    setPixmap(explosionFrames[0]);
+    setOffset(0,0);
+    setPos(centro.x() - boundingRect().width() / 2.0, centro.y() - boundingRect().height() / 2.0);
+
+    // Animar la explosion (5 fotogramas cada 100ms = 500ms)
+    explosionTimer = new QTimer(this);
+    connect(explosionTimer, SIGNAL(timeout()), this, SLOT(updateExplosion()));
+    explosionTimer->start(100);
+
+    //para que suene el somnido y se vea la explosion antes de borrarlo
+    QTimer::singleShot(1000, this, [this]() {
+        // Evitar puntero colgante: si el juego sigue abierto, avisarle que
+        // el heli ya no existe (asÃ­ ~Game no lo borra dos veces).
+        if(game != nullptr && game->heli == this){
+            game->heli = nullptr;
+        }
+        scene()->removeItem(this);
+        delete this;
+    });
+}
+
+void MyHeli::updateExplosion()
+{
+    explosionFrame++;
+    if(explosionFrame >= 5)
+    {
+        explosionTimer->stop();
+        return;
+    }
+    QPointF centroViejo = pos() + boundingRect().center();
+    setPixmap(explosionFrames[explosionFrame]);
+    setPos(centroViejo.x() - boundingRect().width() / 2.0, centroViejo.y() - boundingRect().height() / 2.0);
+}
+
+
+================================================================================
+ARCHIVO: MyHeli.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\MyHeli.h
+================================================================================
+#ifndef MYHELI_H
+#define MYHELI_H
+
+#include <QGraphicsPixmapItem>
+#include <QObject>
+#include <QMediaPlayer>
+#include <QPixmap>
+#include <QElapsedTimer>
+#include <QGraphicsRectItem>
+#include "Physics.h"
+
+class QTimer;
+
+class MyHeli: public QObject, public QGraphicsPixmapItem{
+
+    Q_OBJECT
+
+public:
+
+    MyHeli(int nivel = 1);
+    ~MyHeli();
+
+    void keyPressEvent(QKeyEvent * event);
+    void keyReleaseEvent(QKeyEvent * event);
+
+    // Dispara una bala hacia la derecha (solo desde el nivel 2, con cooldown)
+    void disparar();
+
+    // Recarga una cantidad fija de combustible (pickup de bidÃ³n)
+    void recargarCombustible(double cantidad);
+
+    // Detiene todos los timers del heli (fÃ­sica, rotor, viento, explosiÃ³n).
+    // Se usa al salir del juego: el heli no debe seguir "vivo" en el menÃº.
+    void detenerTimers();
+
+    // Combustible actual (0â€“100)
+    double getFuel() const;
+
+public slots:
+
+    void updatePhysics();
+    void crash();
+    void updateRotorAnimation();
+    void updateExplosion();
+
+private:
+
+    //fisicas
+    Physics *physics;
+    double velX;
+    double velY;
+    bool thrusting; //subiendo
+    bool movingLeft;
+    bool movingRight;
+    bool crashed; //true apenas explota, corta la fisica y evita crash() repetido
+
+    //combustible (0â€“100)
+    double fuel;
+
+    //viento (empuja al helicÃ³ptero)
+    double windX;
+    double windY;
+    QTimer *windTimer; // nivel 3: recalcula viento random cada 1-2s
+
+    //sonidos
+    QMediaPlayer *crashSound;
+    QAudioOutput *crashAudio;
+
+    //animacion del rotor (4 fotogramas)
+    QPixmap rotorFrames[4];
+    int currentFrame;
+    QTimer *rotorTimer;
+
+    //animacion de la explosion
+    QPixmap explosionFrames[5];
+    int explosionFrame;
+    QTimer *explosionTimer;
+
+    //disparo de balas (solo nivel 2 y 3)
+    int nivel;                  // nivel actual del juego
+    bool puedeDisparar;         // true si nivel >= 2
+    QElapsedTimer ultimoDisparo; // controla el cooldown entre balas
+
+    //funciones
+    void checkLanding();
+};
+#endif // MYHELI_H
+
+
+================================================================================
+ARCHIVO: ObstacleH.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleH.cpp
+================================================================================
+#include <QApplication>
+
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QTimer>
+#include <QList>
+#include <QDebug>
+#include <QMediaPlayer>
+#include <QAudioOutput>
+
+#include "ObstacleH.h"
+#include "MyHeli.h"
+#include "GAME.h"
+#include "ObstacleManager.h"
+
+extern Game * game;
+
+ObstacleH::ObstacleH(ObstacleType type, ObstacleManager *manager, int nivel): QObject(), QGraphicsPixmapItem(){
+
+    // Guardar el tipo
+    tipo = type;
+    this->manager = manager;
+    this->nivel = nivel;
+
+    // Pixmap segÃºn el nivel (ciudad / desierto / nieve) y el tipo.
+    // Los obstÃ¡culos de desierto y nieve usan sus imÃ¡genes propias;
+    // el de techo (CEILING) no tiene variante temÃ¡tica y usa el genÃ©rico.
+    QPixmap pix;
+    switch(nivel){
+    case 2: // desierto
+        switch(tipo) {
+        case ObstacleType::VERTICAL:
+            pix = QPixmap(":/Sprites/recursosh/desierto_obstaculo_roca_vertical_60x200.png");
+            break;
+        case ObstacleType::SMALL:
+            pix = QPixmap(":/Sprites/recursosh/desierto_obstaculo_roca_pequena_48x48.png");
+            break;
+        case ObstacleType::FALLING:
+            pix = QPixmap(":/Sprites/recursosh/desierto_obstaculo_roca_cayendo_40x40.png");
+            break;
+        default: // CEILING
+            pix = QPixmap(":/Sprites/recursosh/tuberias_techo_obstaculo_160x64.png");
+        }
+        break;
+    case 3: // nieve
+        switch(tipo) {
+        case ObstacleType::VERTICAL:
+            pix = QPixmap(":/Sprites/recursosh/nieve_obstaculo_espiga_hielo_60x200.png");
+            break;
+        case ObstacleType::SMALL:
+            pix = QPixmap(":/Sprites/recursosh/nieve_obstaculo_roca_hielo_48x48.png");
+            break;
+        case ObstacleType::FALLING:
+            pix = QPixmap(":/Sprites/recursosh/nieve_obstaculo_carambano_cayendo_28x70.png");
+            break;
+        default: // CEILING
+            pix = QPixmap(":/Sprites/recursosh/tuberias_techo_obstaculo_160x64.png");
+        }
+        break;
+    default: // ciudad (nivel 1)
+        switch(tipo) {
+        case ObstacleType::VERTICAL:
+            //torre industrial (obstaculo alto)
+            //se escala para que sea mas gruesa y alta y quede anclada al suelo
+            //(el manager la coloca en y = altura - 300, asi la base toca el fondo)
+            pix = QPixmap(":/Sprites/recursosh/torre_industrial_obstaculo_40x140.png")
+                      .scaled(80, 300, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+            break;
+        case ObstacleType::SMALL:
+            //cajon / barrera industrial (obstaculo bajo)
+            pix = QPixmap(":/Sprites/recursosh/cajon_barrera_obstaculo_32x32.png");
+            break;
+        default: // CEILING y FALLING (el nivel 1 no usa FALLING, por si acaso)
+            //tuberias colgando del techo
+            pix = QPixmap(":/Sprites/recursosh/tuberias_techo_obstaculo_160x64.png");
+        }
+    }
+    setPixmap(pix);
+
+    // Vida segÃºn el tamaÃ±o del obstÃ¡culo (impactos de bala que aguanta)
+    if(tipo == ObstacleType::SMALL || tipo == ObstacleType::FALLING){
+        vida = 2;
+    }else{
+        vida = 3;
+    }
+    vidaMaxima = vida;
+    barraVisible = false;
+
+    // Barra de vida estilo Survivor: se dibuja encima del obstÃ¡culo pero
+    // OCULTA hasta que una bala le pegue por primera vez.
+    barraFondo = new QGraphicsRectItem(0, 0, boundingRect().width(), 6, this);
+    barraFondo->setBrush(QBrush(QColor(60, 60, 60)));
+    barraFondo->setPen(QPen(Qt::black));
+    barraFondo->setPos(0, -10);
+    barraFondo->setVisible(false);
+
+    barra = new QGraphicsRectItem(0, 0, boundingRect().width(), 6, this);
+    barra->setBrush(QBrush(Qt::yellow));
+    barra->setPen(QPen(Qt::NoPen));
+    barra->setPos(0, -10);
+    barra->setVisible(false);
+
+    //conectarlo
+    QTimer * timer=new QTimer(this);
+    connect(timer,SIGNAL(timeout()),this,SLOT(move()));
+    timer->start(50);
+
+    CrashSound = new QMediaPlayer;
+    CrashSound->setSource(QUrl("qrc:/Sounds/recursosh/CrashSound.wav"));
+
+    audioOutput = new QAudioOutput();
+
+    CrashSound->setAudioOutput(audioOutput);
+    audioOutput->setVolume(0.3);
+}
+
+ObstacleH::~ObstacleH(){
+    delete CrashSound;
+    delete audioOutput;
+}
+
+ObstacleType ObstacleH::getType() const{
+    return tipo;
+}
+void ObstacleH::move(){
+
+    if(scene() == nullptr){
+        return;
+    }
+
+    // Si el juego terminÃ³ (ganÃ³ o perdiÃ³), los obstÃ¡culos se congelan
+    if(game == nullptr || game->juegoTerminado){
+        return;
+    }
+
+    //colision
+    QList<QGraphicsItem* > colliding_items = collidingItems();
+
+    for (int i=0, n=colliding_items.size();i<n;i++){
+
+        if (typeid(*(colliding_items[i])) == typeid(MyHeli)) {
+            //quita vida
+            game->health->decrease();
+
+            //suena el sonido de crash
+            if(CrashSound->playbackState() == QMediaPlayer::PlayingState){
+                CrashSound->setPosition(0);
+            }else if(CrashSound->playbackState()== QMediaPlayer::StoppedState){
+                CrashSound->play();
+            }
+            //si llega a 0 se destruye
+            if(game->health->getHealth()<=0){
+                MyHeli *heli = dynamic_cast<MyHeli*>(colliding_items[i]);
+                if(heli != nullptr){
+                    heli->crash();
+                }
+            }
+            //si el heli pega con un objeto lo destruye
+            scene()->removeItem(this);
+            manager->notifyObstacleDied(this);
+            return;
+        }
+    }
+
+    //mover el obstaculo
+    if(tipo == ObstacleType::FALLING){
+        // cae de arriba hacia abajo (3px por tick = 60px/s)
+        setPos(x(), y()+3);
+        if(pos().y() > scene()->height()){
+            scene()->removeItem(this);
+            manager->notifyObstacleDied(this);
+        }
+        return;
+    }
+
+    //mover el obstaculo (3px por tick = 60px/s, igual que el scroll del mundo)
+    setPos(x()-3,y());
+    if(pos().x()+boundingRect().width()< 0){
+        scene()->removeItem(this);
+        manager->notifyObstacleDied(this);
+    }
+}
+
+void ObstacleH::recibirImpacto(){
+
+    if(scene() == nullptr){
+        return;
+    }
+
+    // Si el juego terminÃ³, las balas ya no afectan
+    if(game == nullptr || game->juegoTerminado){
+        return;
+    }
+
+    vida--;
+    if(vida < 0){
+        vida = 0;
+    }
+
+    // En el primer impacto la barra aparece arriba del obstÃ¡culo
+    if(!barraVisible){
+        barraVisible = true;
+        barraFondo->setVisible(true);
+        barra->setVisible(true);
+    }
+
+    // La barra se va LLENANDO con cada bala: ancho = daÃ±o acumulado / vida total
+    int danio = vidaMaxima - vida;
+    int ancho = static_cast<int>(boundingRect().width() * (danio / (double)vidaMaxima));
+    barra->setRect(0, 0, ancho, 6);
+
+    if(vida <= 0){
+        // Destruido por las balas
+        scene()->removeItem(this);
+        manager->notifyObstacleDied(this);
+    }
+}
+
+
+================================================================================
+ARCHIVO: ObstacleH.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleH.h
+================================================================================
+#ifndef OBSTACLEH_H
+#define OBSTACLEH_H
+
+#include <QGraphicsPixmapItem>
+#include <QObject>
+#include <QMediaPlayer>
+#include <QGraphicsRectItem>
+#include "ObstacleType.h"
+//esto para que la memoria unicamente la controle obstacle manager, evita dependencia circular
+class ObstacleManager;
+class ObstacleH: public QObject, public QGraphicsPixmapItem{
+    Q_OBJECT
+public:
+    ObstacleH(ObstacleType type, ObstacleManager *manager, int nivel = 1);
+    ~ObstacleH();
+    ObstacleType getType() const;
+    // Una bala le pegÃ³ al obstÃ¡culo: muestra la barra de vida (en el primer
+    // impacto) y resta vida; al llegar a 0 el obstÃ¡culo se destruye.
+    void recibirImpacto();
+public slots:
+    void move();
+private:
+    QMediaPlayer *CrashSound;
+    QAudioOutput *audioOutput;  // Se guarda para liberarlo en el destructor
+    ObstacleType tipo;
+    ObstacleManager *manager;
+    int nivel;                  // nivel actual (elige el pixmap del obstÃ¡culo)
+
+    // Barra de vida estilo Survivor: oculta hasta el primer impacto de bala
+    int vida;                   // impactos que aguanta
+    int vidaMaxima;             // vida inicial (para calcular el ancho)
+    bool barraVisible;          // false hasta el primer impacto
+    QGraphicsRectItem *barraFondo;  // fondo oscuro de la barra (hija)
+    QGraphicsRectItem *barra;       // relleno amarillo que se reduce (hija)
+};
+#endif // OBSTACLEH_H
+
+
+================================================================================
+ARCHIVO: ObstacleManager.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleManager.cpp
+================================================================================
+#include "ObstacleManager.h"
+#include <QDebug>
+#include <QTimer>
+#include <typeinfo>
+
+ObstacleManager::ObstacleManager(QGraphicsScene *scene, int nivel, QObject *parent):QObject(parent){
+
+    obstaculos = nullptr;
+    cantidad = 0;
+    this->scene = scene;
+    this->nivel = nivel;
+}
+
+ObstacleManager::~ObstacleManager(){
+
+    //destructor envargado de liberar la memoria dinamica
+
+    for(int i=0; i<cantidad; i++){
+        //si sigue viendose en la escena
+        if(obstaculos[i] != nullptr){
+            if(obstaculos[i]->scene()!=nullptr){
+                scene->removeItem(obstaculos[i]);
+        }
+        delete obstaculos[i];
+        obstaculos[i] = nullptr; //para evitar puntero colgante
+    }
+}
+//liberar el arreglo de punteros osea la  matriz
+
+if(obstaculos != nullptr){
+    delete[] obstaculos;
+    obstaculos = nullptr;
+   }
+cantidad = 0;
+}
+
+void ObstacleManager::spawnObstacle(ObstacleType type,int yPos){
+
+    ObstacleH *nuevo = new ObstacleH(type, this, nivel);
+
+    qreal xPos = scene->width();
+
+    switch(type){
+     case ObstacleType::VERTICAL:
+        if (yPos <=0)
+             // la base toca el suelo: altura de la escena menos la altura del obstÃ¡culo
+             yPos = static_cast<int>(scene->height() - nuevo->boundingRect().height());
+        break;
+     case ObstacleType::SMALL:
+         if (yPos <= 0)
+            // yPos = 50 + (rand() % 400);
+             yPos = 200;
+         break;
+     case ObstacleType::CEILING:
+         yPos = 0;
+             break;
+     case ObstacleType::FALLING:
+         // cae desde arriba en una posiciÃ³n aleatoria (empieza fuera de la pantalla)
+         xPos = 100 + (rand() % 500);
+         yPos = -static_cast<int>(nuevo->boundingRect().height());
+         break;
+
+    }
+    nuevo->setPos(xPos, yPos);
+
+    //redimensionar la matriz
+    ObstacleH **nuevaMatriz = new ObstacleH*[cantidad + 1];
+    // Copiar los punteros existentes
+    for(int i = 0; i < cantidad; i++){
+        nuevaMatriz[i] = obstaculos[i];
+    }
+    //ponemos el obstaculo nuevo al final
+    nuevaMatriz[cantidad] = nuevo;
+
+    if(obstaculos != nullptr){
+        delete[] obstaculos;
+    }
+
+    // Apuntar a la nueva matriz
+    obstaculos = nuevaMatriz;
+    cantidad++;
+
+    scene->addItem(nuevo);
+}
+
+void ObstacleManager::removerObstacle(int index){
+
+    if(index < 0 || index >= cantidad){
+        qDebug() << "ObstacleManager: Ãndice invÃ¡lido:" << index;//prevencion para evitar segment fault
+        return;
+    }
+
+    if(obstaculos[index] != nullptr){
+        if(obstaculos[index]->scene() != nullptr){
+            scene->removeItem(obstaculos[index]);
+        }
+        delete obstaculos[index];
+        obstaculos[index] = nullptr;  // Evitar puntero colgante
+    }
+
+      if(cantidad == 1){
+        delete[] obstaculos;
+        obstaculos = nullptr;
+    } else {
+        ObstacleH **nuevaMatriz = new ObstacleH*[cantidad - 1];
+
+        int nuevaPos = 0;
+        for(int i = 0; i < cantidad; i++){
+            // Saltar el Ã­ndice que se eliminÃ³
+            if(i != index){
+                nuevaMatriz[nuevaPos] = obstaculos[i];
+                nuevaPos++;
+            }
+        }
+        delete[] obstaculos;
+        obstaculos = nuevaMatriz;
+    }
+       cantidad--;
+}
+
+int ObstacleManager::getCantidad() const{
+    return cantidad;
+}
+
+ObstacleH* ObstacleManager::getObstacle(int index) const{
+    // ValidaciÃ³n para evitar segmentation fault
+    if(index < 0 || index >= cantidad){
+        return nullptr;
+    }
+    return obstaculos[index];
+}
+
+int ObstacleManager::countVisible() const{
+
+    int contador = 0;
+    QList<QGraphicsItem*> items = scene->items();
+    for(int i = 0; i < items.size(); i++){
+        if(typeid(*(items[i])) == typeid(ObstacleH)){
+            contador++;
+        }
+    }
+    return contador;
+}
+
+void ObstacleManager::notifyObstacleDied(ObstacleH *obstaculo){
+
+    if(obstaculo == nullptr){
+        return;
+    }
+
+    // Buscar el obstÃ¡culo en la matriz y poner su slot en nullptr
+    bool encontrado = false;
+    for(int i = 0; i < cantidad; i++){
+        if(obstaculos[i] == obstaculo){
+            obstaculos[i] = nullptr;  // Sin puntero colgante
+            encontrado = true;
+            break;
+        }
+    }
+
+    if(!encontrado){
+        return;
+    }
+    // PASO 2: Programar el delete con retraso (para que suene el crash)
+    QTimer::singleShot(500, obstaculo, [obstaculo]() {
+        delete obstaculo;
+    });
+}
+
+
+================================================================================
+ARCHIVO: ObstacleManager.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleManager.h
+================================================================================
+#ifndef OBSTACLEMANAGER_H
+#define OBSTACLEMANAGER_H
+
+#include <QObject>
+#include <QGraphicsScene>
+#include "ObstacleH.h"
+#include "ObstacleType.h"
+
+class ObstacleManager : public QObject {
+ Q_OBJECT
+
+public:
+
+ ObstacleManager(QGraphicsScene *scene,int nivel = 1,QObject *parent = nullptr);
+
+ //destructor
+ ~ObstacleManager();
+
+ void spawnObstacle(ObstacleType type, int yPos);
+ void removerObstacle(int index);
+ int getCantidad() const;
+
+ ObstacleH* getObstacle(int index) const;
+
+ int countVisible() const;
+ // Busca el obstÃ¡culo en la matriz y pone su slot en nullptr
+void notifyObstacleDied(ObstacleH *obstaculo);
+
+private:
+     ObstacleH **obstaculos;
+     int cantidad;
+     QGraphicsScene *scene;
+     int nivel;   // nivel actual (los obstÃ¡culos usan el pixmap del nivel)
+ };
+
+
+
+
+#endif // OBSTACLEMANAGER_H
+
+
+================================================================================
+ARCHIVO: ObstacleType.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ObstacleType.h
+================================================================================
+#ifndef OBSTACLETYPE_H
+#define OBSTACLETYPE_H
+
+enum class ObstacleType {
+    VERTICAL,
+    SMALL,
+    CEILING,
+    FALLING   // cae de arriba hacia abajo (roca de desierto / carÃ¡mbano de nieve)
+};
+
+#endif // OBSTACLETYPE_H
+
+
+================================================================================
+ARCHIVO: Physics.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Physics.cpp
+================================================================================
+#include "Physics.h"
+#include <cmath>
+
+Physics :: Physics(){
+
+    //constantes (px=pixeles)
+
+    gravedad = 500.0; // px/s^2
+    empuje = -800; // px/s^2 negativo = para arriba
+    velocidadMaxCaida = 350.0; // px/s
+    velocidadMaxAterrizaje = 200.0; // px/s
+    velocidadMaxHorizontal = 300.0; // px/s
+
+    friccion = 0.90; //va por frames
+}
+
+void Physics::applyGravity(double &velY,double dt){
+
+    //formula de aceleracion  v = v0 + a*t
+
+    velY += gravedad * dt;
+
+    //limitar maxima velocidad de caida
+    clampFallSpeed(velY);
+
+}
+
+void Physics::applyThrust(double &velY,double dt){
+
+    //el empuje negativo par que el helicoptero suba
+    velY += empuje * dt;
+
+   //limite de ascenso
+
+    if(velY < -velocidadMaxCaida){
+        velY = -velocidadMaxCaida;
+    }
+}
+
+void Physics::applyFriction(double &velX, double dt){
+
+    //Inercia, funciona cuando se deja de tocar la tecla de
+    //  derecha/izquierda hace que no se frene en seco
+    velX *= std::pow(friccion,dt*60.0);
+
+    //al momento que llegue a menos de uno se redondea a 0 para que no deslice
+    if(std::abs(velX)< 1.0){
+        velX=0.0;
+    }
+
+}
+
+double Physics::calculateTilt(double velY, double velX) const{
+    
+    
+    //angulo de rotacion
+    
+    double tilt = velY * 0.06 + velX * 0.02;
+    
+    if(tilt > 25.0) tilt = 25.0;
+    if(tilt < -25.0) tilt = -25.0;
+
+    return tilt;
+}
+
+bool Physics::SafeLanding(double velY)const{
+    return velY <= velocidadMaxAterrizaje;
+}
+
+void Physics::clampFallSpeed(double &velY) const{
+    // Velocidad terminal
+    if(velY > velocidadMaxCaida){
+        velY = velocidadMaxCaida;
+    }
+}
+
+double Physics::getMaxHorizontalSpeed() const{
+    return velocidadMaxHorizontal;
+}
+
+double Physics::getMaxFallSpeed() const{
+    return velocidadMaxCaida;
+}
+
+
+================================================================================
+ARCHIVO: Physics.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Physics.h
+================================================================================
+#ifndef PHYSICS_H
+#define PHYSICS_H
+
+class Physics{
+public:
+
+    Physics();
+
+    void applyGravity(double &velY,double dt);
+    void applyThrust(double &velY,double dt);
+    void applyFriction(double &velX,double dt);
+    double calculateTilt(double velY, double velX) const;
+    bool SafeLanding(double velY) const;
+
+    void clampFallSpeed(double &velY) const;
+
+    double getMaxHorizontalSpeed() const;
+    double getMaxFallSpeed() const;
+
+private:
+    double gravedad;
+    double empuje;
+    double velocidadMaxCaida;
+    double velocidadMaxAterrizaje;
+    double velocidadMaxHorizontal;
+    double friccion; // factor de desaceleraciÃ³n horizontal
+
+
+};
+
+#endif // PHYSICS_H
+
+
+================================================================================
+ARCHIVO: Puntajes.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Puntajes.cpp
+================================================================================
+#include "Puntajes.h"
+#include "VentanaPrincipal.h"
+
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <QPainter>
+#include <QSettings>
+
+//puntero global de la ventana Ãºnica (definido en main.cpp)
+extern VentanaPrincipal * ventanaPrincipal;
+
+// Color del borde segÃºn el nivel (igual que el popup de victoria)
+static QColor colorNivel(int nivel){
+    switch(nivel){
+    case 1: return QColor(77, 232, 255);   // cian (ciudad)
+    case 2: return QColor(255, 149, 0);    // naranja (desierto)
+    case 3: return QColor(170, 220, 255);  // azul hielo (nieve)
+    }
+    return QColor(77, 232, 255);
+}
+
+// Color de la letra segÃºn la nota obtenida
+static QColor colorNota(const QString &nota){
+    if(nota == "A") return QColor(0, 255, 150);      // verde
+    if(nota.startsWith("B")) return QColor(255, 255, 100); // amarillo
+    if(nota.startsWith("C")) return QColor(255, 170, 60);  // naranja
+    if(nota == "â€”") return QColor(150, 150, 150);    // gris: no jugado
+    return QColor(255, 100, 100);                    // rojo: D/F
+}
+
+Puntajes::Puntajes(QWidget *parent) : QWidget(parent) {
+
+    // Es una pÃ¡gina de la ventana Ãºnica: el tamaÃ±o lo define la ventana
+    // (800x600). El fondo se estira para llenar toda la pantalla.
+    fondo = QPixmap(":/Sprites/recursosh/menu_fondo_v2_640x880.png");
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(40, 40, 40, 40);
+    layout->setSpacing(16);
+
+    QLabel *titulo = new QLabel("PUNTAJES Y LOGROS");
+    titulo->setAlignment(Qt::AlignCenter);
+    titulo->setAttribute(Qt::WA_StyledBackground, true);
+    titulo->setStyleSheet(
+        "QLabel {"
+        "  color: #4de8ff;"
+        "  font-family: 'Consolas';"
+        "  font-size: 20px;"
+        "  font-weight: bold;"
+        "  letter-spacing: 3px;"
+        "  background-color: rgba(15, 10, 25, 160);"
+        "  border: 1px solid #4de8ff;"
+        "  border-radius: 4px;"
+        "  padding: 12px;"
+        "}"
+        );
+    layout->addWidget(titulo);
+    layout->addSpacing(10);
+
+    // Mejor nota de cada nivel (guardada por Game::guardarLogro en QSettings)
+    QSettings settings("HelicopterRescue", "Progreso");
+
+    for(int i = 1; i <= 3; i++){
+        QString clave = QString("logro_nivel_%1").arg(i);
+        QString nota = settings.value(clave).toString();
+        if(nota.isEmpty()) nota = "â€”";
+
+        QColor cNivel = colorNivel(i);
+
+        QWidget *fila = new QWidget(this);
+        QHBoxLayout *filaLayout = new QHBoxLayout(fila);
+        filaLayout->setContentsMargins(0, 0, 0, 0);
+        filaLayout->setSpacing(20);
+
+        QLabel *lblNivel = new QLabel(QString("NIVEL %1").arg(i));
+        lblNivel->setFixedWidth(220);
+        lblNivel->setAlignment(Qt::AlignCenter);
+        lblNivel->setAttribute(Qt::WA_StyledBackground, true);
+        lblNivel->setStyleSheet(QString(
+            "QLabel {"
+            "  color: %1;"
+            "  font-family: 'Consolas';"
+            "  font-size: 18px;"
+            "  font-weight: bold;"
+            "  letter-spacing: 2px;"
+            "  background-color: rgba(15, 10, 25, 160);"
+            "  border: 1px solid %1;"
+            "  border-radius: 4px;"
+            "  padding: 10px;"
+            "}").arg(cNivel.name()));
+        filaLayout->addWidget(lblNivel);
+
+        filaLayout->addStretch();
+
+        QLabel *lblNota = new QLabel(nota);
+        lblNota->setAlignment(Qt::AlignCenter);
+        lblNota->setAttribute(Qt::WA_StyledBackground, true);
+        lblNota->setStyleSheet(QString(
+            "QLabel {"
+            "  color: %1;"
+            "  font-family: 'Consolas';"
+            "  font-size: 40px;"
+            "  font-weight: bold;"
+            "  background-color: rgba(15, 10, 25, 160);"
+            "  border: 1px solid %1;"
+            "  border-radius: 4px;"
+            "  padding: 4px 24px;"
+            "}").arg(colorNota(nota).name()));
+        filaLayout->addWidget(lblNota);
+
+        layout->addWidget(fila);
+    }
+
+    layout->addSpacing(10);
+
+    // Logro dorado: todos los niveles en A
+    bool todosA = true;
+    for(int i = 1; i <= 3; i++){
+        QString clave = QString("logro_nivel_%1").arg(i);
+        if(settings.value(clave).toString() != "A"){ todosA = false; break; }
+    }
+
+    QLabel *lblLogro = new QLabel(todosA
+        ? "â˜… Â¡Consigue todos los logros en A! â˜…"
+        : "â˜… Â¡Consigue todos los logros en A! â˜…  (bloqueado)");
+    lblLogro->setAlignment(Qt::AlignCenter);
+    lblLogro->setAttribute(Qt::WA_StyledBackground, true);
+    QString colorLogro = todosA ? "#ffd700" : "#888888";
+    lblLogro->setStyleSheet(QString(
+        "QLabel {"
+        "  color: %1;"
+        "  font-family: 'Consolas';"
+        "  font-size: 16px;"
+        "  font-weight: bold;"
+        "  background-color: rgba(15, 10, 25, 160);"
+        "  border: 1px solid %1;"
+        "  border-radius: 4px;"
+        "  padding: 12px;"
+        "}").arg(colorLogro));
+    layout->addWidget(lblLogro);
+
+    layout->addStretch();
+
+    QPushButton *btnVolver = new QPushButton("VOLVER");
+    btnVolver->setFixedSize(220, 50);
+    btnVolver->setCursor(Qt::PointingHandCursor);
+    btnVolver->setStyleSheet(
+        "QPushButton { background-color: #1a1a2e; color: #ff6b6b;"
+        " border: 2px solid #ff6b6b; border-radius: 6px;"
+        " font-size: 16px; font-weight: bold; }"
+        "QPushButton:hover { background-color: #2a2a4e; }"
+        "QPushButton:pressed { background-color: #0f0f1e; }");
+    layout->addWidget(btnVolver, 0, Qt::AlignHCenter);
+
+    connect(btnVolver, &QPushButton::clicked, this, &Puntajes::volver);
+}
+
+void Puntajes::paintEvent(QPaintEvent *event)
+{
+    // Fondo estirado a TODA la ventana (igual que el menÃº)
+    QPainter painter(this);
+    painter.fillRect(rect(), QColor(21, 10, 43));
+    painter.drawPixmap(rect(), fondo);
+
+    QWidget::paintEvent(event);
+}
+
+void Puntajes::volver(){
+    // Regresar al menÃº principal (cambia de pÃ¡gina en la ventana Ãºnica)
+    ventanaPrincipal->mostrarMenu();
+}
+
+
+================================================================================
+ARCHIVO: Puntajes.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Puntajes.h
+================================================================================
+#ifndef PUNTAJES_H
+#define PUNTAJES_H
+
+#include <QWidget>
+#include <QPixmap>
+
+class QPushButton;
+
+// Pantalla de puntajes y logros: muestra la mejor nota (letra) obtenida
+// en cada nivel y el logro dorado "Todos los A" si estÃ¡ desbloqueado.
+// Las notas las guarda Game::guardarLogro en QSettings (clave logro_nivel_N).
+class Puntajes : public QWidget {
+    Q_OBJECT
+
+public:
+    Puntajes(QWidget *parent = nullptr);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
+private slots:
+    void volver();
+
+private:
+    QPixmap fondo;
+};
+
+#endif // PUNTAJES_H
+
+
+================================================================================
+ARCHIVO: RegisterScreen.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\RegisterScreen.cpp
+================================================================================
+#include "RegisterScreen.h"
+#include "UserManager.h"
+#include "VentanaPrincipal.h"
+
+#include <QVBoxLayout>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QLabel>
+#include <QIcon>
+#include <QPainter>
+#include <QMessageBox>
+
+//puntero global (definido en main.cpp)
+extern UserManager * userManager;
+extern VentanaPrincipal * ventanaPrincipal;
+
+RegisterScreen::RegisterScreen(QWidget *parent)
+    : QWidget(parent)
+{
+    // Es una pÃ¡gina de la ventana Ãºnica: el tamaÃ±o lo define la ventana
+    // (800x600). El fondo se estira para llenar toda la pantalla.
+
+    fondo = QPixmap(":/Sprites/recursosh/login_fondo_640x880.png");
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(120, 120, 120, 60);
+    layout->setSpacing(16);
+
+    QLabel *titulo = new QLabel("CREAR CUENTA");
+    titulo->setAlignment(Qt::AlignCenter);
+    titulo->setAttribute(Qt::WA_StyledBackground, true);
+    titulo->setStyleSheet(
+        "QLabel {"
+        "  color: #4de8ff;"
+        "  font-family: 'Consolas';"
+        "  font-size: 20px;"
+        "  font-weight: bold;"
+        "  letter-spacing: 3px;"
+        "  background-color: rgba(15, 10, 25, 160);"
+        "  border: 1px solid #4de8ff;"
+        "  border-radius: 4px;"
+        "  padding: 10px;"
+        "}"
+        );
+    layout->addWidget(titulo);
+    layout->addSpacing(10);
+
+    QString estiloCampo =
+        "QLineEdit { background-color: rgba(15, 10, 25, 200); color: #ffffff;"
+        " border: 1px solid #4de8ff; border-radius: 4px; padding: 10px;"
+        " font-size: 16px; }"
+        "QLineEdit:focus { border: 2px solid #4de8ff; }";
+
+    campoUsuario = new QLineEdit();
+    campoUsuario->setPlaceholderText("Usuario");
+    campoUsuario->setStyleSheet(estiloCampo);
+    layout->addWidget(campoUsuario);
+
+    campoContrasena = new QLineEdit();
+    campoContrasena->setPlaceholderText("ContraseÃ±a");
+    campoContrasena->setEchoMode(QLineEdit::Password);
+    campoContrasena->setStyleSheet(estiloCampo);
+    layout->addWidget(campoContrasena);
+
+    campoConfirmar = new QLineEdit();
+    campoConfirmar->setPlaceholderText("Confirmar contraseÃ±a");
+    campoConfirmar->setEchoMode(QLineEdit::Password);
+    campoConfirmar->setStyleSheet(estiloCampo);
+    layout->addWidget(campoConfirmar);
+
+    layout->addSpacing(10);
+
+    // Botones como QIcon sin borde (igual que en el menÃº principal)
+    QPushButton *btnRegistrar = crearBotonImagen(":/Sprites/recursosh/boton_registrarse.png", 380, 52);
+    QPushButton *btnVolver = crearBotonImagen(":/Sprites/recursosh/boton_volver.png", 380, 52);
+    layout->addWidget(btnRegistrar, 0, Qt::AlignHCenter);
+    layout->addWidget(btnVolver, 0, Qt::AlignHCenter);
+    layout->addStretch();
+
+    connect(btnRegistrar, &QPushButton::clicked, this, &RegisterScreen::registrarse);
+    connect(btnVolver, &QPushButton::clicked, this, &RegisterScreen::volver);
+
+    // Enter en el campo de confirmar tambiÃ©n registra
+    connect(campoConfirmar, &QLineEdit::returnPressed, this, &RegisterScreen::registrarse);
+}
+
+void RegisterScreen::paintEvent(QPaintEvent *event)
+{
+    // Fondo estirado a TODA la ventana (sin barras laterales ni franjas)
+    QPainter painter(this);
+    painter.fillRect(rect(), QColor(21, 10, 43));
+    painter.drawPixmap(rect(), fondo);
+
+    QWidget::paintEvent(event);
+}
+
+QPushButton* RegisterScreen::crearBotonImagen(const QString &rutaImagen, int w, int h)
+{
+    QPushButton *boton = new QPushButton(this);
+    boton->setIcon(QIcon(rutaImagen));
+    boton->setIconSize(QSize(w, h));
+    boton->setFixedSize(w, h);
+    boton->setFlat(true);
+    boton->setCursor(Qt::PointingHandCursor);
+    boton->setStyleSheet(
+        "QPushButton { border: none; background: transparent; }"
+        "QPushButton:hover { background: rgba(255, 255, 255, 25); border-radius: 4px; }"
+        "QPushButton:pressed { background: rgba(0,0,0,60); border-radius: 4px; }"
+        );
+    return boton;
+}
+
+void RegisterScreen::registrarse(){
+
+    QString nombre = campoUsuario->text().trimmed();
+    QString contrasena = campoContrasena->text();
+    QString confirmar = campoConfirmar->text();
+
+    if(nombre.isEmpty() || contrasena.isEmpty() || confirmar.isEmpty()){
+        QMessageBox::warning(this, "Registrarse", "CompletÃ¡ todos los campos.");
+        return;
+    }
+    if(contrasena != confirmar){
+        QMessageBox::warning(this, "Registrarse", "Las contraseÃ±as no coinciden.");
+        return;
+    }
+
+    QString error;
+    if(userManager == nullptr || !userManager->registrar(nombre, contrasena, error)){
+        QMessageBox::warning(this, "Registrarse",
+                             error.isEmpty() ? "No se pudo crear la cuenta." : error);
+        return;
+    }
+
+    QMessageBox::information(this, "Registrarse", "Cuenta creada. Ya podÃ©s iniciar sesiÃ³n.");
+    volver();
+}
+
+void RegisterScreen::volver(){
+    // Volver al login (cambia de pÃ¡gina en la ventana Ãºnica)
+    ventanaPrincipal->mostrarLogin();
+}
+
+
+================================================================================
+ARCHIVO: RegisterScreen.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\RegisterScreen.h
+================================================================================
+#ifndef REGISTERSCREEN_H
+#define REGISTERSCREEN_H
+
+#include <QWidget>
+#include <QPixmap>
+
+class QLineEdit;
+class QPushButton;
+
+// Pantalla de registro de cuenta: usuario + contraseÃ±a + confirmar.
+// Crea la cuenta vÃ­a UserManager y vuelve al LoginScreen.
+// Es una pÃ¡gina de la ventana Ãºnica (VentanaPrincipal).
+class RegisterScreen : public QWidget {
+    Q_OBJECT
+
+public:
+    RegisterScreen(QWidget *parent = nullptr);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
+private slots:
+    void registrarse();
+    void volver();
+
+private:
+    QPixmap fondo;
+    QLineEdit *campoUsuario;
+    QLineEdit *campoContrasena;
+    QLineEdit *campoConfirmar;
+    QPushButton* crearBotonImagen(const QString &rutaImagen, int w, int h);
+};
+
+#endif // REGISTERSCREEN_H
+
+
+================================================================================
+ARCHIVO: ResourceLoader.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ResourceLoader.cpp
+================================================================================
+#include "ResourceLoader.h"
+
+QHash<int, QImage> ResourceLoader::s_backgrounds;
+QHash<int, QVector<QImage>> ResourceLoader::s_survivorFrames;
+QMutex ResourceLoader::s_mutex;
+
+ResourceLoader::ResourceLoader(QObject *parent) : QObject(parent) {}
+
+void ResourceLoader::preloadAll(){
+    // Este slot corre en el hilo de trabajo (QThread).
+    // Cargar imÃ¡genes es lento (disco + decodificaciÃ³n): hacerlo aquÃ­ evita
+    // que la UI se congele cuando el jugador abre un nivel.
+    for(int nivel = 1; nivel <= 3; nivel++){
+        QString rutaFondo;
+        QString baseSurvivor;
+        switch(nivel){
+        case 2:
+            rutaFondo = ":/Sprites/recursosh/nivel2_desierto_800x600.png";
+            baseSurvivor = "superviviente_desierto_frame";
+            break;
+        case 3:
+            rutaFondo = ":/Sprites/recursosh/nivel3_nieve_800x600.png";
+            baseSurvivor = "superviviente_nieve_frame";
+            break;
+        default:
+            rutaFondo = ":/Sprites/recursosh/fondo_ciudad_cyberpunk_800x600.png";
+            baseSurvivor = "superviviente_frame";
+        }
+
+        // QImage es seguro de crear en cualquier hilo (a diferencia de
+        // QPixmap, que solo debe usarse en el hilo de la UI).
+        QImage fondo(rutaFondo);
+        QVector<QImage> frames;
+        frames.append(QImage(":/Sprites/recursosh/" + baseSurvivor + "1.png"));
+        frames.append(QImage(":/Sprites/recursosh/" + baseSurvivor + "2.png"));
+
+        // Escribir en la cachÃ© compartida (protegida por el mutex para que
+        // el hilo de la UI no lea a medias).
+        QMutexLocker locker(&s_mutex);
+        s_backgrounds.insert(nivel, fondo);
+        s_survivorFrames.insert(nivel, frames);
+    }
+
+    emit preloadFinished();
+}
+
+QPixmap ResourceLoader::background(int nivel){
+    QMutexLocker locker(&s_mutex);
+    QImage img = s_backgrounds.value(nivel);
+    if(img.isNull()){
+        return QPixmap();
+    }
+    // La conversiÃ³n a QPixmap se hace AQUÃ (hilo de la UI), que es donde
+    // QPixmap es seguro.
+    return QPixmap::fromImage(img);
+}
+
+QVector<QPixmap> ResourceLoader::survivorFrames(int nivel){
+    QMutexLocker locker(&s_mutex);
+    QVector<QImage> imgs = s_survivorFrames.value(nivel);
+    QVector<QPixmap> pixmaps;
+    for(int i = 0; i < imgs.size(); i++){
+        pixmaps.append(QPixmap::fromImage(imgs[i]));
+    }
+    return pixmaps;
+}
+
+
+================================================================================
+ARCHIVO: ResourceLoader.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ResourceLoader.h
+================================================================================
+#ifndef RESOURCELOADER_H
+#define RESOURCELOADER_H
+
+#include <QObject>
+#include <QImage>
+#include <QPixmap>
+#include <QHash>
+#include <QMutex>
+#include <QVector>
+
+// Carga los recursos pesados (fondos y sprites de los niveles) en un hilo
+// de trabajo para no congelar la interfaz al abrir un nivel.
+//
+// CÃ³mo funciona:
+//  - El slot preloadAll() corre en un QThread aparte (ver main.cpp).
+//  - En el hilo se cargan QImage (seguras para crear fuera del hilo de UI).
+//  - Quedan en una cachÃ© estÃ¡tica protegida con QMutex.
+//  - El juego consulta background()/survivorFrames() desde el hilo de la UI;
+//    ahÃ­ se convierten a QPixmap (que solo se debe usar en el hilo de UI).
+class ResourceLoader : public QObject {
+    Q_OBJECT
+
+public:
+    explicit ResourceLoader(QObject *parent = nullptr);
+
+    // Consultas desde el hilo de la UI (protegidas con mutex).
+    // Devuelven un QPixmap vacÃ­o si el hilo aÃºn no terminÃ³ de cargar.
+    static QPixmap background(int nivel);
+    static QVector<QPixmap> survivorFrames(int nivel);
+
+public slots:
+    // Corre en el hilo de trabajo: carga TODO y emite preloadFinished().
+    void preloadAll();
+
+signals:
+    void preloadFinished();
+
+private:
+    static QHash<int, QImage> s_backgrounds;
+    static QHash<int, QVector<QImage>> s_survivorFrames;
+    static QMutex s_mutex;
+};
+
+#endif // RESOURCELOADER_H
+
+
+================================================================================
+ARCHIVO: Score.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Score.cpp
+================================================================================
+#include "Score.h"
+#include <QFont>
+
+Score::Score(QGraphicsItem *parent): QGraphicsTextItem(parent){
+    //empieze en 0
+    score =0;
+    // Usar fuente mÃ¡s grande para mayor visibilidad
+    setFont(QFont("Arial", 24, QFont::Bold));
+    setDefaultTextColor(Qt::yellow);
+    setPlainText("Rescates: 0/0");
+}
+
+void Score::increase(){
+    score++;
+}
+
+int Score::getScore(){
+    return score;
+}
+
+void Score::mostrarRescates(int rescatados, int objetivo){
+    setPlainText(QString("Rescates: %1/%2").arg(rescatados).arg(objetivo));
+}
+
+
+================================================================================
+ARCHIVO: Score.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Score.h
+================================================================================
+#ifndef SCORE_H
+#define SCORE_H
+
+#include <QGraphicsTextItem>
+
+class Score: public QGraphicsTextItem{
+public:
+    Score(QGraphicsItem * parent=0);
+    void increase();
+    int getScore();
+    void mostrarRescates(int rescatados, int objetivo);
+private:
+    int score;
+};
+
+#endif // SCORE_H
+
+
+================================================================================
+ARCHIVO: Survivor.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Survivor.cpp
+================================================================================
+#include "Survivor.h"
+#include "GAME.h"
+#include "ResourceLoader.h"
+#include <QTimer>
+#include <QBrush>
+#include <QPen>
+
+extern Game * game;
+
+Survivor::Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene, int nivel)
+    : QObject(), QGraphicsPixmapItem()
+{
+    this->escena = scene;
+    progreso = 0;
+    rescatado = false;
+    rescatadoPorProgreso = false;
+    heliEncima = false;
+
+    // cargar los 2 fotogramas segÃºn el nivel (brazo derecho / izquierdo
+    // levantado). Se usa la cachÃ© del hilo de precarga; si el hilo aÃºn no
+    // terminÃ³, se carga directo como respaldo.
+    QVector<QPixmap> precargadas = ResourceLoader::survivorFrames(nivel);
+    if(precargadas.size() == 2 && !precargadas[0].isNull()){
+        frames[0] = precargadas[0];
+        frames[1] = precargadas[1];
+    }else{
+        QString base;
+        switch(nivel){
+        case 2:
+            base = "superviviente_desierto_frame";
+            break;
+        case 3:
+            base = "superviviente_nieve_frame";
+            break;
+        default:
+            base = "superviviente_frame";
+        }
+        frames[0] = QPixmap(":/Sprites/recursosh/" + base + "1.png");
+        frames[1] = QPixmap(":/Sprites/recursosh/" + base + "2.png");
+    }
+    currentFrame = 0;
+    setPixmap(frames[currentFrame]);
+    setPos(xPos, yPos);
+
+    //  fondo de la barra de progresion
+    fondoBarra = new QGraphicsRectItem(0, 0, boundingRect().width(), 6, this);
+    fondoBarra->setBrush(QBrush(QColor(60, 60, 60)));
+    fondoBarra->setPen(QPen(Qt::black));
+    fondoBarra->setPos(0, -10);  // Encima del superviviente
+
+    // barra de progresion
+    barra = new QGraphicsRectItem(0, 0, 0, 6, this);
+    barra->setBrush(QBrush(Qt::yellow));
+    barra->setPen(QPen(Qt::NoPen));
+    barra->setPos(0, -10);  // Encima del superviviente, sobre el fondo
+
+    // timer de progresion
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateProgress()));
+    timer->start(50);
+
+    // timer de movimiento (el movimiento con pantalla)
+    moveTimer = new QTimer(this);
+    connect(moveTimer, SIGNAL(timeout()), this, SLOT(move()));
+    moveTimer->start(50);
+
+    // timer de animacion (alterna los brazos, como si pidiera auxilio)
+    animTimer = new QTimer(this);
+    connect(animTimer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
+    animTimer->start(400);
+}
+
+Survivor::~Survivor(){
+
+    if(timer != nullptr){
+        timer->stop();
+    }
+    if(moveTimer != nullptr){
+        moveTimer->stop();
+    }
+    if(animTimer != nullptr){
+        animTimer->stop();
+    }
+    // La barra y el fondo (para que se dentengan y desaparezcan)
+    // No hace falta delete manual aquÃ­
+}
+
+bool Survivor::isRescued() const{
+    return rescatado;
+}
+
+bool Survivor::fueRescatado() const{
+    return rescatadoPorProgreso;
+}
+
+bool Survivor::isHeliOver(QRectF heliRect) const{
+    // Verificar si el rectÃ¡ngulo del heli se superpone con el del superviviente
+    return heliRect.intersects(boundingRect().translated(pos()));
+}
+
+double Survivor::getProgreso() const{
+    return progreso;
+}
+
+void Survivor::setHeliEncima(bool encima){
+    heliEncima = encima;
+}
+
+void Survivor::updateProgress(){
+    // Si el juego terminÃ³ (ganÃ³ o perdiÃ³), el mundo se pausa
+    if(game == nullptr || game->juegoTerminado){
+        return;
+    }
+
+    // Si ya fue rescatado, no hacer nada
+    if(rescatado){
+        return;
+    }
+
+    // Si el heli NO estÃ¡ encima, reiniciar el progreso (el rescate se cancela)
+    if(!heliEncima){
+        progreso = 0;
+        barra->setRect(0, 0, 0, 6);  // Barra vacÃ­a
+        return;
+    }
+
+    // El heli estÃ¡ encima -> avanzar el progreso.
+    // 100/30 por tick de 50ms = rescate en 1.5s (antes 2s: 2.5 por tick).
+    progreso += 100.0 / 30.0;
+    if(progreso > 100){
+        progreso = 100;
+    }
+
+    // Actualizar la barra segÃºn el progreso
+    int anchoBarra = static_cast<int>((progreso / 100.0) * boundingRect().width());
+    barra->setRect(0, 0, anchoBarra, 6);
+
+    // Si llego a rescatar
+    if(progreso >= 100){
+        rescatado = true;
+        rescatadoPorProgreso = true;  // rescate REAL (completÃ³ la barra)
+        timer->stop();
+        moveTimer->stop();  // Detener tambiÃ©n el movimiento
+        animTimer->stop();
+        escena->removeItem(this);
+        // No hacemos delete this porque eso se controla en survivor manager
+    }
+}
+
+void Survivor::move(){
+
+    if(scene() == nullptr){
+        return;
+    }
+
+    // Si el juego terminÃ³ (ganÃ³ o perdiÃ³), el mundo se pausa
+    if(game == nullptr || game->juegoTerminado){
+        return;
+    }
+
+    // Mover hacia la izquierda
+    setPos(x() - 3, y());
+
+    // Si salio por la izquierda, quitarlo de la escena
+    if(pos().x() + boundingRect().width() < 0){
+        escena->removeItem(this);
+
+        rescatado = true;
+        timer->stop();
+        moveTimer->stop();
+        animTimer->stop();
+    }
+}
+
+void Survivor::updateAnimation(){
+    if(rescatado){
+        return;
+    }
+    currentFrame = (currentFrame + 1) % 2;
+    setPixmap(frames[currentFrame]);
+}
+
+
+================================================================================
+ARCHIVO: Survivor.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\Survivor.h
+================================================================================
+#ifndef SURVIVOR_H
+#define SURVIVOR_H
+
+#include <QObject>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsRectItem>
+#include <QGraphicsScene>
+#include <QPixmap>
+
+
+class Survivor : public QObject, public QGraphicsPixmapItem {
+    Q_OBJECT
+
+public:
+
+    // nivel: 1 = ciudad, 2 = desierto, 3 = nieve (elige los sprites)
+    Survivor(qreal xPos, qreal yPos, QGraphicsScene *scene, int nivel = 1);
+
+    ~Survivor();
+
+    bool isRescued() const;
+
+    // true solo si el rescate se completÃ³ por la barra de progreso
+    // (no si el superviviente simplemente saliÃ³ del mapa)
+    bool fueRescatado() const;
+
+    bool isHeliOver(QRectF heliRect) const;
+
+    // Progreso actual de rescate (0 a 100). Se usa para la barra de la derrota.
+    double getProgreso() const;
+
+    void setHeliEncima(bool encima);
+
+public slots
+    :
+    void updateProgress();
+
+    void move();
+
+    void updateAnimation();
+
+private:
+    QGraphicsScene *escena;     // Escena donde se dibuja
+    QTimer *timer;              // Timer que avanza el progreso
+    QTimer *moveTimer;          // Timer que mueve el superviviente
+    QTimer *animTimer;          // Timer que alterna los brazos (animacion)
+    QGraphicsRectItem *barra;   // Barra de progreso (hija, se llena)
+    QGraphicsRectItem *fondoBarra; // Fondo oscuro de la barra
+    QPixmap frames[2];          // Los 2 fotogramas (brazo izq/der levantado)
+    int currentFrame;
+    double progreso;            // Progreso actual (0 a 100)
+    bool rescatado;             // si ya a fue rescatado?
+    bool rescatadoPorProgreso;  // true si se rescatÃ³ completando la barra
+    bool heliEncima;            // Â¿El heli estÃ¡ encima en el Ãºltimo tick?
+};
+
+#endif // SURVIVOR_H
+
+
+================================================================================
+ARCHIVO: SurvivorManager.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\SurvivorManager.cpp
+================================================================================
+#include "SurvivorManager.h"
+#include <QDebug>
+
+SurvivorManager::SurvivorManager(QGraphicsScene *scene, ObstacleManager *obstacleManager,
+                                 int nivel, QObject *parent)
+    : QObject(parent)
+{
+    this->scene = scene;
+    this->obstacleManager = obstacleManager;
+    this->nivel = nivel;
+    totalGenerados = 0;
+    totalRescatados = 0;
+    // Supervivientes por nivel: nivel 1 = 5, nivel 2 = 10, nivel 3 = 15
+    switch(nivel){
+    case 2:
+        maximoSupervivientes = 10;
+        break;
+    case 3:
+        maximoSupervivientes = 15;
+        break;
+    default:
+        maximoSupervivientes = 5;
+        break;
+    }
+}
+
+SurvivorManager::~SurvivorManager(){
+    // Liberar todos los supervivientes
+    for(int i = 0; i < supervivientes.size(); i++){
+        if(supervivientes[i] != nullptr){
+            if(supervivientes[i]->scene() != nullptr){
+                scene->removeItem(supervivientes[i]);
+            }
+            delete supervivientes[i];
+            supervivientes[i] = nullptr;
+        }
+    }
+    supervivientes.clear();
+}
+
+bool SurvivorManager::posicionLibre(qreal xPos, qreal yPos) const{
+
+    // Verifica que la posiciÃ³n no esta chocando con un obstaculo
+
+    QRectF zonaSuperviviente(xPos, yPos, 40, 40);
+
+    int cantidad = obstacleManager->getCantidad();
+    for(int i = 0; i < cantidad; i++){
+        ObstacleH *obs = obstacleManager->getObstacle(i);
+        if(obs == nullptr){
+            continue;  // Slot vacio
+        }
+        //solo se fija en los obstaculos que sigen en la escena
+        if(obs->scene() == nullptr){
+            continue;
+        }
+        // basicamente devuevle el size del pixmap
+        QRectF zonaObstaculo = obs->boundingRect().translated(obs->pos());
+        if(zonaSuperviviente.intersects(zonaObstaculo)){
+            return false;  // Hay un obstaculo ahi
+        }
+    }
+    return true;
+}
+
+bool SurvivorManager::spawnSurvivorBehindObstacle(ObstacleH *obstaculo){
+    //genera un superviviente adelante de los obstaculos
+    if(totalGenerados >= maximoSupervivientes){
+        return false;  // Ya se generaron todos los de este nivel
+    }
+
+    if(obstaculo == nullptr || obstaculo->scene() == nullptr){
+        return false;
+    }
+
+    // El suelo esta en la parte inferior de la pantalla
+    qreal yPos = scene->height() - 40;
+
+    // Posicioan X ADELANTE del obstÃ¡culo
+    qreal xPos = obstaculo->pos().x() + 200;
+
+    // Crear el superviviente (con los sprites del nivel actual)
+    Survivor *nuevo = new Survivor(xPos, yPos, scene, nivel);
+    scene->addItem(nuevo);
+    supervivientes.append(nuevo);
+    totalGenerados++;
+    qDebug() << "SurvivorManager: Superviviente creado adelante del obstÃ¡culo en x=" << xPos
+             << "(total:" << totalGenerados << ")";
+    return true;
+}
+
+void SurvivorManager::updateAll(QRectF heliRect){
+    //verificar posicion y estado(si esta aun o no)
+    for(int i = supervivientes.size() - 1; i >= 0; i--){
+        Survivor *s = supervivientes[i];
+        if(s == nullptr){
+            supervivientes.removeAt(i);
+            continue;
+        }
+
+        // Decirle al superviviente si el heli estÃ¡ encima
+        s->setHeliEncima(s->isHeliOver(heliRect));
+
+        // Si ya fue rescatado eliminarlo
+        if(s->isRescued()){
+
+            // Solo cuenta como rescatado si completÃ³ la barra de progreso
+            if(s->fueRescatado()){
+                totalRescatados++;
+            }
+
+            delete s;
+            supervivientes.removeAt(i);
+        }
+    }
+}
+
+int SurvivorManager::countActive() const{
+    return supervivientes.size();
+}
+
+bool SurvivorManager::allSpawned() const{
+    return totalGenerados >= maximoSupervivientes;
+}
+
+int SurvivorManager::getTotalRescatados() const{
+    return totalRescatados;
+}
+
+int SurvivorManager::getTotalObjetivo() const{
+    return maximoSupervivientes;
+}
+
+int SurvivorManager::getProgresoTotal() const{
+    int total = totalRescatados * 100;
+    for(int i = 0; i < supervivientes.size(); i++){
+        if(supervivientes[i] != nullptr){
+            total += static_cast<int>(supervivientes[i]->getProgreso());
+        }
+    }
+    return total;
+}
+
+
+================================================================================
+ARCHIVO: SurvivorManager.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\SurvivorManager.h
+================================================================================
+#ifndef SURVIVORMANAGER_H
+#define SURVIVORMANAGER_H
+
+#include <QObject>
+#include <QGraphicsScene>
+#include <QList>
+#include "Survivor.h"
+#include "ObstacleManager.h"
+
+
+class SurvivorManager : public QObject {
+    Q_OBJECT
+
+public:
+
+    // nivel: 1 = ciudad, 2 = desierto, 3 = nieve (sprites del superviviente)
+    SurvivorManager(QGraphicsScene *scene, ObstacleManager *obstacleManager,
+                    int nivel = 1, QObject *parent = nullptr);
+
+    ~SurvivorManager();
+
+    bool spawnSurvivorBehindObstacle(ObstacleH *obstaculo);
+
+    void updateAll(QRectF heliRect);
+
+    int countActive() const;
+
+    bool allSpawned() const;
+
+    // CuÃ¡ntos supervivientes se rescataron de verdad (barra completada)
+    int getTotalRescatados() const;
+
+    // CuÃ¡ntos supervivientes hay que rescatar en este nivel
+    // (5 en el nivel 1, 10 en el nivel 2, 15 en el nivel 3).
+    int getTotalObjetivo() const;
+
+    // Progreso total de rescate: rescatados*100 + progreso de los activos.
+    // El mÃ¡ximo es getTotalObjetivo()*100 (â†’ 100%).
+    int getProgresoTotal() const;
+
+private:
+    QGraphicsScene *scene;              // Escena donde se dibujan
+    ObstacleManager *obstacleManager;   // Para saber dÃ³nde estÃ¡n los obstÃ¡culos
+    QList<Survivor*> supervivientes;    // Lista de supervivientes activos
+    int nivel;                          // Nivel actual (elige los sprites)
+    int totalGenerados;                 // CuÃ¡ntos supervivientes se han generado
+    int maximoSupervivientes;           // MÃ¡ximo por nivel (2 o 3)
+    int totalRescatados;                // CuÃ¡ntos se rescataron completando la barra
+
+    bool posicionLibre(qreal xPos, qreal yPos) const;
+};
+
+#endif // SURVIVORMANAGER_H
+
+
+================================================================================
+ARCHIVO: UserManager.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\UserManager.cpp
+================================================================================
+#include "UserManager.h"
+
+#include <QCryptographicHash>
+#include <QFile>
+#include <QTextStream>
+#include <QCoreApplication>
+
+UserManager::UserManager(QObject *parent) : QObject(parent) {}
+
+QString UserManager::rutaArchivo() const{
+    // El archivo vive en el directorio de la aplicaciÃ³n
+    return QCoreApplication::applicationDirPath() + "/usuarios.dat";
+}
+
+QString UserManager::hashDe(const QString &contrasena) const{
+    // SHA-256 en hexadecimal: nunca se guarda la contraseÃ±a en texto plano
+    return QString(QCryptographicHash::hash(contrasena.toUtf8(),
+                                            QCryptographicHash::Sha256).toHex());
+}
+
+bool UserManager::cargarUsuarios(){
+
+    usuarios.clear();
+
+    QFile archivo(rutaArchivo());
+    if(!archivo.exists()){
+        return true;  // primera vez: todavÃ­a no hay usuarios
+    }
+    if(!archivo.open(QIODevice::ReadOnly | QIODevice::Text)){
+        return false;
+    }
+
+    QTextStream in(&archivo);
+    while(!in.atEnd()){
+        QString linea = in.readLine().trimmed();
+        if(linea.isEmpty()){
+            continue;
+        }
+        // Formato: usuario:hash:mejorScore
+        QStringList partes = linea.split(':');
+        if(partes.size() < 2){
+            continue;  // lÃ­nea corrupta, se ignora
+        }
+        Usuario u;
+        u.nombreUsuario = partes[0];
+        u.hashContrasena = partes[1];
+        u.mejorScore = (partes.size() >= 3) ? partes[2].toInt() : 0;
+        usuarios.append(u);
+    }
+    archivo.close();
+    return true;
+}
+
+bool UserManager::guardarUsuarios(){
+
+    QFile archivo(rutaArchivo());
+    if(!archivo.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
+        return false;
+    }
+
+    QTextStream out(&archivo);
+    for(const Usuario &u : usuarios){
+        out << u.nombreUsuario << ':' << u.hashContrasena << ':' << u.mejorScore << '\n';
+    }
+    archivo.close();
+    return true;
+}
+
+Usuario* UserManager::buscarPorNombre(const QString &nombre){
+
+    for(int i = 0; i < usuarios.size(); i++){
+        if(usuarios[i].nombreUsuario == nombre){
+            return &usuarios[i];
+        }
+    }
+    return nullptr;
+}
+
+bool UserManager::registrar(const QString &nombre, const QString &contrasena, QString &error){
+
+    if(nombre.trimmed().isEmpty()){
+        error = "El usuario no puede estar vacÃ­o.";
+        return false;
+    }
+    if(nombre.contains(':')){
+        error = "El usuario no puede contener ':'.";
+        return false;
+    }
+    if(contrasena.isEmpty()){
+        error = "La contraseÃ±a no puede estar vacÃ­a.";
+        return false;
+    }
+    if(buscarPorNombre(nombre) != nullptr){
+        error = "El usuario ya existe.";
+        return false;
+    }
+
+    Usuario u;
+    u.nombreUsuario = nombre;
+    u.hashContrasena = hashDe(contrasena);
+    u.mejorScore = 0;
+    usuarios.append(u);
+
+    if(!guardarUsuarios()){
+        error = "No se pudo guardar el archivo de usuarios.";
+        return false;
+    }
+    return true;
+}
+
+bool UserManager::verificarLogin(const QString &nombre, const QString &contrasena){
+
+    Usuario *u = buscarPorNombre(nombre);
+    if(u == nullptr){
+        return false;
+    }
+    // Comparar el hash de lo que escribiÃ³ con el hash guardado
+    return u->hashContrasena == hashDe(contrasena);
+}
+
+
+================================================================================
+ARCHIVO: UserManager.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\UserManager.h
+================================================================================
+#ifndef USERMANAGER_H
+#define USERMANAGER_H
+
+#include <QObject>
+#include <QList>
+#include <QString>
+
+// Cuenta de un jugador. La contraseÃ±a NUNCA se guarda en texto plano:
+// solo su hash SHA-256.
+struct Usuario {
+    QString nombreUsuario;
+    QString hashContrasena;
+    int mejorScore;   // mejor puntaje del jugador (por ahora siempre 0)
+};
+
+// Maneja las cuentas en un archivo de TEXTO PLANO "usuarios.dat"
+// (una lÃ­nea por usuario, formato "usuario:hash:mejorScore").
+// La seguridad la da el hash, no el formato del archivo.
+class UserManager : public QObject {
+    Q_OBJECT
+
+public:
+    explicit UserManager(QObject *parent = nullptr);
+
+    // Carga todos los usuarios del archivo a la lista (al iniciar la app)
+    bool cargarUsuarios();
+    // Guarda la lista completa al archivo
+    bool guardarUsuarios();
+
+    // Busca un usuario por nombre (nullptr si no existe)
+    Usuario* buscarPorNombre(const QString &nombre);
+
+    // Registra un usuario nuevo. Devuelve false y llena `error` si el
+    // usuario ya existe o los datos no son vÃ¡lidos.
+    bool registrar(const QString &nombre, const QString &contrasena, QString &error);
+
+    // Verifica usuario + contraseÃ±a (compara hashes)
+    bool verificarLogin(const QString &nombre, const QString &contrasena);
+
+    // Hash SHA-256 en hexadecimal de una contraseÃ±a
+    QString hashDe(const QString &contrasena) const;
+
+    // Ruta del archivo de usuarios (directorio de la app)
+    QString rutaArchivo() const;
+
+private:
+    QList<Usuario> usuarios;
+};
+
+#endif // USERMANAGER_H
+
+
+================================================================================
+ARCHIVO: VentanaPrincipal.cpp
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\VentanaPrincipal.cpp
+================================================================================
+#include "VentanaPrincipal.h"
+#include "LoginScreen.h"
+#include "RegisterScreen.h"
+#include "Menu.h"
+#include "LevelSelect.h"
+#include "Puntajes.h"
+#include "Game.h"
+#include "AdminMusica.h"
+
+#include <QStackedWidget>
+
+//puntero global del juego (definido en main.cpp)
+extern Game * game;
+
+VentanaPrincipal::VentanaPrincipal(QWidget *parent) : QMainWindow(parent) {
+
+    setWindowTitle("Helicopter Rescue");
+
+    // La ventana usa el tamaÃ±o nativo del juego (800x600). Las demÃ¡s
+    // pantallas estiran su fondo para llenar toda la ventana.
+    resize(800, 600);
+    setMinimumSize(640, 480);
+
+    stack = new QStackedWidget(this);
+    setCentralWidget(stack);
+
+    // PÃ¡ginas fijas: se crean UNA sola vez y se reutilizan al navegar
+    login = new LoginScreen();
+    registro = new RegisterScreen();
+    menu = new Menu();
+    selector = new LevelSelect();
+    puntajes = new Puntajes();
+
+    stack->addWidget(login);     // Ã­ndice 0
+    stack->addWidget(registro);  // Ã­ndice 1
+    stack->addWidget(menu);      // Ã­ndice 2
+    stack->addWidget(selector);  // Ã­ndice 3
+    stack->addWidget(puntajes);  // Ã­ndice 4
+
+    juego = nullptr;
+
+    // La app arranca en el login
+    stack->setCurrentWidget(login);
+}
+
+void VentanaPrincipal::quitarJuego(){
+    if(juego != nullptr){
+        // Resetear el juego en su lugar (sin crear objetos nuevos).
+        // Esto cumple el requisito de "todo en un solo frame".
+        juego->reset(juego->nivelActual);
+        // El juego ya no se ve: pausarlo por completo (timers + mÃºsica).
+        // reset() los reinicia, asÃ­ que hay que pararlos despuÃ©s.
+        juego->pausar();
+    }
+}
+
+void VentanaPrincipal::mostrarLogin(){
+    quitarJuego();
+    // Tema del login/registro (Main Theme).
+    AdminMusica::instancia()->reproducirLogin();
+    stack->setCurrentWidget(login);
+}
+
+void VentanaPrincipal::mostrarRegistro(){
+    // El registro usa el mismo tema que el login.
+    AdminMusica::instancia()->reproducirLogin();
+    stack->setCurrentWidget(registro);
+}
+
+void VentanaPrincipal::mostrarMenu(){
+    quitarJuego();
+    // Tema del menÃº (se usa en menÃº, selector y puntajes).
+    AdminMusica::instancia()->reproducirMenu();
+    stack->setCurrentWidget(menu);
+}
+
+void VentanaPrincipal::mostrarSelector(){
+    quitarJuego();
+
+    // Recrear el selector para que lea el progreso ACTUALIZADO del usuario
+    // (las cards de niveles desbloqueados cambian al completar un nivel).
+    stack->removeWidget(selector);
+    delete selector;
+    selector = new LevelSelect();
+    stack->addWidget(selector);
+
+    stack->setCurrentWidget(selector);
+}
+
+void VentanaPrincipal::mostrarPuntajes(){
+    quitarJuego();
+
+    // Recrear la pantalla para que lea el progreso ACTUALIZADO del usuario
+    // (las notas de cada nivel cambian al completar un nivel).
+    stack->removeWidget(puntajes);
+    delete puntajes;
+    puntajes = new Puntajes();
+    stack->addWidget(puntajes);
+
+    stack->setCurrentWidget(puntajes);
+}
+
+void VentanaPrincipal::mostrarJuego(int nivel){
+    if(juego == nullptr){
+        juego = new Game(nivel);
+        game = juego;
+        stack->addWidget(juego);
+    }
+    juego->reset(nivel);
+    stack->setCurrentWidget(juego);
+}
+
+void VentanaPrincipal::reintentarNivel(){
+    if(juego != nullptr){
+        int nivel = juego->nivelActual;
+        juego->reset(nivel);
+        stack->setCurrentWidget(juego);
+    }
+}
+
+
+================================================================================
+ARCHIVO: VentanaPrincipal.h
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\VentanaPrincipal.h
+================================================================================
+#ifndef VENTANAPRINCIPAL_H
+#define VENTANAPRINCIPAL_H
+
+#include <QMainWindow>
+
+class QStackedWidget;
+class LoginScreen;
+class RegisterScreen;
+class Menu;
+class LevelSelect;
+class Puntajes;
+class Game;
+
+// Ventana ÃšNICA del juego: todas las pantallas (login, registro, menÃº,
+// selector de niveles y juego) son pÃ¡ginas de un QStackedWidget. AsÃ­ no
+// se abren varias ventanas: todo ocurre en una sola pantalla continua.
+class VentanaPrincipal : public QMainWindow {
+    Q_OBJECT
+
+public:
+    VentanaPrincipal(QWidget *parent = nullptr);
+
+    // NavegaciÃ³n entre pÃ¡ginas (cambia la pÃ¡gina visible del stack)
+    void mostrarLogin();
+    void mostrarRegistro();
+    void mostrarMenu();
+    void mostrarSelector();
+    void mostrarPuntajes();
+    void mostrarJuego(int nivel);
+    void reintentarNivel();
+
+private:
+    QStackedWidget *stack;
+    LoginScreen *login;
+    RegisterScreen *registro;
+    Menu *menu;
+    LevelSelect *selector;
+    Puntajes *puntajes;
+    Game *juego;
+
+    // Resetea la pÃ¡gina del juego en su lugar (sin crear objetos nuevos)
+    void quitarJuego();
+};
+
+#endif // VENTANAPRINCIPAL_H
+
+
+================================================================================
+ARCHIVO: CMakeLists.txt
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\CMakeLists.txt
+================================================================================
+cmake_minimum_required(VERSION 3.16)
+
+project(HELICOPTERO VERSION 0.1 LANGUAGES CXX)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Multimedia)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Multimedia)
+
+set(PROJECT_SOURCES
+        main.cpp
+
+
+
+)
+
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_add_executable(HELICOPTERO
+        MANUAL_FINALIZATION
+        ${PROJECT_SOURCES}
+        Menu.h
+        Menu.cpp
+        MyHeli.h
+        MyHeli.cpp
+        ObstacleH.h
+        ObstacleH.cpp
+        GAME.cpp
+        GAME.h
+        AdminMusica.h
+        AdminMusica.cpp
+        Score.h
+        Score.cpp
+        Health.h
+        Health.cpp
+        ResourcesForProject.qrc
+        ObstacleType.h
+        ObstacleManager.h
+        ObstacleManager.cpp
+        Physics.h
+        Physics.cpp
+        LevelManager.h
+        LevelManager.cpp
+        FinishLine.h
+        FinishLine.cpp
+        Survivor.h
+        SurvivorManager.h
+        Survivor.cpp
+        SurvivorManager.cpp
+        ResourceLoader.h
+        ResourceLoader.cpp
+        LevelSelect.h
+        LevelSelect.cpp
+        Puntajes.h
+        Puntajes.cpp
+        Bala.h
+        Bala.cpp
+        BidonCombustible.h
+        BidonCombustible.cpp
+        UserManager.h
+        UserManager.cpp
+        LoginScreen.h
+        LoginScreen.cpp
+        RegisterScreen.h
+        RegisterScreen.cpp
+        VentanaPrincipal.h
+        VentanaPrincipal.cpp
+    )
+# Define target properties for Android with Qt 6 as:
+#    set_property(TARGET HELICOPTERO APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
+# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
+else()
+    if(ANDROID)
+        add_library(HELICOPTERO SHARED
+            ${PROJECT_SOURCES}
+        )
+# Define properties for Android with Qt 5 after find_package() calls as:
+#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+    else()
+        add_executable(HELICOPTERO
+            ${PROJECT_SOURCES}
+        )
+    endif()
+endif()
+
+target_link_libraries(HELICOPTERO PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Multimedia)
+
+# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
+# If you are developing for iOS or macOS you should consider setting an
+# explicit, fixed bundle identifier manually though.
+if(${QT_VERSION} VERSION_LESS 6.1.0)
+  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.HELICOPTERO)
+endif()
+set_target_properties(HELICOPTERO PROPERTIES
+    ${BUNDLE_ID_OPTION}
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+)
+
+include(GNUInstallDirs)
+install(TARGETS HELICOPTERO
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(HELICOPTERO)
+endif()
+
+
+================================================================================
+ARCHIVO: ResourcesForProject.qrc
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\ResourcesForProject.qrc
+================================================================================
+<RCC>
+    <qresource prefix="/Sounds">
+        <file>recursosh/HelicopteroSound.wav</file>
+        <file>recursosh/CrashSound.wav</file>
+        <file>recursosh/Main Theme.mp3</file>
+        <file>recursosh/Menu.mp3</file>
+        <file>recursosh/Level 1.mp3</file>
+        <file>recursosh/Level 2.mp3</file>
+        <file>recursosh/Level 3.mp3</file>
+    </qresource>
+    <qresource prefix="/Sprites">
+        <file>recursosh/fondo_ciudad_cyberpunk_800x600.png</file>
+        <file>recursosh/helicoptero_frame1.png</file>
+        <file>recursosh/helicoptero_frame2.png</file>
+        <file>recursosh/helicoptero_frame3.png</file>
+        <file>recursosh/helicoptero_frame4.png</file>
+        <file>recursosh/torre_industrial_obstaculo_40x140.png</file>
+        <file>recursosh/cajon_barrera_obstaculo_32x32.png</file>
+        <file>recursosh/tuberias_techo_obstaculo_160x64.png</file>
+        <file>recursosh/superviviente_frame1.png</file>
+        <file>recursosh/superviviente_frame2.png</file>
+        <file>recursosh/explosion_frame1.png</file>
+        <file>recursosh/explosion_frame2.png</file>
+        <file>recursosh/explosion_frame3.png</file>
+        <file>recursosh/explosion_frame4.png</file>
+        <file>recursosh/explosion_frame5.png</file>
+        <file>recursosh/menu_fondo_v2_640x880.png</file>
+        <file>recursosh/boton_jugar.png</file>
+        <file>recursosh/boton_seleccionar_nivel.png</file>
+        <file>recursosh/boton_puntajes.png</file>
+        <file>recursosh/boton_como_jugar.png</file>
+        <file>recursosh/boton_salir.png</file>
+        <file>recursosh/boton_ranking.png</file>
+        <file>recursosh/nivel2_desierto_800x600.png</file>
+        <file>recursosh/nivel3_nieve_800x600.png</file>
+        <file>recursosh/superviviente_desierto_frame1.png</file>
+        <file>recursosh/superviviente_desierto_frame2.png</file>
+        <file>recursosh/superviviente_nieve_frame1.png</file>
+        <file>recursosh/superviviente_nieve_frame2.png</file>
+        <file>recursosh/desierto_obstaculo_roca_vertical_60x200.png</file>
+        <file>recursosh/desierto_obstaculo_roca_pequena_48x48.png</file>
+        <file>recursosh/desierto_obstaculo_roca_cayendo_40x40.png</file>
+        <file>recursosh/nieve_obstaculo_espiga_hielo_60x200.png</file>
+        <file>recursosh/nieve_obstaculo_roca_hielo_48x48.png</file>
+        <file>recursosh/nieve_obstaculo_carambano_cayendo_28x70.png</file>
+        <file>recursosh/bala.png</file>
+        <file>recursosh/nivel_card_1_unlocked.png</file>
+        <file>recursosh/nivel_card_2_locked.png</file>
+        <file>recursosh/nivel_card_2_unlocked.png</file>
+        <file>recursosh/nivel_card_3_locked.png</file>
+        <file>recursosh/nivel_card_3_unlocked.png</file>
+        <file>recursosh/seleccionar_nivel_fondo_800x600.png</file>
+        <file>recursosh/login_fondo_640x880.png</file>
+        <file>recursosh/boton_iniciar_sesion.png</file>
+        <file>recursosh/boton_crear_cuenta.png</file>
+        <file>recursosh/boton_registrarse.png</file>
+        <file>recursosh/boton_volver.png</file>
+        <file>recursosh/bidon_combustible_32x32.png</file>
+        <file>recursosh/ManualDeUsuario.jpeg</file>
+    </qresource>
+</RCC>
+
+
+================================================================================
+ARCHIVO: audio.qrc
+RUTA: C:\Users\gpopo\Desktop\Proyecto HELICOPTERO\ProjectoProgra-3Helicoptero\HELICOPTERO\audio.qrc
+================================================================================
+<RCC>
+    <qresource prefix="/new/prefix1"/>
+    <qresource prefix="/new/prefix2"/>
+</RCC>
+
+
